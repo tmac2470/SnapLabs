@@ -1,0 +1,112 @@
+/* Common styles for Evothings examples and client. */
+
+@import '../fonts/ProximaNova.css';
+
+/*  ----------------------------------------------------------
+								JQUERY MOBILE
+	---------------------------------------------------------- */
+
+.ui-nosvg .ui-icon-myicon:after {
+	background-image: url("TISensorTagCC2650.png");
+}
+
+
+.folder, .file{
+font-family:sans;
+font-size:10px;
+cursor:pointer;
+}
+
+.folder{
+background: url("/ui/images/folder.png") no-repeat 50% 0%;
+margin:2px;
+padding-top:25px;
+text-align:center;
+}
+
+.file{
+background: url("/ui/images/folder.png") no-repeat 50% 0%;
+margin:2px;
+padding-top:25px;
+text-align:center;
+}
+
+/*  ----------------------------------------------------------
+								HEADER
+	---------------------------------------------------------- */
+
+/* Tesxt for title. */
+header p.title {
+	position: absolute;
+	top: 50%;
+	left: 0;
+	right: 0;
+	color: #e15a64;
+	font-family: 'Proxima Nova Black';
+
+
+	height: 60%;
+
+	margin: 0 auto;
+
+	-webkit-transform: translateY(-50%);
+	-ms-transform: translateY(-50%);
+	transform: translateY(-50%);
+}
+
+
+/*  ----------------------------------------------------------
+								MENU
+	---------------------------------------------------------- */
+
+
+
+
+
+/*  ----------------------------------------------------------
+								SECTIONS
+	---------------------------------------------------------- */
+
+
+body img#experimentLogo {
+	float:right;
+	height:auto;
+	width:100px;
+}
+
+body h1#labTitle {
+	font-family:'Proxima Nova Regular';
+	font-weight: bold;
+	margin: 0;
+}
+
+.sensorReadingEntry
+{
+}
+.sensorReadingLabel{
+	vertical-align:top;
+	display:inline-block;
+	width:40%;
+}
+
+.sensorReadingValue{
+	display:inline-block;
+	width:60%;
+	font-size:80%;
+ }
+	
+/*  ----------------------------------------------------------
+								BUTTONS
+	---------------------------------------------------------- */
+	
+button#sensortagConfigButton{
+	text-transform:none;
+	width: 45%;
+	float: left;
+}
+
+button#expConfigButton{
+	text-transform:none;
+	width: 45%;
+	float: right;
+} 

@@ -1,0 +1,54 @@
+
+label.error { 
+	float: left; 
+	color: red; 
+	padding-top: .5em; 
+	vertical-align: top; 
+	font-weight:bold
+}
+
+.centre-wrapper{
+  text-align: center;
+}
+.centre-wrapper * {
+  margin: 0 auto;
+}
+
+
+/*  ----------------------------------------------------------
+								DRAG AND DROP
+	---------------------------------------------------------- */
+
+.draggable {
+	width:100px;
+	height:75px;
+	position:absolute
+}
+
+#canvaspanel{ 
+	margin-left: 2%;
+	width:95%;
+	min-height:100px;
+	overflow:auto;
+	background-color:white;
+    border-top: solid 5px #FF903D;
+    border-left: solid 5px #FF903D;
+    border-right: solid 5px #FF903D;
+    border-bottom: solid 5px #FF903D;
+	padding: 5px;
+}
+
+.widgetItem{
+	background-color: #2EA89F!important;
+
+}
+
+.widgetimage{
+	height: 40px;
+	width: 40px;
+	
+}
+
+.widgetcaption{
+	display: block;
+}

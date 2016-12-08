@@ -1,0 +1,274 @@
+{
+	"experimentConfig" : {
+		"labTitle" : "SensorTag Experiment",
+		"dataStoragePrefix" : "",
+		"videoPrefix" : "",
+		"sensorTags" : {
+			"0" : {
+				"connect" : "on",
+				"title" : "Sensortag 0",
+				"sensors" : {
+					"Temperature" : {
+						"parameters" : {
+							"ambient" : "on",
+							"IR" : "off"
+						},
+						"grid" : {
+							"griddisplay" : "on",
+							"columns" : "3",
+							"rows" : "7"
+						},
+						"captureOnClick" : "on",
+						"label" : "",
+						"graphType" : "spline",
+						"graphTitle" : "",
+						"graphXAxis" : "",
+						"graphYAxis" : "",
+						"display" : "off",
+						"graph" : "on"
+					},
+					"Humidity" : {
+						"grid" : {
+							"griddisplay" : "on",
+							"columns" : "2",
+							"rows" : "1"
+						},
+						"label" : "",
+						"graphType" : "spline",
+						"graphTitle" : "",
+						"graphXAxis" : "",
+						"graphYAxis" : "",
+						"display" : "on",
+						"graph" : "off",
+						"captureOnClick" : "off"
+					},
+					"Barometer" : {
+						"captureOnClick" : "on",
+						"label" : "",
+						"graphType" : "spline",
+						"graphTitle" : "",
+						"graphXAxis" : "",
+						"graphYAxis" : "",
+						"grid" : {
+							"columns" : "2",
+							"rows" : "1",
+							"griddisplay" : "off"
+						},
+						"display" : "on",
+						"graph" : "off"
+					},
+					"Accelerometer" : {
+						"label" : "",
+						"graphType" : "spline",
+						"graphTitle" : "",
+						"graphXAxis" : "",
+						"graphYAxis" : "",
+						"grid" : {
+							"columns" : "2",
+							"rows" : "1",
+							"griddisplay" : "off"
+						},
+						"display" : "off",
+						"graph" : "off",
+						"captureOnClick" : "off"
+					},
+					"Gyroscope" : {
+						"label" : "",
+						"graphType" : "spline",
+						"graphTitle" : "",
+						"graphXAxis" : "",
+						"graphYAxis" : "",
+						"grid" : {
+							"columns" : "2",
+							"rows" : "1",
+							"griddisplay" : "off"
+						},
+						"display" : "off",
+						"graph" : "off",
+						"captureOnClick" : "off"
+					},
+					"Magnetometer" : {
+						"label" : "",
+						"graphType" : "spline",
+						"graphTitle" : "",
+						"graphXAxis" : "",
+						"graphYAxis" : "",
+						"grid" : {
+							"columns" : "2",
+							"rows" : "1",
+							"griddisplay" : "off"
+						},
+						"display" : "off",
+						"graph" : "off",
+						"captureOnClick" : "off"
+					},
+					"Luxometer" : {
+						"label" : "",
+						"graphType" : "spline",
+						"graphTitle" : "",
+						"graphXAxis" : "",
+						"graphYAxis" : "",
+						"grid" : {
+							"columns" : "2",
+							"rows" : "1",
+							"griddisplay" : "off"
+						},
+						"display" : "off",
+						"graph" : "off",
+						"captureOnClick" : "off"
+					},
+					"Keypress" : {
+						"label" : "",
+						"graphType" : "spline",
+						"graphTitle" : "",
+						"graphXAxis" : "",
+						"graphYAxis" : "",
+						"grid" : {
+							"columns" : "2",
+							"rows" : "1",
+							"griddisplay" : "off"
+						},
+						"display" : "off",
+						"graph" : "off",
+						"captureOnClick" : "off"
+					}
+				}
+			},
+			"1" : {
+				"title" : "Sensortag 1",
+				"sensors" : {
+					"Temperature" : {
+						"label" : "",
+						"graphType" : "spline",
+						"graphTitle" : "",
+						"graphXAxis" : "",
+						"graphYAxis" : "",
+						"grid" : {
+							"columns" : "2",
+							"rows" : "1",
+							"griddisplay" : "off"
+						},
+						"parameters" : {
+							"IR" : "off",
+							"ambient" : "off"
+						},
+						"display" : "off",
+						"graph" : "off",
+						"captureOnClick" : "off"
+					},
+					"Humidity" : {
+						"label" : "",
+						"graphType" : "spline",
+						"graphTitle" : "",
+						"graphXAxis" : "",
+						"graphYAxis" : "",
+						"grid" : {
+							"columns" : "2",
+							"rows" : "1",
+							"griddisplay" : "off"
+						},
+						"display" : "off",
+						"graph" : "off",
+						"captureOnClick" : "off"
+					},
+					"Barometer" : {
+						"label" : "",
+						"graphType" : "spline",
+						"graphTitle" : "",
+						"graphXAxis" : "",
+						"graphYAxis" : "",
+						"grid" : {
+							"columns" : "2",
+							"rows" : "1",
+							"griddisplay" : "off"
+						},
+						"display" : "off",
+						"graph" : "off",
+						"captureOnClick" : "off"
+					},
+					"Accelerometer" : {
+						"label" : "",
+						"graphType" : "spline",
+						"graphTitle" : "",
+						"graphXAxis" : "",
+						"graphYAxis" : "",
+						"grid" : {
+							"columns" : "2",
+							"rows" : "1",
+							"griddisplay" : "off"
+						},
+						"display" : "off",
+						"graph" : "off",
+						"captureOnClick" : "off"
+					},
+					"Gyroscope" : {
+						"label" : "",
+						"graphType" : "spline",
+						"graphTitle" : "",
+						"graphXAxis" : "",
+						"graphYAxis" : "",
+						"grid" : {
+							"columns" : "2",
+							"rows" : "1",
+							"griddisplay" : "off"
+						},
+						"display" : "off",
+						"graph" : "off",
+						"captureOnClick" : "off"
+					},
+					"Magnetometer" : {
+						"label" : "",
+						"graphType" : "spline",
+						"graphTitle" : "",
+						"graphXAxis" : "",
+						"graphYAxis" : "",
+						"grid" : {
+							"columns" : "2",
+							"rows" : "1",
+							"griddisplay" : "off"
+						},
+						"display" : "off",
+						"graph" : "off",
+						"captureOnClick" : "off"
+					},
+					"Luxometer" : {
+						"label" : "",
+						"graphType" : "spline",
+						"graphTitle" : "",
+						"graphXAxis" : "",
+						"graphYAxis" : "",
+						"grid" : {
+							"columns" : "2",
+							"rows" : "1",
+							"griddisplay" : "off"
+						},
+						"display" : "off",
+						"graph" : "off",
+						"captureOnClick" : "off"
+					},
+					"Keypress" : {
+						"label" : "",
+						"graphType" : "spline",
+						"graphTitle" : "",
+						"graphXAxis" : "",
+						"graphYAxis" : "",
+						"grid" : {
+							"columns" : "2",
+							"rows" : "1",
+							"griddisplay" : "off"
+						},
+						"display" : "off",
+						"graph" : "off",
+						"captureOnClick" : "off"
+					}
+				},
+				"connect" : "off"
+			}
+		},
+		"institution" : "",
+		"owner" : "",
+		"dataStorageAllowed" : "off",
+		"videoAllowed" : "off",
+		"graphAutoStart" : "off"
+	}
+}

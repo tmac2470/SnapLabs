@@ -1,0 +1,525 @@
+/* Common styles for Evothings examples and client. */
+
+@import '../fonts/ProximaNova.css';
+
+/*  ----------------------------------------------------------
+								JQUERY MOBILE
+	---------------------------------------------------------- */
+
+.ui-nosvg .ui-icon-myicon:after {
+	background-image: url("TISensorTagCC2650.png");
+}
+
+
+.folder, .file{
+font-family:sans;
+font-size:10px;
+cursor:pointer;
+}
+
+.folder{
+background: url("/ui/images/logo.png") no-repeat 50% 0%;
+margin:2px;
+padding-top:25px;
+text-align:center;
+}
+
+.file{
+background: url("/ui/images/menu.png") no-repeat 50% 0%;
+margin:2px;
+padding-top:25px;
+text-align:center;
+}
+
+/*  ----------------------------------------------------------
+								LOGO
+	---------------------------------------------------------- */
+
+.logo {
+	color:#3CFB7A!important;  /* older Green colour */
+	/*color:#2EA89F!important; new green */
+}	
+
+
+.logo img{
+	float:right;
+	height:auto;
+	width:120px;
+}
+
+/*  ----------------------------------------------------------
+								Heading and text
+	---------------------------------------------------------- */
+
+.aselltext{
+	color:#3CFB7A!important;
+	font-weight: normal;
+	font-size: 1em;
+}	
+
+/*  ----------------------------------------------------------
+								LISTS
+	---------------------------------------------------------- */
+
+.asellList h3 a{
+	/* color:#FD7808!important; /* older orange color */
+	color:#FF903D!important; 
+}
+
+.orangeText
+	color:#FF903D!important; /* orange color */
+}
+
+
+/*  ----------------------------------------------------------
+								SECTIONS
+	---------------------------------------------------------- */
+
+
+body img#experimentLogo {
+	float:right;
+	height:auto;
+	width:100px;
+}
+
+body h1#labTitle {
+	font-family:'Proxima Nova Regular';
+	font-weight: bold;
+	margin: 0;
+}
+
+.sensorReadingEntry
+{
+}
+.sensorReadingLabel{
+	vertical-align:top;
+	display:inline-block;
+	width:30%;
+}
+
+.sensorReadingValue{
+	display:inline-block;
+	width:50%;
+	font-size:80%;
+ }
+	
+.graphdiv{
+	background-color:white!important;
+}	
+
+.border-grid{
+    border-top: solid 1px #FF903D;
+    border-left: solid 1px #FF903D;
+    border-right: solid 1px #FF903D;
+    border-bottom: solid 1px #FF903D;
+	/*height: 80px;*/
+}
+
+.draggable {
+	width:50px;
+	height:50px;
+	position:absolute
+}
+
+#droppable{
+	width:90%;
+	height:250px;
+
+}
+
+/*  ----------------------------------------------------------
+								BUTTONS
+	---------------------------------------------------------- */
+	
+button#sensortagConfigButton{
+	text-transform:none;
+	width: 45%;
+	float: left;
+}
+
+button#expConfigButton{
+	text-transform:none;
+	width: 45%;
+	float: right;
+} 
+
+button.sensorGraphButton{
+	display:inline-block;
+	width: 30%;
+	float: right;
+} 
+
+#startVideo{
+	width: 95%;
+	margin-left: 2.5%;
+	
+}
+
+#initDataStorage {
+	width: 100%;
+}
+
+/*  ----------------------------------------------------------
+								BUTTONS
+	---------------------------------------------------------- */
+
+button.clear {
+	margin-left: 1%;
+	background-color: #e15a64; /* Default color: "Soft Red". */
+}
+
+button,
+input.btn-group + label,
+.button {
+	display: inline-block;
+	box-sizing: border-box; /* Width & height includes padding & border. */
+
+	font-family: 'Proxima Nova Black';
+	font-size: inherit;
+	line-height: 100%;
+	text-align: center;
+	text-transform: uppercase;
+
+	color: #fff;
+
+	margin: 0.5em 0 0.5em 0;
+	padding: 9px 13px 8px 13px;
+
+	border-radius: 4px;
+	border: none;
+
+	box-shadow: none;
+
+	background-color: #b9b9b9; /* Default color: "Charcoal" */
+}
+body > button,
+body > input.btn-group + label,
+main > button,
+main > input.btn-group + label {
+	font-size: 63% !important;
+}
+button:active, button.pressed,
+input.btn-group:active + label, input.btn-group + label:active,
+input.btn-group:checked + label {
+	box-shadow: inset 0 8px 9px -9px #000;
+	background-color: #9d9d9d; /* Default color: "Charcoal" */
+}
+button:focus,
+input.btn-group:focus {
+	outline: none;
+}
+
+button.half,
+input.btn-group.half + label,
+input.btn-group + label.half {
+	float: left;
+	width: 50%; /* Fallback in case calc() is unsupported. */
+	width: calc(50% - 4px);
+	margin-left: 2px;
+	margin-right: 2px;
+}
+
+button.third,
+input.btn-group.third + label,
+input.btn-group + label.third {
+	float: left;
+	width: 33%; /* Fallback in case calc() is unsupported. */
+	width: calc(33% - 4px);
+	margin-left: 2px;
+	margin-right: 2px;
+}
+
+button.quarter,
+input.btn-group.quarter + label,
+input.btn-group + label.quarter {
+	float: left;
+	width: 25%; /* Fallback in case calc() is unsupported. */
+	width: calc(25% - 4px);
+	margin-left: 2px;
+	margin-right: 2px;
+}
+
+button.wide,
+input.btn-group.wide + label,
+input.btn-group + label.wide {
+	width: 100%;
+}
+
+button.big,
+input.btn-group.big + label,
+input.btn-group + label.big {
+	font-size: 150%;
+	line-height: 3.0;
+}
+
+/*  ----------------------------------------------------------
+								ASELL COLORS
+	---------------------------------------------------------- */
+
+/*  Color: "Asell Green"
+	Class name: asellgreen
+    ------------------ */
+.color_wavegreen { color: #2EA89F; }
+.bg_asellgreen, input.asellgreen, button.asellgreen, ul.asellgreen li, label.asellgreen,
+input.asellgreen + label {
+	background-color: #2EA89F;
+	color: black;
+	font-weight: bold;
+}
+/* Downpressed button. */
+button.asellgreen:active, button.asellgreen.pressed,
+/* Input element with adjacent label. */
+input.btn-group:active + label.asellgreen,
+input.btn-group.asellgreen:active + label,
+input.btn-group:checked + label.asellgreen,
+input.btn-group.asellgreen:checked + label {
+	background-color: #3aca9c;
+}
+
+/*  Color: "Asell Green"
+	Class name: asellbrightgreen
+    ------------------ */
+.color_wavebrightgreen { color: #3CFB7A; }
+.bg_asellbrightgreen, input.asellbrightgreen, button.asellbrightgreen, ul.asellbrightgreen li, label.asellbrightgreen, a.asellbrightgreen,
+input.asellbrightgreen + label {
+	background-color: #3CFB7A!important;
+	color: black!important;
+	font-weight: bold!important;
+}
+/* Downpressed button. */
+button.asellbrightgreen:active, button.asellbrightgreen.pressed,
+/* Input element with adjacent label. */
+input.btn-group:active + label.asellbrightgreen,
+input.btn-group.asellbrightgreen:active + label,
+input.btn-group:checked + label.asellbrightgreen,
+input.btn-group.asellbrightgreen:checked + label {
+	background-color: #3aca9c!important;
+}
+
+/*  Color: "Asell red"
+	Class name: asellred
+    ---------------- */
+.color_asellred { color: #C23D45; }
+.bg_asellred, input.asellred, button.asellred, ul.asellred li, label.asellred,
+input.asellred + label {
+	background-color: #C23D45;
+	font-weight: bold;
+}
+/* Downpressed button. */
+button.asellred:active, button.asellred.pressed,
+/* Input element with adjacent label. */
+input.btn-group:active + label.asellred,
+input.btn-group.asellred:active + label,
+input.btn-group:checked + label.asellred,
+input.btn-group.asellred:checked + label {
+	background-color: #cb414b;
+}
+
+/*  Color: "Asell Orange"
+	Class name: asellorange
+    ---------------- */
+.color_asellorange { color: #FF903D; }
+.bg_asellorange, input.asellorange, button.asellorange, ul.asellorange li, label.asellorange,
+input.asellorange + label {
+	background-color: #FF903D;
+	font-weight: bold;
+}
+/* Downpressed button. */
+button.asellorange:active, button.asellorange.pressed,
+/* Input element with adjacent label. */
+input.btn-group:active + label.asellorange,
+input.btn-group.asellorange:active + label,
+input.btn-group:checked + label.asellorange,
+input.btn-group.asellorange:checked + label {
+	background-color: #cb414b;
+}
+
+/*  ----------------------------------------------------------
+								COLORS
+	---------------------------------------------------------- */
+
+/*  Color: "Soft Red"
+	Class name: red
+    ---------------- */
+.color_softred { color: #e15a64; }
+.bg_red, input.red, button.red, ul.red li, label.red,
+input.red + label {
+	background-color: #e15a64;
+}
+/* Downpressed button. */
+button.red:active, button.red.pressed,
+/* Input element with adjacent label. */
+input.btn-group:active + label.red,
+input.btn-group.red:active + label,
+input.btn-group:checked + label.red,
+input.btn-group.red:checked + label {
+	background-color: #cb414b;
+}
+
+/*  Color: "Bright Light"
+	Class name: yellow
+    -------------------- */
+.color_brightlight { color: #ecd53b; }
+.bg_yellow, input.yellow, button.yellow, ul.yellow li, label.yellow,
+input.yellow + label {
+	background-color: #ecd53b;
+}
+/* Downpressed button. */
+button.yellow:active, button.yellow.pressed,
+/* Input element with adjacent label. */
+input.btn-group:active + label.yellow,
+input.btn-group.yellow:active + label,
+input.btn-group:checked + label.yellow,
+input.btn-group.yellow:checked + label {
+	background-color: #d9c022;
+}
+
+/*  Color: "Wave Green"
+	Class name: green
+    ------------------ */
+.color_wavegreen { color: #54dfb3; }
+.bg_green, input.green, button.green, ul.green li, label.green,
+input.green + label {
+	background-color: #54dfb3;
+}
+/* Downpressed button. */
+button.green:active, button.green.pressed,
+/* Input element with adjacent label. */
+input.btn-group:active + label.green,
+input.btn-group.green:active + label,
+input.btn-group:checked + label.green,
+input.btn-group.green:checked + label {
+	background-color: #3aca9c;
+}
+
+/*  Color: "Blue Hue"
+	Clas name: blue
+    ------------------ */
+.color_bluehue { color: #6bc6ce; }
+.bg_blue, input.blue, button.blue, ul.blue li, label.blue,
+input.blue + label {
+	background-color: #6bc6ce;
+}
+/* Downpressed button. */
+button.blue:active, button.blue.pressed,
+/* Input element with adjacent label. */
+input.btn-group:active + label.blue,
+input.btn-group.blue:active + label,
+input.btn-group:checked + label.blue,
+input.btn-group.blue:checked + label {
+	background-color: #52afb8;
+}
+
+/*  Color: "Indigo"
+	Class name: indigo
+    ------------------ */
+.color_indigo { color: #b48b9b; }
+.bg_indigo, input.indigo, button.indigo, ul.indigo li, label.indigo,
+input.indigo + label {
+	background-color: #b48b9b;
+}
+/* Downpressed button. */
+button.indigo:active, button.indigo.pressed,
+/* Input element with adjacent label. */
+input.btn-group:active + label.indigo,
+input.btn-group.indigo:active + label,
+input.btn-group:checked + label.indigo,
+input.btn-group.indigo:checked + label {
+	background-color: #9c7283;
+}
+
+/*  Color: "Arctic"
+	Class name: arctic
+    ------------------ */
+.color_arctic { color: #f3f3f3; }
+.bg_arctic, input.arctic, button.arctic, ul.arctic li,
+input.arctic + label {
+	background-color: #f3f3f3;
+}
+/* Downpressed button. */
+button.arctic:active, button.arctic.pressed,
+/* Input element with adjacent label. */
+input.btn-group:active + label.arctic,
+input.btn-group.arctic:active + label,
+input.btn-group:checked + label.arctic,
+input.btn-group.arctic:checked + label {
+	background-color: #656565;
+}
+
+/*  Color: "Aluminium"
+	Class name: aluminium
+    ------------------ */
+.color_aluminium { color: #e2e2e2 }
+.bg_aluminium, input.aluminium, button.aluminium, ul.aluminium li,
+input.aluminium + label {
+	background-color: #e2e2e2;
+}
+/* Downpressed button. */
+button.aluminium:active, button.aluminium.pressed,
+ /* Input element with adjacent label. */
+input.btn-group:active + label.aluminium,
+input.btn-group.aluminium:active + label,
+input.btn-group:checked + label.aluminium,
+input.btn-group.aluminium:checked + label {
+	background-color: #c0c0c0;
+}
+
+/*  Color: "Charcoal"
+	Class name: charcoal
+    ------------------ */
+.color_charcoal { color: #b9b9b9; }
+.bg_charcoal, input.charcoal, button.charcoal, ul.charcoal li,
+input.charcoal + label {
+	background-color: #b9b9b9;
+}
+/* Downpressed button. */
+button.charcoal:active, button.charcoal.pressed,
+/* Input element with adjacent label. */
+input.btn-group:active + label.charcoal,
+input.btn-group.charcoal:active + label,
+input.btn-group:checked + label.charcoal,
+input.btn-group.charcoal:checked + label {
+	background-color: #9d9d9d;
+}
+
+/*  Color: "Stone"
+	Class name: stone
+    ------------------ */
+.color_stone { color: #777777 }
+.bg_stone, input.stone, button.stone, ul.stone li,
+input.stone + label {
+	background-color: #777777;
+}
+/* Downpressed button.	 */
+button.stone:active, button.stone.pressed,
+/* Input element with adjacent label. */
+input.btn-group:active + label.stone,
+input.btn-group.stone:active + label,
+input.btn-group:checked + label.stone,
+input.btn-group.stone:checked + label {
+	background-color: #656565;
+}
+
+/*  Color: "Jet Black"
+	Class name: jetblack
+    ------------------ */
+.color_black { color: #070707 }
+.bg_black, input.black, button.black, ul.black li,
+input.black + label {
+	background-color: #070707;
+}
+/* Downpressed button. */
+button.black:active, button.black.pressed,
+/* Input element with adjacent label. */
+input.btn-group:active + label.black,
+input.btn-group.black:active + label,
+input.btn-group:checked + label.black,
+input.btn-group.black:checked + label {
+	background-color: #000000;
+}
+
+@media	screen and (orientation: landscape) and (-webkit-min-device-pixel-ratio : 2),
+		screen and (orientation: landscape) and (min--moz-device-pixel-ratio: 2),
+		screen and (orientation: landscape) and (min-device-pixel-ratio : 2) {
+	body { font-size: 4.5vw; }
+}

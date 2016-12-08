@@ -1,0 +1,26 @@
+{
+	"sensortagMapping" : {
+		"institution" : "Testing",
+		"owner" : "Tania",
+		"sensortags" : {
+			"4a5b600f8e6a0" : "Galileo",
+			"4aeb600f8e6a0" : "Aristotle",
+			"41fad00f8e6a0" : "Newton",
+			"818aaf00f8e6a0" : "Einstein",
+			"85a6bf0048b4b0" : "Curie",
+			"311b700f8e6a0" : "Faraday",
+			"3bbbe0048b4b0" : "Darwin",
+			"8285b600f8e6a0" : "Maxwell",
+			"842b700f8e6a0" : "Archimedes",
+			"58faf00f8e6a0" : "Bohr",
+			"539ae00f8e6a0" : "Planck",
+			"8525c300f8e6a0" : "Schrodinger",
+			"807eb600f8e6a0" : "Gauss",
+			"8654b600f8e6a0" : "Hubble",
+			"863fae00f8e6a0" : "Hawking",
+			"659c30048b4b0" : "Tesla",
+			"8038ae00f8e6a0" : "Fermi",
+			"614b600f8e6a0" : "Copernicus"
+		}
+	}
+}

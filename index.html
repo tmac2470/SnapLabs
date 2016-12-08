@@ -1,0 +1,902 @@
+ <!DOCTYPE html> 
+<html>
+ 
+<head>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, user-scalable=no,
+		shrink-to-fit=no, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0" />
+	<meta http-equiv="cache-control" content="no-cache, no-store, must-revalidate" />
+	<meta http-equiv="pragma" content="no-cache" />
+	<meta http-equiv="expires" content="-1" />
+
+	<title>SnapLabs (Beta)</title>
+
+	<style>
+		@import 'ui/css/jquery.mobile-1.4.5.min.css';
+		@import 'ui/css/nerld.css';
+		@import 'ui/css/snaplabs.css';
+	</style>   
+
+	<script>
+	// Redirect console.log to Evothings Workbench.
+	if (window.hyper && window.hyper.log) { console.log = hyper.log }
+	</script>
+
+	<script src="cordova.js"></script>
+	<script src="libs/jquery/jquery.js"></script>
+	<script src="libs/evothings/evothings.js"></script>
+	<script src="libs/evothings/ui/ui.js"></script>
+	<script src="https://www.google.com/jsapi"></script>
+	<script src="SnapLabsApp.js"></script>
+	<script src="SnapLabsUIApp.js"></script>
+	<script src="SnapLabsDevicesApp.js"></script>
+	<script src="SnapLabsGraphDataApp.js"></script>
+	<script src="test.js"></script>
+	<script src="libs/evothings/util/util.js"></script>
+ 	<script src="libs/jquery/jquery-1.11.3.min.js"></script>
+	<script src="libs/jquery/jquery-ui.min.js"></script>
+	<script src="libs/jquery/jquery.mobile-1.4.5.min.js"></script>
+	<script src="libs/jquery/jquery.serializejson.min.js"></script>
+	<script src="libs/jquery/jquery.validate.min.js"></script>
+	<script type="text/javascript" src="libs/js/canvasjs.min.js"></script>
+	<script src="libs/jquery/jquery.ui.touch-punch.min.js"></script> 
+
+</head> 
+
+<body onload="onLoad()">      
+
+	<script> 
+		var httpd = null; 
+  
+		function onLoad() {
+			document.addEventListener("deviceready", snaplabs.onDeviceReady, false);
+			
+			// Making the widgets draggable and droppable
+			// Based on http://embed.plnkr.co/WcIZlD/ 
+	  		$( ".widgetItem" ).draggable(
+				{cursor: 'move',
+				 helper: "clone",
+		         snap: '#canvaspanel'} 
+			);
+	
+			$(".selectionpanel").droppable({
+				drop: function(event, ui) {  
+					var itemid = $(ui.draggable).attr("itemid");
+					var sensor = itemid.split("_");
+
+					$('.widgetItem').each(function() {
+						//console.log("DEBUG - Comparing for selection is " + itemid + " and adding to element #"+sensor[0]+"_Selection")
+						if ($(this).attr("itemid") === itemid) {
+							$(this).appendTo("#"+sensor[0]+"_Selection");
+						}
+					});
+				}
+			});
+
+			$("#canvaspanel").droppable({
+				drop: function(event, ui) {
+					var itemid = $(ui.draggable).attr("itemid");
+					document.getElementById("draganddrop").style.display = "none";
+
+					$('.widgetItem').each(function() {
+						//console.log("DEBUG - Comparing for canvas is " + itemid + " and  " + $(this).attr("itemid"))
+						//console.log("DEBUG - Comparing for canvas is " + itemid + " and  " + $(this).attr("itemid"))
+						if ($(this).attr("itemid") === itemid) {
+							$(this).appendTo("#canvaspanel");
+						}
+					});
+				}
+			});
+		}
+		
+		$(".resizable").resizable();
+		
+		function equalHeight(group) {
+			var tallest = 0;
+			//console.log("DEBUG - adjusting height for " + group.selector)
+			group.each(function() {
+				var thisHeight = $(this).height();
+				//console.log("DEBUG - in each function ")
+				if(thisHeight > tallest) {
+					tallest = thisHeight;
+				}
+			});
+			group.height(tallest);
+		}
+		
+		//Bind event handler to first select input
+		$(document).ready(function(){
+			// Changed based on http://stackoverflow.com/questions/15948353/jquery-mobile-not-triggering-change-event-on-phonegap-app
+			$(document).on('change','#serverURL',function(){ 
+				//enable or disable the next element based on the value of this one
+				var state = (this.value == 'other') ? 'enable' : 'disable';
+				$("#newServerURL").textinput(state); 
+			});
+			$(document).on('change','#sensorServerURL',function(){ 
+				//enable or disable the next element based on the value of this one
+				var state = (this.value == 'other') ? 'enable' : 'disable';
+				$("#newSensorServerURL").textinput(state); 
+			});
+		
+			// Make sure the collapsible file lists update when the list is expanded
+			/*$(".refreshCollapsible" ).on("collapsibleexpand", function( event, ui ) {
+				//console.log("DEBUG - event is " + JSON.stringify(event) + " and ui is " + JSON.stringify(ui))
+				var listSelector = $(this).find('ul').attr('id')	
+				var fn = $(this).find('ul').attr('data-customListFunction')
+				var listFunction = snaplabs.ui[fn]
+				var dirType = $(this).find('ul').attr('data-directoryTypeForFiles')
+				//alert(listSelector + " " + listFunction)
+				snaplabs.ui.listFilesInDiv(dirType, listSelector, listFunction )
+			} );*/
+
+			$(document).on('change','#numberOfSensorTags',function(){ 
+				//enable or disable the next element based on the value of this one
+				var number = this.value ;
+				console.log("DEBUG - Form element changed")
+				for (var i=1; i<number; i++)
+				{
+					//snaplabs.ui.buildSensortagConfigHTML(i)
+					document.getElementById('sensorTags' + i + 'connect').style.display = 'block'
+				}
+			});
+			
+		    $(".graph").resizable();
+			
+			$("#signinForm").submit(function(e){
+				e.preventDefault();
+			});
+
+			
+			$("#signinForm").validate({
+			    submitHandler: function (form) {
+					console.log("DEBUG - Sign In Form submission only after validation")
+					snaplabs.signinCheck(form)
+					event.preventDefault();
+				}
+			});
+			
+			$("#signupForm").submit(function(e){
+				e.preventDefault();
+			});
+
+			$("#signupForm").validate({
+			    rules: {
+					password2: {
+						equalTo: "#password1"
+					}
+				},
+				messages: {
+					password2: {
+						equalTo: "Please enter the same password as above"
+					}
+				},
+			    submitHandler: function (form) {
+					console.log("DEBUG - Sign Up form submission only after validation")
+					snaplabs.registerUser(form)
+				}
+			}); 
+			
+			$('#newSensorTagConfigForm').submit(function(e){
+				e.preventDefault();
+			});
+			
+			$("#newSensorTagConfigForm").validate({
+			    submitHandler: function (form) {
+					console.log("DEBUG - new sensortag config form submission only after validation")
+					snaplabs.navigation.goToAddSensorTag()
+					snaplabs.sensortagconfig.newSensorTagConfigFile()
+					event.preventDefault(); 
+				}
+			});
+			
+			$(document).on( "pagecontainerchange", function( event, ui ) {
+				var toPageID = ui.toPage[0].id;
+				if(ui.prevPage) var fromPageID = ui.prevPage[0].id;
+				//only execute the following code if the app is changing to the Main signin page 
+				if(toPageID === "pageHome"){
+					console.log("DEBUG - Logging out user at initial page and stopping server")
+					snaplabs.session = {}
+					snaplabs.server.stopServer();
+				}
+				if(toPageID == "pageLocalInvestigations")
+				{
+					console.log("DEBUG - Local Investigation page loading data")
+					//snaplabs.ui.listLocalExperimentFiles()
+					snaplabs.ui.listFilesInDiv("EXPERIMENT_DIR",'localExperimentFiles',snaplabs.ui.listLocalExperimentFiles)
+				}
+				if(toPageID == "pageEditExperimentSelect")
+				{
+					console.log("DEBUG - Edit Investigation page loading data")
+					//snaplabs.ui.listLocalExperimentFiles()
+					snaplabs.ui.listFilesInDiv("EXPERIMENT_DIR",'editFileList',snaplabs.ui.editExperimentFileList)
+				}
+				if(toPageID == "pageExperiment")
+				{
+					snaplabs.devices.closeAllConnections()
+				}
+				if(toPageID == "pageSettings")
+				{
+					console.log("DEBUG -File Handling page loading data")
+					//snaplabs.ui.listLocalExperimentFiles()
+					snaplabs.ui.listFilesInDiv("EXPERIMENT_DIR",'handleExperimentFileList',snaplabs.ui.handleExperimentFileList)
+					snaplabs.ui.listFilesInDiv("SAVEDDATA_DIR",'handleSavedDataFileList',snaplabs.ui.handleSavedDataFileList)
+					snaplabs.ui.listFilesInDiv("SENSORTAG_DIR",'handleSensortagFileList',snaplabs.ui.handleSensorTagFileList)
+				}
+				if(fromPageID == "pageAddSensortags" || fromPageID == "pageExperiment")
+				{
+					snaplabs.devices.closeAllConnections()
+				}
+
+			});
+			
+ 		});
+		
+	</script> 
+	
+	<div data-role="page" id="pageHome" data-theme="b">
+		<header data-role ="header" data-add-back-btn="true"> 
+		  <h1 class="ui-title" role="heading">SnapLabs App</h1>
+		</header>
+		 
+		<div data-role="content">
+			<h1 class="logo">SNAPLABS<img src="ui/images/GrayLogoColour2.jpg"></h1> 
+
+			<br>
+			<div class="centre-wrapper" >
+				<a href="#signinPage" data-theme="a" data-role="button">Sign In</a>
+				<br>
+				<a href="#signupPage" data-theme="a" data-role="button">Sign Up</a>
+				<br>
+				<a href="#pageMain" data-role="button" onclick="snaplabs.setTeacher()">TESTING - TEACHER</a>
+				<a href="#pageMain" data-role="button" onclick="snaplabs.setStudent()">TESTING - STUDENT</a>
+			</div>
+
+		</div>
+	</div>
+	
+	<div data-role="page" id="signinPage" data-theme="b">
+		<header data-role ="header" data-add-back-btn="true"> 
+		  <h1 class="ui-title" role="heading">SnapLabs App</h1>
+		</header>
+
+		<div data-role="main" class="ui-content" >
+			<form id="signinForm" >
+				<fieldset data-role="fieldcontain"> 
+					<label for="signinemail">Email:</label>
+					<input type="email" name="signinemail" id="signinemail" class="required email">
+				</fieldset>
+				<fieldset data-role="fieldcontain"> 
+					<label for="signinpassword">Password:</label>
+					<input type="password" name="signinpassword" id="signinpassword" class="required" minlength="5">
+				</fieldset>	
+				<input type="submit" value="Sign In" data-theme="a">
+			</form>
+		</div>
+	</div>	
+ 
+	<div data-role="page" id="signupPage" data-theme="b">
+		<header data-role ="header" data-add-back-btn="true"> 
+		  <h1 class="ui-title" role="heading">SnapLabs App</h1>
+		</header>
+		
+		<div data-role="main" class="ui-content" >
+			<form id="signupForm" >
+
+				<fieldset data-role="fieldcontain"> 
+					<label for="email">Email (to be used for signin):</label>
+					<input type="email" name="email" id="email" class="required email" minlength="5">
+				</fieldset>
+
+				<fieldset data-role="fieldcontain"> 
+					<label for="username">User Name:</label>
+					<input type="text" name="username" id="username" class="required nowhitespace" minlength="5">
+				</fieldset>
+
+				<fieldset data-role="fieldcontain"> 
+					<label for="password1">Password:</label>
+					<input type="password" name="password1" id="password1" class="required" minlength="5">
+				</fieldset>
+
+				<fieldset data-role="fieldcontain"> 
+					<label for="password2">Confirm Password:</label>
+					<input type="password" name="password2" id="password2" class="required" minlength="5">
+				</fieldset>
+
+
+				<input type="submit" value="Register">
+
+			</form>
+		</div>
+	</div>	
+
+	
+	<div data-role="page" id="pageMain" data-theme="b">
+		<header data-role ="header" data-add-back-btn="true"> 
+		  <h1 class="ui-title logo" role="heading" >SnapLabs App</h1>
+			<div class="ui-btn-right" data-role="controlgroup" data-type="horizontal">
+				<a href="#pageSettings" data-role="button" data-icon="bars" >File Handling</a>
+				<a href="#pageHome" data-role="button" data-icon="gear">Logout</a>
+			</div>
+		</header>
+		
+		<div data-role="content" data-theme="b">
+			<h1 class="logo">What would you like to do?<img src="ui/images/GrayLogoColour2.jpg"></h1> 
+			   
+			<div data-role="controlgroup" data-type="vertical">
+				<a href="#pageLocalInvestigations"  data-role="button" data-transition="slide">Select a Local Investigation</a>
+				<a href="#pageDownloadExperimentFile"  data-role="button" data-transition="slide">Download a New Investigation</a>
+				<a href="#pageDesignHome"  data-role="button" data-transition="slide">Design or Edit an Investigation</a>
+				<a href="#pageSensortagConfig"  data-role="button" data-transition="slide" class="teacherview" >Configure SensorTag Names</a>
+			</div>
+		</div>
+	</div>
+	
+	<div data-role="page" id="pageLocalInvestigations" data-theme="b">
+		<header data-role ="header" data-add-back-btn="true"> 
+		  <h1 class="ui-title logo" role="heading" >SnapLabs App</h1>
+			<div class="ui-btn-right" data-role="controlgroup" data-type="horizontal">
+				<a href="#pageSettings" data-role="button" data-icon="bars" >File Handling</a>
+				<a href="#pageHome" data-role="button" data-icon="gear">Logout</a>
+			</div>
+		</header>
+		
+		<div data-role="content">
+			<div data-role="content" data-theme="b">
+				<h1 class="logo">Investigations <img src="ui/images/GrayLogoColour2.jpg"></h1> 
+			   
+				<h2 class="aselltext">Select an investigation from the local investigations available: </h2>
+				
+				<div data-role="controlgroup" data-type="vertical" id="localExperimentFiles">
+				
+				</div>
+					
+			</div>
+		</div> 
+	</div>
+	
+	<div data-role="page" id="pageExperiment" data-theme="b" data-content-theme="b">
+		<header data-role ="header" data-add-back-btn="true"> 
+		  <h1 class="ui-title logo" role="heading" >SnapLabs App</h1>
+			<div class="ui-btn-right" data-role="controlgroup" data-type="horizontal">
+				<a href="#pageSettings" data-role="button" data-icon="bars" >File Handling</a>
+				<a href="#pageHome" data-role="button" data-icon="gear">Logout</a>
+			</div>
+		</header>
+		
+		<div data-role="main" class="ui-content">
+			<h1 id="labTitle"  class="logo">Your investigation title goes here <img src="ui/images/GrayLogoColour2.jpg"></h1>
+			<p><strong>Sampling Interval: </strong> <span id ="sampleInterval"> </span></p>
+			<p/>
+			<div id="experiment"> 
+			 The experiment details should go here.
+ 			</div>
+			<div id="experimentfooter" data-role="footer" class="ui-bar" data-position="fixed" data-tap-toggle="false" style="height:60px">
+				<a data-role='button' data-icon='recycle' id='footerConnectionButton' onclick='snaplabs.devices.connectToAllDevicesExperiment()'  class='asellbrightgreen'> Connect</a>
+				<a data-role='button' data-icon='delete' id='footerDisconnectButton' onclick='snaplabs.devices.closeAllConnections()' class='asellred'  style="display:none"> Disconnect</a>
+				<a data-role='button' data-icon='check'  id='footerCoCButton' onclick='snaplabs.captureOnClick.capture()' style="display:none"> Capture </a>
+				<a data-role='button' data-icon='refresh'  id='footerClearGrid' onclick='snaplabs.grid.clearGrids()' style="display:none"> Clear Grid </a>
+				<a data-role='button' data-icon='arrow-r' id='footerStartGraphsButton' onclick='snaplabs.graph.startGraphs()' class='asellbrightgreen' style="display:none"> Start Graphs </a>
+				<a data-role='button' data-icon='delete' id='footerStopGraphsButton' onclick='snaplabs.graph.stopGraphs()' class='asellred' style="display:none"> Stop Graphs </a>
+				<a data-role='button' data-icon='refresh' id='footerResetGraphsButton' onclick='snaplabs.graph.resetAllGraphs()' class='asellorange' style="display:none"> Reset Graphs  </a>
+				<a data-role='button' data-icon='cloud' id='initDataStorage' onclick='snaplabs.data.toggleDataStorage()' class='asellorange' style="display:none"> Save Data </a>
+			</div>
+		</div> 
+	</div> 
+	
+	
+	<div data-role="page" data-dialog="true" id="pageDownloadExperimentFile">
+		<header data-role ="header" > 
+		  <h1 class="ui-title" role="heading" >File Download</h1>
+		</header>
+		
+		<div data-role="main" class="ui-content" >
+			<form id="downloadExpConfigForm" >
+				<label for="serverURL"  ><strong>Select file server location:</strong></label>
+				<select name="serverURL" id="serverURL" data-mini="true">
+				   <option value="other">Teacher App Server</option>
+				   <option value="http://s3-ap-northeast-1.amazonaws.com/nerldconfigs/">AWS Server</option>
+				</select> 
+				
+				<div class="ui-field-contain" >
+					<label for="newServerURL"><strong>Server IP:</strong></label>
+					<input type="text" name="newServerURL" id="newServerURL" value="127.0.0.1"/>
+				</div>
+
+				<div class="ui-field-contain">
+					<label for="configFileName"><strong>File Name:</strong></label>
+					<input type="text" name="configFileName" id="configFileName" value="expConfig.json" onfocus="inputFocus(this)" onblur="inputBlur(this)"/>
+				</div>
+
+				<a href="#pageMain" data-inline="true" data-icon="delete" data-theme="a" data-role="button">Cancel</a>
+				<input type="button" data-inline="true" data-icon="check" data-theme="b" name="submit" id="submit" value="Submit" onclick="snaplabs.file.getConfigFile('expConfig','#downloadExpConfigForm')">
+			</form>
+		</div>
+	</div>
+	
+	<div data-role="page" id="pageDesignHome" data-theme="b">
+		<header data-role ="header" data-add-back-btn="true"> 
+		  <h1 class="ui-title logo" role="heading" >SnapLabs App</h1>
+			<div class="ui-btn-right" data-role="controlgroup" data-type="horizontal">
+				<a href="#pageSettings" data-role="button" data-icon="bars" >File Handling</a>
+				<a href="#pageHome" data-role="button" data-icon="gear">Logout</a>
+			</div>
+		</header>
+		 
+		<div data-role="content">
+			<div data-role="content" data-theme="b">
+				<h1 class="logo">Investigation Design<img src="ui/images/GrayLogoColour2.jpg"></h1> 
+			</div> 
+			<h2 class="aselltext">
+				Choose whether to view our quick links to design experiments using drag and drop widgets, or have access to all configuration options through the full application. <br />
+			<br /></h2>
+
+			<div data-role="controlgroup" data-type="vertical">
+				<a href="#pageQuickDesign" data-transition="slide"  data-role="button" >Quick Design</a>
+				<a href="#pageFullDesign" data-transition="slide"  data-role="button">Detailed Investigation Design</a>
+				<a href="#pageEditExperimentSelect" data-transition="slide"  data-role="button">Edit a Design</a>
+			</div>
+		</div>
+	</div>
+	
+	<div data-role="page" id="pageQuickDesign" data-theme="b">
+		<header data-role ="header" data-add-back-btn="true"> 
+		  <h1 class="ui-title logo" role="heading" >SnapLabs App</h1>
+			<div class="ui-btn-right" data-role="controlgroup" data-type="horizontal">
+				<a href="#pageSettings" data-role="button" data-icon="bars" >File Handling</a>
+				<a href="#pageHome" data-role="button" data-icon="gear">Logout</a>
+			</div>
+		</header>
+		
+		<div data-role="content">
+			<div data-role="content" data-theme="b">
+				<h1 class="logo">Quick Design<img src="ui/images/GrayLogoColour2.jpg"></h1> 
+			 
+				<h2 class="aselltext">Design an experiment by selecting a sensor and dragging and dropping the required widgets
+				</h2>
+				<br/>
+				<form id="quickDesignForm" >
+					<label for="name"><strong>Provide an Experiment Title:</strong></label>
+					<input data-theme="a" type="text" name="labTitle" value="" placeholder="SensorTag Investigation" />
+					<div class='ui-field-contain'>
+						<label for='sampleInterval'>Maximum sampling rate:</label>
+						<select name='sampleInterval' id='select-native-1-quick'>
+							<option value='1000'>1 sample per second</option>
+							<option value='500'>2 samples per second</option>
+							<option value='250'>4 samples per second</option>
+							<option value='100'>10 samples per second</option>
+						</select>
+					</div>
+					<br />
+					<div id="canvaspanel" data-content-theme="b" >
+						<span id="draganddrop">Drag and drop widgets here</span>
+					</div>
+					<input type="button" data-inline="true" data-icon="check" data-theme="b" name="submit"  value="Submit" onclick="snaplabs.experimentconfig.quickDesignConfiguration()">
+					<input type="reset" data-inline="true" data-icon="delete" data-theme="a" data-role="button" value="Reset" onclick="snaplabs.experimentconfig.resetQuickDesign()"/>
+
+				</form> 
+
+				<div data-role="collapsibleset" data-content-theme="a" data-mini="true" id="widgetset">
+					<script> snaplabs.ui.createWidgets() </script>  
+				</div>
+         	   
+			</div>
+		</div>
+	</div>	
+
+	<div data-role="page" id="pageFullDesign" data-theme="b">
+		<header data-role ="header" data-add-back-btn="true"> 
+		  <h1 class="ui-title logo" role="heading" >SnapLabs App</h1>
+			<div class="ui-btn-right" data-role="controlgroup" data-type="horizontal">
+				<a href="#pageSettings" data-role="button" data-icon="bars" >File Handling</a>
+				<a href="#pageHome" data-role="button" data-icon="gear">Logout</a>
+			</div>
+		</header>
+		
+		<div data-role="main" class="ui-content">
+			<h1 class='logo'>
+				Design an Investigation
+				<img src="ui/images/GrayLogoColour2.jpg">
+			</h1>
+			<form id="experimentForm">
+				<label for="name"><strong>Provide an Experiment Title:</strong></label>
+				<input data-theme="a" type="text" name="labTitle" id="labTitle"  value="" placeholder="SensorTag Investigation" />
+				
+				<div class='ui-field-contain'>
+					<label for='numberOfSensorTags'>Number of SensorTags:</label>
+					<select name='numberOfSensorTags' id='numberOfSensorTags'>
+						<option value='1'>1</option>
+						<option value='2'>2</option>
+						<option value='3'>3</option>
+						<option value='4'>4</option>
+					</select>
+				</div>
+
+				<div class='ui-field-contain'>
+					<label for='sampleInterval'>Maximum sampling rate:</label>
+					<select name='sampleInterval' id='select-native-1'>
+						<option value='1000'>1 sample per second</option>
+						<option value='500'>2 samples per second</option>
+						<option value='250'>4 samples per second</option>
+						<option value='100'>10 samples per second</option>
+					</select>
+				</div>
+				
+				<div data-role="fieldcontain">
+					<fieldset class='ui-grid-b'>
+						<div class='ui-block-a'>
+							<label for="addDataStorage">Allow Data Storage</label>
+							<input data-theme="a" type="checkbox" data-role="flipswitch" name="dataStorageAllowed" id="dataStorageAllowed" onchange="snaplabs.ui.showHideLabel('dataStoragePrefixLabel')" >
+						</div>
+						<div class='ui-block-b'>
+							<label for="add video">Allow Video:</label>
+							<input data-theme="a" type="checkbox" data-role="flipswitch" name="videoAllowed" id="videoAllowed" onchange="snaplabs.ui.showHideLabel('videoPrefixLabel')">
+						</div>
+						<div class='ui-block-c'>
+							<label for="add video">Autostart Graphs:</label>
+							<input  data-theme="a" type="checkbox" data-role="flipswitch" name="graphAutoStart" id="graphAutoStart">
+						</div>
+					</div
+
+				</div>
+				
+				<div data-role="fieldcontain" id="dataStoragePrefixLabel" + id + "label" style="display:none">
+					<label for="dataStoragePrefix"> Prefix for Data Storage File:</label>
+					<input  data-theme="a"type="text" name="dataStoragePrefix" value="" placeholder="sensorTag"/>
+				</div>
+				<div data-role="fieldcontain" id="videoPrefixLabel" + id + "label" style="display:none">
+					<label for="videoPrefix"> Prefix for Video File:</label>
+					<input  data-theme="a"type="text" name="videoPrefix" value="" placeholder="sensorTagVideo"/>
+				</div>
+
+				<div data-role="collapsible" data-content-theme="a" id="sensorTags0connect"  style="display:block;" class="asellList">
+					<h3>First SensorTag </h3> 
+					<div id="sensortag0List">
+						<script> snaplabs.ui.buildSensortagConfigHTML(0) </script>
+					</div> 
+				</div>
+
+				<div data-role="collapsible" data-content-theme="a" id="sensorTags1connect"  style="display:none;" class="asellList">
+					<h3>Additional SensorTag </h3> 
+					<div id="sensortag1List">
+						<script> snaplabs.ui.buildSensortagConfigHTML(1) </script>
+					</div> 
+				</div>
+
+				<div data-role="collapsible" data-content-theme="a" id="sensorTags2connect"  style="display:none;" class="asellList">
+					<h3>Additional SensorTag </h3> 
+					<div id="sensortag2List">
+						<script> snaplabs.ui.buildSensortagConfigHTML(2) </script>
+					</div> 
+				</div>
+
+				<div data-role="collapsible" data-content-theme="a" id="sensorTags3connect"  style="display:none;" class="asellList">
+					<h3>Additional SensorTag </h3> 
+					<div id="sensortag3List">
+						<script> snaplabs.ui.buildSensortagConfigHTML(3) </script>
+					</div> 
+				</div>
+
+				<a href="#pageDesignHome" data-inline="true" data-icon="delete" data-theme="a" data-role="button">Cancel</a>
+				<input type="button" data-inline="true" data-icon="check" data-theme="b" name="submit" id="submit" value="Submit" onclick="snaplabs.experimentconfig.submitFullDesign()" />
+				<input type="reset" id="experimentFormReset" data-inline="true" data-icon="arrow-r" data-theme="a" data-role="button" id="newExperiment" value="New Experiment" />
+
+			</form>
+		</div>
+	</div>
+
+
+	<div data-role="page" id="pageEditExperimentSelect" data-theme="b">
+		<header data-role ="header" data-add-back-btn="true"> 
+		  <h1 class="ui-title logo" role="heading" >SnapLabs App</h1>
+			<div class="ui-btn-right" data-role="controlgroup" data-type="horizontal">
+				<a href="#pageSettings" data-role="button" data-icon="bars" >File Handling</a>
+				<a href="#pageHome" data-role="button" data-icon="gear">Logout</a>
+			</div>
+		</header>    
+
+		<div data-role="main" class="ui-content">
+			<h1 class='logo'>
+				Edit an Investigation
+				<img src="ui/images/GrayLogoColour2.jpg">
+			</h1>
+
+
+			<div  data-content-theme="b" class="asellList">
+			   <h3>Choose an investigation configuration file to edit</h3>
+				<ul id="editFileList" data-role="listview" data-inset="true" data-directoryTypeForFiles="EXPERIMENT_DIR" data-customListFunction="editExperimentFileList">
+				</ul>
+				<a data-role="button" data-theme="a" onclick="snaplabs.ui.listFilesInDiv('EXPERIMENT_DIR','editFileList', snaplabs.ui.editExperimentFileList)">Refresh Investigation File List</a>
+			</div> 
+
+		</div> 
+	</div> 
+	
+	
+	<div id="pageSensortagConfig" data-role="page"  data-theme="b">
+		<header data-role ="header" data-add-back-btn="true"> 
+		  <h1 class="ui-title logo" role="heading" >SnapLabs App</h1>
+			<div class="ui-btn-right" data-role="controlgroup" data-type="horizontal">
+				<a href="#pageSettings" data-role="button" data-icon="bars" >File Handling</a>
+				<a href="#pageHome" data-role="button" data-icon="gear">Logout</a>
+			</div>
+		</header>   
+		
+		<div data-role="content">
+			<div data-role="content" data-theme="b" class='logo'>
+				<h1 class="logo">SensorTag Configuration<img src="ui/images/GrayLogoColour2.jpg"></h1>
+			<br />
+			</div>
+			<h2 class="aselltext">
+				Use this page to configure your SensorTags to have names associated with unique ID's.
+				You can also set the configuration institution and owner on the file.
+			<br />
+			<br />
+				You can inspect the current configuration file:
+			</h2>
+			
+			<a data-role="button" onclick="snaplabs.sensortagconfig.readSensorTagConfigFile(snaplabs.sensortagconfig.currentSensorTagConfigFile, snaplabs.ui.showSensorTagConfigFile)" id="sensortagConfigShowButton">View Current Configuration</a>
+			<a onclick="snaplabs.ui.hideElementView('sensortagConfigFileData')" data-role="button" id="sensortagConfigHideButton" style="display:none"> Hide Configuration</a>
+			<div id='sensortagConfigFileData' >
+			</div>
+			
+
+			<div style="display:none">
+						<h2 class="aselltext">
+						<br />
+							Update the current configuration file: (temporarily removed)
+						</h2>			
+						<a href="#pageConfigData" data-role="button"  data-index="new"> Change Institution or Owner </a>
+						<a href="#pageAddSensortags" data-role="button" > Add or Update SensorTag names</a>
+			</div>
+			<h2 class="aselltext">
+			<br />
+			
+				Create a new SensorTag configuration file:
+			</h2>	
+			<a id="overwriteSensortagConfigFile" href="#newConfigData" data-role="button" > Create new Sensortag configuration</a>
+	
+		</div>
+	</div>
+
+	<div id="pageConfigData" data-role="page"  data-theme="b">
+		<header data-role ="header" data-add-back-btn="true"> 
+		  <h1 class="ui-title logo" role="heading" >SnapLabs App</h1>
+			<div class="ui-btn-right" data-role="controlgroup" data-type="horizontal">
+				<a href="#pageSettings" data-role="button" data-icon="bars" >File Handling</a>
+				<a href="#pageHome" data-role="button" data-icon="gear">Logout</a>
+			</div>
+		</header>   
+		
+		
+		<div data-role="main" class="ui-content">
+			<p class='logo' >
+				<h1 class="logo"> Update Institution or <img src="ui/images/GrayLogoColour2.jpg"></h1>
+				<h1 class="logo">  Owner </h1>
+			</p>
+
+			<h2 class="aselltext">Enter new Institution or Owner names below. To keep existing values, leave the field blank. 
+			</h2>
+			<br/>
+			<form id="sensorTagConfigForm" >
+				<label for="institution"><strong>New Institution Name:</strong></label>
+				<input type="text" name="institution" id="institution" data-theme="a" value="" />
+
+				<label for="owner"><strong>New Owner Name:</strong></label>
+				<input type="text" name="owner" id="owner" value="" data-theme="a"/>
+
+				<a href="#pageSensortagConfig" data-inline="true" data-icon="delete" data-theme="a" data-role="button" >Cancel</a>
+				<input type="button" data-inline="true" data-icon="check" data-theme="b" name="submit" id="institutionOwnerUpdateSubmit" value="Update" onclick="snaplabs.sensortagconfig.updateInstitutionOwner()">
+			</form>
+		</div>
+	</div>
+
+	<div id="newConfigData" data-role="page" data-theme="b">
+		<header data-role ="header" data-add-back-btn="true"> 
+		  <h1 class="ui-title" role="heading" >SnapLabs App</h1>
+			<div class="ui-btn-right" data-role="controlgroup" data-type="horizontal">
+				<a href="#pageSettings" data-role="button" data-icon="bars" >File Handling</a>
+				<a href="#pageHome" data-role="button" data-icon="gear">Logout</a>
+			</div>
+		</header>   
+		
+		<div data-role="content">
+			<div data-role="content" data-theme="b" class="logo">
+				Enter new Institution or Owner names below. <br />
+			</div>
+
+			<form id="newSensorTagConfigForm" >
+				<label for="sensortagconfigfilename"><strong>SensorTag Configuration File Name:</strong></label>
+				<input type="text" name="sensortagconfigfilename" id="sensortagconfigfilename" placeholder="sensortag_new.json" class="required"/>
+				
+				<br>
+				<br>
+				<label for="institution"><strong>New Institution Name:</strong></label>
+				<input type="text" name="institution" id="institution" placeholder="snaplabs school"  />
+
+				<br>
+				<br>
+				<label for="owner"><strong>New Owner Name:</strong></label>
+				<input type="text" name="owner" id="owner" placeholder="snaplabs teacher" />
+ 
+				<a href="#pageSensortagConfig" data-inline="true" data-icon="delete" data-theme="a" data-role="button" >Cancel</a>
+				<input type="submit" data-inline="true" data-theme="a" data-icon="arrow-r" value="Continue with configuration">
+			</form>
+		</div>
+	</div>
+	
+	<div id="pageAddSensortags" data-role="page" data-theme="b">
+		<header data-role ="header" data-add-back-btn="true"> 
+		  <h1 class="ui-title" role="heading" >SnapLabs App</h1>
+			<div class="ui-btn-right" data-role="controlgroup" data-type="horizontal">
+				<a href="#pageSettings" data-role="button" data-icon="bars" >File Handling</a>
+				<a href="#pageHome" data-role="button" data-icon="gear">Logout</a>
+			</div>
+		</header>   
+		
+		<div data-role="content">
+			<div id="sensortagScanning" >
+			<div data-role="content" data-theme="b" class='logo'>
+				<h1 class="logo">Add SensorTags to  <img src="ui/images/GrayLogoColour2.jpg"></h1> 
+				<h1 class="logo">Configuration</h1> 
+			</div>
+
+			<h2 class="aselltext">
+				To add SensorTags to the configuration file: <br />
+				1. Press button to start scanning for available SensorTags. <br />
+				2. Select the SensorTag to connect to. <br />
+				3. Press any key on the SensorTag to create or update the SensorTag name.
+			</h2>
+			<br/>
+			
+			<div class='ui-grid-a ui-responsive'>
+				<div class='ui-block-a'>
+					<button id="startScanButton" onclick="snaplabs.sensortagconfig.onStartScanButton()" class="asellbrightgreen" style="display:block" data-inline="true">
+						START SCANNING FOR SENSORTAGS
+					</button>
+					<button id="pauseScanButton" onclick="snaplabs.sensortagconfig.onPauseScanButton()" class="asellorange" style="display:none" data-inline="true">
+						PAUSE SCANNING
+					</button>
+				</div>
+				<div class='ui-block-b' style='text-align: right;'>
+					<button id="resetScanButton" onclick="snaplabs.sensortagconfig.onResetScanButton()" data-theme="a" style="display:block;float:right" data-inline="true" >
+						RESET ALL
+					</button>
+				</div>
+			</div>
+
+			<p><strong>Scan Status: </strong><span id="scan-status">Scanning Paused</span></p>
+			<p><strong>SensorTag Connection Status: </strong> <span id="StatusData">Press "Start Scanning For SensorTags" to look for SensorTags</span></p>
+
+			<div data-inset="true" id="found-devices" class="dynamic"></div>
+			</div>
+
+		</div>
+	</div>
+	
+	
+	<div data-role="page" id="pageData" data-theme="b">
+		<header data-role ="header" data-add-back-btn="true"> 
+		  <h1 class="ui-title" role="heading" >SnapLabs App</h1>
+			<div class="ui-btn-right" data-role="controlgroup" data-type="horizontal">
+				<a href="#pageSettings" data-role="button" data-icon="bars" >File Handling</a>
+				<a href="#pageHome" data-role="button" data-icon="gear">Logout</a>
+			</div>
+		</header>   
+		
+		<div data-role="main" class="ui-content">
+		<h2 id="filenameTitle">Name of file</h2>
+			<div id="dataBlock"> 
+			 The data is dumped here
+			</div>
+		</div>   
+	</div> 
+
+	
+	<div data-role="page" id="pageInfo">
+        <div data-theme="a" data-role="header" data-add-back-btn="true">
+			<h1> About this Experiment App </h1> 
+			<a href="index.html" class="ui-btn-right ui-icon-home" data-icon="home">Home</a>
+		</div>
+		
+		<div data-role="main" class="ui-content">
+
+			The Experiment App has been designed to test development of remote lab design for non expert developers.
+			This app runs the experiments for students
+			
+		</div>  
+	</div> 
+
+	
+	<div data-role="page" data-dialog="true" id="pageDownloadSensortagFile">
+		<div data-role="header" data-theme="b">
+			<h1>File Download</h1>
+		</div>
+		<div data-role="main" class="ui-content">
+			<form id="downloadSensortagConfigForm">
+				<label for="sensorServerURL" class="select" ><strong>Select file server location:</strong></label>
+				<select name="sensorServerURL" id="sensorServerURL" data-mini="true">
+				   <option value="http://s3-ap-northeast-1.amazonaws.com/nerldconfigs/">AWS Server</option>
+				   <option value="other">Teacher App Server</option>
+				</select> 
+				
+				<div class="ui-field-contain">
+					<label for="newSensorServerURL"><strong>Server IP:</strong></label>
+					<input disabled="disabled" type="text" name="newSensorServerURL" id="newSensorServerURL" value="10.17.42.194"/>
+				</div>
+
+				<div class="ui-field-contain">
+					<label for="configFileName"><strong>File Name:</strong></label>
+					<input type="text" name="configFileName" id="configFileName" value="sensorTagConfig.json" onfocus="inputFocus(this)" onblur="inputBlur(this)"/>
+				</div>
+
+				<a href="#pageFullSite" data-inline="true" data-icon="delete" data-theme="a" data-role="button">Cancel</a>
+				<input type="button" data-inline="true" data-icon="check" data-theme="b" name="submit" id="submit" value="Submit" onclick="getConfigFile('sensortagConfig','#downloadSensortagConfigForm')">
+			</form>
+			
+						<h2 class="aselltext">
+			<strong>SensorTag Configuration: </strong> <br/>
+			Load a new SensorTag Configuration file (to map SensorTags to their names)
+			or download a new SensorTag Mapping Cofiguration file.			
+			</h2>
+
+		 	<div  data-role="collapsible"  class="asellList refreshCollapsible">
+			   <h3>Choose a Sensortag Mapping file to load</h3>
+				<ul id="sensortagFileList" data-role="listview" data-inset="true" data-customListFunction="readConfigFile" data-directoryNameForFiles="sensortagConfigDir">
+				</ul>
+				<a  data-theme="a" onclick="listFilesInDiv('sensortagFileList','readConfigFile','sensortagConfigDir')" data-role="button" data-mini="true"> Refresh file list </a>
+			</div> 
+			<a  href="#pageDownloadSensortagFile"  data-role="button">Download a new Sensortag Mapping File</a>
+			<div id="mapping"> </div>
+			
+		</div>  
+	</div> 
+	 
+	<div data-role="page" id="pageSettings" data-theme="b">
+		<header data-role ="header" data-add-back-btn="true"> 
+		  <h1 class="ui-title logo" role="heading" >SnapLabs App</h1>
+			<div class="ui-btn-right" data-role="controlgroup" data-type="horizontal">
+				<a href="#pageHome" data-role="button" data-icon="gear">Logout</a>
+			</div>
+		</header>
+		
+		<div data-role="main" class="ui-content">
+			<div class='logo'>
+				<h1 class="logo"> File Handling<img src="ui/images/GrayLogoColour2.jpg"></h1>
+
+				<h2 class="aselltext">
+				<strong>File Handling: </strong> <br />
+				Select files to view, share or delete (with suitable permissions).  Please note, files cannot be retrieved once deleted.			
+				</h2>
+				<div  data-role="collapsible" data-content-theme="b" class='asellList '>
+				   <h3>Saved Data files in:<br> <span id="savedDataFileDirSetting"></span></h3>
+					<ul id="handleSavedDataFileList" data-role="listview" data-inset="true" >
+					</ul>
+					<a data-theme="a"  onclick="snaplabs.ui.listFilesInDiv('SAVEDDATA_DIR','handleSavedDataFileList',snaplabs.ui.handleSavedDataFileList)" data-role="button" data-mini="true">Refresh saved data file list</a>
+				</div> 
+				
+				<div  data-role="collapsible" data-content-theme="b" class='asellList '>
+				   <h3>Experiment Configuration files in:<br> <span id="experimentConfigDirSetting"></span></h3>
+					<ul id="handleExperimentFileList" data-role="listview" data-inset="true">
+					</ul>
+					<a data-theme="a" onclick="snaplabs.ui.listFilesInDiv('EXPERIMENT_DIR','handleExperimentFileList',snaplabs.ui.handleExperimentFileList)" data-role="button" data-mini="true"> Refresh file list </a>
+				</div> 
+
+				<div  data-role="collapsible" data-content-theme="b" class='asellList teacherview'>
+				   <h3>Sensortag Mapping Configuration files in:<br> <span id="sensortagConfigDirSetting"></span></h3>
+					<ul id="handleSensortagFileList" data-role="listview" data-inset="true" >
+					</ul>
+					<a data-theme="a" onclick="snaplabs.ui.listFilesInDiv('SENSORTAG_DIR','handleSensortagFileList',snaplabs.ui.handleSensorTagFileList)" data-role="button" data-mini="true"> Refresh file list </a>
+				</div> 
+
+			</div>  
+			<div class="teacherview">
+				<div id='url'>Address </div>
+				<div id='localpath'></div>
+				<div id='location'></div>
+			</div>
+		
+		</div> 
+	</div>
+	
+</body>
+</html>
