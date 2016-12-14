@@ -87,7 +87,14 @@ snaplabs.devices.closeAllConnections = function(){
 	{
 		var device = snaplabs.devices.connected[key];
 		device &&  evothings.ble.close(device);
-		snaplabs.devices.connected[key] = null;
+		delete snaplabs.devices.connected[key];
+	}
+	
+	// Stop saving data if it is
+	if(snaplabs.data.isStoring)
+	{
+		snaplabs.data.isStoring = false;
+		snaplabs.data.stopInitDataStorage();
 	}
 }
 
@@ -149,7 +156,7 @@ snaplabs.devices.addDeviceToConfig = function(deviceKey)
 	function onDisconnectedAddToConfig(device)
     {
 		snaplabs.ui.displayStatus('Disconnected');
-		snaplabs.devices.connected[device.address] = null;
+		delete snaplabs.devices.connected[device.address];
         console.log('Disconnected from device: ' + device.name);
     }
 	 
@@ -232,7 +239,7 @@ snaplabs.devices.connectToDeviceExperiment = function(device, id)
 			onConnectedExperiment(device, id)
 		},
         function(error){
-			onDisconnectedExperiment(error, id)
+			onDisconnectedExperiment(error, id, device)
 		},
         snaplabs.devices.onConnectError)
 
@@ -336,6 +343,8 @@ snaplabs.devices.connectToDeviceExperiment = function(device, id)
     // Function called if the device disconnects.
     function onDisconnectedExperiment(error,id)
     {
+		delete snaplabs.devices.connected[device.address];
+
 		snaplabs.ui.displayValue('StatusData'+id, "DISCONNECTED")
 
 		snaplabs.ui.displayValue('footerConnectionButton', "CONNECT")
@@ -500,6 +509,7 @@ snaplabs.devices.enableMovementSensor = function(device, bits, id)
 	var dataCharacteristic = evothings.ble.getCharacteristic(service, snaplabs.devices.MOVEMENT.DATA)
 	var periodCharacteristic = evothings.ble.getCharacteristic(service, snaplabs.devices.MOVEMENT.PERIOD)
 
+	console.log("Are values ok: " + configCharacteristic + dataCharacteristic + periodCharacteristic)
 	evothings.ble.writeCharacteristic(
 		device,
 		configCharacteristic,
@@ -512,7 +522,7 @@ snaplabs.devices.enableMovementSensor = function(device, bits, id)
 		})
 		
 	// Just for testing
-	evothings.ble.readCharacteristic(
+	/*evothings.ble.readCharacteristic(
 		device,
 		configCharacteristic,
 		function(data)
@@ -521,9 +531,9 @@ snaplabs.devices.enableMovementSensor = function(device, bits, id)
 		},
 		function(errorCode)
 		{
-			console.log('readCharacteristic error: ' + errorCode);
+			console.log('Move readCharacteristic error: ' + errorCode);
 		}
-		);
+		);*/
 
 } 
 
@@ -552,12 +562,12 @@ snaplabs.devices.calculateAccelerometer = function(data,id)
 	var ax_temp = new DataView(data).getInt16(6, true);
 	var ay_temp = new DataView(data).getInt16(8, true);
 	var az_temp = new DataView(data).getInt16(10, true);
-
+	//console.log("DEBUG - accelerometer values read are :" + ax_temp + ", " + ay_temp + ", " +az_temp  )
 	// Calculate accelerometer values.
 	// Leave as 6,8,10  http://processors.wiki.ti.com/index.php/CC2650_SensorTag_User's_Guide#Movement_Sensor
 	var ax = ax_temp / divisors.x
-	var ay = ax_temp / divisors.y
-	var az = ax_temp / divisors.z
+	var ay = ay_temp / divisors.y
+	var az = az_temp / divisors.z
 	var comb = Math.sqrt(ax*ax+ay*ay+az*az)
 
 	snaplabs.display.accelerometerDisplay(id, ax,ay,az, comb)
@@ -592,7 +602,8 @@ snaplabs.devices.calculateMagnetometer = function(data,id)
 	var my = new DataView(data).getInt16(14, true);
 	var mz = new DataView(data).getInt16(16, true);
 	var comb = Math.sqrt(mx*mx+my*my+mz*mz)
-			
+	
+	//console.log("DEBUG - calling mag display for id " + id + " with values " + mx + "," + my + "," + mz)
 	snaplabs.display.magnetometerDisplay(id, mx,my,mz, comb)
 }
 
@@ -739,7 +750,7 @@ snaplabs.devices.scanTimeOut = function(){
 
 	snaplabs.devices.closeAllConnections();
 	evothings.ble.stopScan();
-	alert("SensorTags not found, please check that you have a sufficient number of SensorTags powered up and in range.") 
+	alert("Could not connect to SensorTags, please check that you have a sufficient number of SensorTags powered up and in range.") 
 }
 
 /*
@@ -760,7 +771,7 @@ snaplabs.devices.disconnect = function(deviceKey)
 	evothings.ble.stopScan();
 	clearInterval(updateTimer);
 	device &&  evothings.ble.close(device);
-	snaplabs.devices.connected[deviceKey] = null;
+	delete snaplabs.devices.connected[deviceKey];
 }
 
 /*

@@ -31,31 +31,7 @@ padding-top:25px;
 text-align:center;
 }
 
-/*  ----------------------------------------------------------
-								LOGO
-	---------------------------------------------------------- */
 
-.logo {
-	color:#3CFB7A!important;  /* older Green colour */
-	/*color:#2EA89F!important; new green */
-}	
-
-
-.logo img{
-	float:right;
-	height:auto;
-	width:120px;
-}
-
-/*  ----------------------------------------------------------
-								Heading and text
-	---------------------------------------------------------- */
-
-.aselltext{
-	color:#3CFB7A!important;
-	font-weight: normal;
-	font-size: 1em;
-}	
 
 /*  ----------------------------------------------------------
 								LISTS

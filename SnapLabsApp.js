@@ -641,7 +641,7 @@ snaplabs.sensortagconfig.updateSensorTagConfigFileSensors = function(sensorData,
  *
  */ 
 snaplabs.experimentconfig.loadDefaultFiles = function(){
-	var defaultFiles = ['balloon.json', 'Magnetism_Investigation.json', 'heatandlight.json', 'rocket.json']
+	var defaultFiles = ['Balloon_Pressure_Investigation.json', 'Magnetic_Mining_Investigation.json', 'Classroom_Heat_and_Light_Investigation.json', 'Rocket_Acceleration_Investigation.json', 'Investigating_the_SensorTags.json']
 	
 	for (var i = 0; i < defaultFiles.length; i++){
 		(function(i) { 
@@ -740,17 +740,27 @@ snaplabs.experimentconfig.runExperiment = function(data)
 	snaplabs.experimentconfig.configuredSampleInterval = data.sampleInterval || 1000
 	document.getElementById("sampleInterval").innerHTML = snaplabs.experimentconfig.configuredSampleInterval
 
+	console.log("Grid Footer - read values are: " +expConfigData.captureOnClick + " and " + expConfigData.grids + " and " + expConfigData.graphs )
 	// Display the footer buttons if required - Connection, capture on click, graph start
 	if(expConfigData.captureOnClick == "on" || expConfigData.grids == "on")
 	{
-		console.log("Grid Footer - read values are: " +expConfigData.captureOnClick + " and " + expConfigData.grids)
 		document.getElementById('footerCoCButton').style.display = "inline"
 		document.getElementById('footerClearGrid').style.display = "inline"
+	}
+	else
+	{
+		document.getElementById('footerCoCButton').style.display = "none"
+		document.getElementById('footerClearGrid').style.display = "none"
 	}
 	if(expConfigData.graphs == "on")
 	{
 		document.getElementById('footerStartGraphsButton').style.display = "inline"
 		document.getElementById('footerResetGraphsButton').style.display = "inline"
+	}
+	else
+	{
+		document.getElementById('footerStartGraphsButton').style.display = "none"
+		document.getElementById('footerResetGraphsButton').style.display = "none"
 	}
 	
 	// Clear experiment data
@@ -816,7 +826,7 @@ snaplabs.experimentconfig.runExperiment = function(data)
 				*/
 				var sensorAddDataString = ""
 				//Set up each div for the sensors data displays 
-				sensorAddDataString += 	"<br><div id=\""+sensor+id+"\" class=\"sensorReadingEntry\" >"
+				sensorAddDataString += 	"<div id=\""+sensor+id+"\" class=\"sensorReadingEntry\" > <br>"
 				sensorAddDataString +=		"<span id=\""+sensor+"Label"+id+"\" class=\"sensorReadingLabel\"><strong>" + sensorLabel +": </strong></span>"	
 				sensorAddDataString +=		"<span id=\""+sensor+"Data"+id+"\" class=\"sensorReadingValue\"> Waiting for value </span></p>"
 				// add 'Click' button if "capture on click"
@@ -887,33 +897,33 @@ snaplabs.experimentconfig.runExperiment = function(data)
 					for(i = 0; i < rowNumber; i++)
 					{
 						sensorAddGridString +=  "<div class='ui-block-a'><div class='ui-bar border-grid widgetblock'  id='"+sensor+"Grid"+cellCount+"'>"
-						sensorAddGridString += 			"<button class='asellbrightgreen' onclick='captureOnClickGrid(\"" + sensor +id +"\", \""+ id + "\", \"" + cellCount + "\")'> "+cellCount+ "</button>"
+						sensorAddGridString += 			"<button class='asellbrightgreen' onclick='snaplabs.grid.captureOnClickGrid(\"" + sensor +id +"\", \""+ id + "\", \"" + cellCount + "\")'> "+cellCount+ "</button>"
 						sensorAddGridString += 	"</div></div>"
-						//console.log("Debug - the function is: " + " onclick='captureOnClickGrid(\"" + sensor +id +"\", \""+ id + "\", \"" + cellCount + "\")'")
+						//console.log("Debug - the function is: " + " onclick='snaplabs.grid.captureOnClickGrid(\"" + sensor +id +"\", \""+ id + "\", \"" + cellCount + "\")'")
 						
 						cellCount++
 						sensorAddGridString +=  "<div class='ui-block-b'><div class='ui-bar  border-grid widgetblock'  id='"+sensor+"Grid"+cellCount+"'>"
-						sensorAddGridString += 			"<button class='asellbrightgreen' onclick='captureOnClickGrid(\"" + sensor +id +"\", \""+ id + "\", \"" + cellCount + "\")'>  "+cellCount+ "</button>"
+						sensorAddGridString += 			"<button class='asellbrightgreen' onclick='snaplabs.grid.captureOnClickGrid(\"" + sensor +id +"\", \""+ id + "\", \"" + cellCount + "\")'>  "+cellCount+ "</button>"
 						sensorAddGridString += 	"</div></div>"
 						cellCount++
 						if(sensorProps.grid.columns > 2)
 						{
 							sensorAddGridString +=     "<div class='ui-block-c'><div class='ui-bar  border-grid widgetblock' id='"+sensor+"Grid"+cellCount+"'>"
-							sensorAddGridString += 			"<button class='asellbrightgreen' onclick='captureOnClickGrid(\"" + sensor +id +"\", \""+ id + "\", \"" + cellCount + "\")'>  "+cellCount+ "</button>"
+							sensorAddGridString += 			"<button class='asellbrightgreen' onclick='snaplabs.grid.captureOnClickGrid(\"" + sensor +id +"\", \""+ id + "\", \"" + cellCount + "\")'>  "+cellCount+ "</button>"
 							sensorAddGridString += 	"</div></div>"
 							cellCount++
 						}
 						if(sensorProps.grid.columns > 3)
 						{
 							sensorAddGridString +=     "<div class='ui-block-d'><div class='ui-bar  border-grid widgetblock' id='"+sensor+"Grid"+cellCount+"'>"
-							sensorAddGridString += 			"<button class='asellbrightgreen' onclick='captureOnClickGrid(\"" + sensor +id +"\", \""+ id + "\", \"" + cellCount + "\")'>  "+cellCount+ "</button>"
+							sensorAddGridString += 			"<button class='asellbrightgreen' onclick='snaplabs.grid.captureOnClickGrid(\"" + sensor +id +"\", \""+ id + "\", \"" + cellCount + "\")'>  "+cellCount+ "</button>"
 							sensorAddGridString += 	"</div></div>"
 							cellCount++
 						}
 						if(sensorProps.grid.columns > 4)
 						{
 							sensorAddGridString +=     "<div class='ui-block-e'><div class='ui-bar  border-grid widgetblock' id='"+sensor+"Grid"+cellCount+"'>"
-							sensorAddGridString += 			"<button class='asellbrightgreen' onclick='captureOnClickGrid(\"" + sensor +id +"\", \""+ id + "\", \"" + cellCount + "\")'>  "+cellCount+ "</button>"
+							sensorAddGridString += 			"<button class='asellbrightgreen' onclick='snaplabs.grid.captureOnClickGrid(\"" + sensor +id +"\", \""+ id + "\", \"" + cellCount + "\")'>  "+cellCount+ "</button>"
 							sensorAddGridString += 	"</div></div>"
 							cellCount++
 						}
@@ -922,6 +932,7 @@ snaplabs.experimentconfig.runExperiment = function(data)
 					//sensorAddGridString += "<div>"
 					//sensorAddGridString += "<button class='asellbrightgreen' onclick='clearGrid(\"" + sensor +"\", \""+ id + "\", \"" + cellCount + "\")'> Clear Grid </button>"
 					sensorAddGridString += "</div>"
+					snaplabs.grid.cellCount = cellCount
 				}
 
 				experiment.innerHTML += sensorAddDataString + sensorAddGraphString + sensorAddGridString
@@ -964,7 +975,7 @@ snaplabs.experimentconfig.runExperiment = function(data)
 			tempVideoPrefix = data.videoPrefix
 			
 		var video =	"<div id='videoArea'>"
-		video +=		"<button class='asellgreen' id='startVideo' onclick=\"startVideo('" + tempVideoPrefix + "')\" > Start Video </button>"
+		video +=		"<button class='asellgreen' id='startVideo' onclick=\"snaplabs.media.startVideo('" + tempVideoPrefix + "')\" > Start Video </button>"
 		video +=	"</div>"
 		experiment.innerHTML += video
 		//console.log("DEBUG - video Prefix is " + tempVideoPrefix)
@@ -1069,7 +1080,7 @@ snaplabs.experimentconfig.quickDesignConfiguration = function(){
 	//check the form for setting global values
 	//var newData = snaplabs.experimentconfig.checkForm(newDataObj)
 	
-	snaplabs.experimentconfig.submitExperimentConfig(newData, fileName+".json")
+	snaplabs.experimentconfig.submitExperimentConfig(newDataObj, fileName+".json")
 	//console.log("DEBUG - After manipulation oject is: " + JSON.stringify(newDataObj) )
 }
 
@@ -1426,13 +1437,19 @@ snaplabs.file.handleSavedDataFile = function(fileName) {
 		 function(button) {
 			console.log("DEBUG - Saved data File handling for file " + fileName)
 			if ( button == 1 ) {
-				// User selected to View file
-				window.location.href="#pageData"
-				snaplabs.ui.displayValue("filenameTitle",fileName)
-				snaplabs.file.readAndDumpFile(fileName)
+				if(fileName.split(".").pop() == "3gp")
+				{
+					alert("Video files cannot be viewed in this app.")
+				}else
+				{
+					// User selected to View file
+					window.location.href="#pageData"
+					snaplabs.ui.displayValue("filenameTitle",fileName)
+					snaplabs.file.readAndDumpFile(fileName)
+				}
 			}
 			if ( button == 2 ) {
-				snaplabs.file.socialShareFile(dir, fileName) 
+				snaplabs.file.socialShareFile(fileName) 
 			}
 			if ( button == 3 ) {
 				if(snaplabs.session.role == TEACHER_ROLE)
@@ -1469,7 +1486,7 @@ snaplabs.file.handleSensorTagFile = function(fileName) {
 				snaplabs.file.readAndDumpFile(fileName)
 			}
 			if ( button == 2 ) {
-				snaplabs.file.socialShareFile(dir, fileName) 
+				snaplabs.file.socialShareFile(fileName) 
 			}
 			if ( button == 3 ) {
 				if(snaplabs.session.role == TEACHER_ROLE)
@@ -1516,11 +1533,11 @@ snaplabs.file.readAndDumpFile = function(fileName) {
  * Based on  https://github.com/EddyVerbruggen/SocialSharing-PhoneGap-Plugin
  */
  
-snaplabs.file.socialShareFile = function(dir, fileShare) {
+snaplabs.file.socialShareFile = function(fileShare) {
 	//var fileName = "file://file" + fileShare
 	//var fileName = filePath
 	
-	window.resolveLocalFileSystemURL(window.cordova.file.externalDataDirectory,
+/*	window.resolveLocalFileSystemURL(window.cordova.file.externalDataDirectory,
         function onSuccess(dirDest)
         {
 			console.log("DEBUG - In Success for resolving file system")
@@ -1528,11 +1545,10 @@ snaplabs.file.socialShareFile = function(dir, fileShare) {
 		},
 		console.log("DEBUG - In Fail for resolving file system")
 	);             
-
+*/
 	fileName = window.cordova.file.externalDataDirectory + fileShare
 	console.log("DEBUG - social sharing " + fileName)
 
-	
 	window.plugins.socialsharing.shareViaEmail(
 		'Please find attached the data file from the Experiment App', // can contain HTML tags, but support on Android is rather limited:  http://stackoverflow.com/questions/15136480/how-to-send-html-content-with-image-through-android-default-email-client
 		'Saved Data File From Experiment App',
@@ -1540,9 +1556,23 @@ snaplabs.file.socialShareFile = function(dir, fileShare) {
 		null, // CC: must be null or an array
 		null, // BCC: must be null or an array
 		[fileName], // FILES: can be null, a string, or an array
-		onSuccess, // called when sharing worked, but also when the user cancelled sharing via email. On iOS, the callbacks' boolean result parameter is true when sharing worked, false if cancelled. On Android, this parameter is always true so it can't be used). See section "Notes about the successCallback" below.
-		onError // called when sh*t hits the fan
+		snaplabs.file.onSuccessSharing , // called when sharing worked, but also when the user cancelled sharing via email. On iOS, the callbacks' boolean result parameter is true when sharing worked, false if cancelled. On Android, this parameter is always true so it can't be used). See section "Notes about the successCallback" below.
+		snaplabs.file.onErrorSharing // called when sh*t hits the fan
 	);
+}
+
+/*
+ * Social Sharing plugin uses the following finctions
+ * Based on  https://github.com/EddyVerbruggen/SocialSharing-PhoneGap-Plugin
+ */
+ 
+snaplabs.file.onSuccessSharing = function(result) {
+  console.log("Share completed? " + result.completed); // On Android apps mostly return false even while it's true
+  console.log("Shared to app: " + result.app); // On Android result.app is currently empty. On iOS it's empty when sharing is cancelled (result.completed=false)
+}
+
+snaplabs.file.onErrorSharing = function(msg) { 
+  console.log("Sharing failed with message: " + msg);
 }
 
 /*

@@ -1,3 +1,30 @@
+/*  ----------------------------------------------------------
+								LOGO
+	---------------------------------------------------------- */
+
+.logo {
+	color:#3CFB7A!important;  /* older Green colour */
+	/*color:#2EA89F!important; new green */
+}	
+
+
+.logo img{
+	float:right;
+	height:auto;
+	width:120px;
+}
+
+/*  ----------------------------------------------------------
+								Heading and text
+	---------------------------------------------------------- */
+
+.aselltext{
+	color:#3CFB7A!important;
+	font-weight: normal;
+	font-size: 1em;
+}	
+
+
 
 label.error { 
 	float: left; 
@@ -51,4 +78,88 @@ label.error {
 
 .widgetcaption{
 	display: block;
+}
+
+
+/*  ----------------------------------------------------------
+								ASELL COLORS
+	---------------------------------------------------------- */
+
+/*  Color: "Asell Green"
+	Class name: asellgreen
+    ------------------ */
+.color_wavegreen { color: #2EA89F; }
+.bg_asellgreen, input.asellgreen, button.asellgreen, ul.asellgreen li, label.asellgreen,
+input.asellgreen + label {
+	background-color: #2EA89F;
+	color: black;
+	font-weight: bold;
+}
+/* Downpressed button. */
+button.asellgreen:active, button.asellgreen.pressed,
+/* Input element with adjacent label. */
+input.btn-group:active + label.asellgreen,
+input.btn-group.asellgreen:active + label,
+input.btn-group:checked + label.asellgreen,
+input.btn-group.asellgreen:checked + label {
+	background-color: #3aca9c;
+}
+
+/*  Color: "Asell Green"
+	Class name: asellbrightgreen
+    ------------------ */
+.color_wavebrightgreen { color: #3CFB7A; }
+.bg_asellbrightgreen, input.asellbrightgreen, button.asellbrightgreen, ul.asellbrightgreen li, label.asellbrightgreen, a.asellbrightgreen,
+input.asellbrightgreen + label {
+	background-color: #3CFB7A!important;
+	color: black!important;
+	font-weight: bold!important;
+}
+/* Downpressed button. */
+button.asellbrightgreen:active, button.asellbrightgreen.pressed,
+/* Input element with adjacent label. */
+input.btn-group:active + label.asellbrightgreen,
+input.btn-group.asellbrightgreen:active + label,
+input.btn-group:checked + label.asellbrightgreen,
+input.btn-group.asellbrightgreen:checked + label {
+	background-color: #3aca9c!important;
+}
+
+/*  Color: "Asell red"
+	Class name: asellred
+    ---------------- */
+.color_asellred { color: #C23D45; }
+.bg_asellred, input.asellred, button.asellred, ul.asellred li, label.asellred,
+input.asellred + label {
+	background-color: #C23D45;
+	font-weight: bold;
+}
+/* Downpressed button. */
+button.asellred:active, button.asellred.pressed,
+/* Input element with adjacent label. */
+input.btn-group:active + label.asellred,
+input.btn-group.asellred:active + label,
+input.btn-group:checked + label.asellred,
+input.btn-group.asellred:checked + label {
+	background-color: #cb414b;
+}
+
+/*  Color: "Asell Orange"
+	Class name: asellorange
+    ---------------- */
+.color_asellorange { color: #FF903D; }
+.bg_asellorange, input.asellorange, button.asellorange, ul.asellorange li, label.asellorange, a.asellorange
+input.asellorange + label {
+	background-color: #FF903D!important;
+	color: black!important;
+	font-weight: bold!important;
+}
+/* Downpressed button. */
+button.asellorange:active, button.asellorange.pressed,
+/* Input element with adjacent label. */
+input.btn-group:active + label.asellorange,
+input.btn-group.asellorange:active + label,
+input.btn-group:checked + label.asellorange,
+input.btn-group.asellorange:checked + label {
+	background-color: #cb414b!important;;
 }

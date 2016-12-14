@@ -1,7 +1,7 @@
 {
 	"experimentConfig" : {
 		"labTitle" : "Pressure Investigation",
-		"sampleInterval" : "100",
+		"sampleInterval" : "300",
 		"sensorTags" : {
 			"0" : {
 				"connect" : "on",

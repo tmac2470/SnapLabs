@@ -1,31 +1,33 @@
 {
 	"experimentConfig" : {
-		"labTitle" : "Magnetism Investigation",
-		"sampleInterval" : "1000",
-		"captureOnClick" : "on",
-		"graphs" : "off",
-		"grids" : "on",
+		"labTitle" : "Accel",
+		"sampleInterval" : "100",
 		"sensorTags" : {
 			"0" : {
 				"connect" : "on",
 				"sensors" : {
-					"Gyroscope" : {
+					"Accelerometer" : {
+						"graph" : {
+							"graphdisplay" : "on",
+							"graphType" : "spline",
+							"graphTitle" : "Accelerometer Graph",
+							"graphXAxis" : "Time (s)",
+							"graphYAxis" : "Accelerometer"
+						},
+						"data" : {
+							"display" : "on",
+							"label" : "Accelerometer"
+						},
+						"captureOnClick" : "off",
 						"grid" : {
 							"griddisplay" : "off",
 							"columns" : "4",
 							"rows" : "4"
 						},
-						"data" : {
-							"display" : "off",
-							"label" : "Gyroscope"
-						},
-						"graph" : {
-							"graphType" : "spline",
-							"graphTitle" : "Gyroscope Graph",
-							"graphXAxis" : "Time (s)",
-							"graphYAxis" : "Gyroscope"
-						},
-						"captureOnClick" : "off"
+						"parameters" : {
+							"xyz" : "on",
+							"scalar" : "on"
+						}
 					},
 					"Temperature" : {
 						"data" : {
@@ -33,6 +35,7 @@
 							"label" : "Temperature"
 						},
 						"graph" : {
+							"graphdisplay" : "off",
 							"graphType" : "spline",
 							"graphTitle" : "Temperature Graph",
 							"graphXAxis" : "Time (s)",
@@ -55,6 +58,7 @@
 							"label" : "Humidity"
 						},
 						"graph" : {
+							"graphdisplay" : "off",
 							"graphType" : "spline",
 							"graphTitle" : "Humidity Graph",
 							"graphXAxis" : "Time (s)",
@@ -73,6 +77,7 @@
 							"label" : "Barometer"
 						},
 						"graph" : {
+							"graphdisplay" : "off",
 							"graphType" : "spline",
 							"graphTitle" : "Barometer Graph",
 							"graphXAxis" : "Time (s)",
@@ -85,16 +90,17 @@
 							"rows" : "4"
 						}
 					},
-					"Accelerometer" : {
+					"Gyroscope" : {
 						"data" : {
 							"display" : "off",
-							"label" : "Accelerometer"
+							"label" : "Gyroscope"
 						},
 						"graph" : {
+							"graphdisplay" : "off",
 							"graphType" : "spline",
-							"graphTitle" : "Accelerometer Graph",
+							"graphTitle" : "Gyroscope Graph",
 							"graphXAxis" : "Time (s)",
-							"graphYAxis" : "Accelerometer"
+							"graphYAxis" : "Gyroscope"
 						},
 						"captureOnClick" : "off",
 						"grid" : {
@@ -105,7 +111,7 @@
 					},
 					"Magnetometer" : {
 						"data" : {
-							"display" : "on",
+							"display" : "off",
 							"label" : "Magnetometer"
 						},
 						"graph" : {
@@ -113,21 +119,26 @@
 							"graphType" : "spline",
 							"graphTitle" : "Magnetometer Graph",
 							"graphXAxis" : "Time (s)",
-							"graphYAxis" : "Magnetic Flux (microT)"
+							"graphYAxis" : "Magnetometer"
 						},
 						"captureOnClick" : "off",
 						"grid" : {
-							"griddisplay" : "on",
-							"columns" : "5",
-							"rows" : "5"
+							"griddisplay" : "off",
+							"columns" : "4",
+							"rows" : "4"
+						},
+						"parameters" : {
+							"xyz" : "on",
+							"scalar" : "on"
 						}
-					}, 
+					},
 					"Luxometer" : {
 						"data" : {
 							"display" : "off",
 							"label" : "Luxometer"
 						},
 						"graph" : {
+							"graphdisplay" : "off",
 							"graphType" : "spline",
 							"graphTitle" : "Luxometer Graph",
 							"graphXAxis" : "Time (s)",
@@ -153,6 +164,7 @@
 							"label" : "Temperature"
 						},
 						"graph" : {
+							"graphdisplay" : "off",
 							"graphType" : "spline",
 							"graphTitle" : "Temperature Graph",
 							"graphXAxis" : "Time (s)",
@@ -175,6 +187,7 @@
 							"label" : "Humidity"
 						},
 						"graph" : {
+							"graphdisplay" : "off",
 							"graphType" : "spline",
 							"graphTitle" : "Humidity Graph",
 							"graphXAxis" : "Time (s)",
@@ -193,6 +206,7 @@
 							"label" : "Barometer"
 						},
 						"graph" : {
+							"graphdisplay" : "off",
 							"graphType" : "spline",
 							"graphTitle" : "Barometer Graph",
 							"graphXAxis" : "Time (s)",
@@ -211,6 +225,7 @@
 							"label" : "Accelerometer"
 						},
 						"graph" : {
+							"graphdisplay" : "off",
 							"graphType" : "spline",
 							"graphTitle" : "Accelerometer Graph",
 							"graphXAxis" : "Time (s)",
@@ -221,6 +236,10 @@
 							"griddisplay" : "off",
 							"columns" : "4",
 							"rows" : "4"
+						},
+						"parameters" : {
+							"xyz" : "on",
+							"scalar" : "on"
 						}
 					},
 					"Gyroscope" : {
@@ -229,6 +248,7 @@
 							"label" : "Gyroscope"
 						},
 						"graph" : {
+							"graphdisplay" : "off",
 							"graphType" : "spline",
 							"graphTitle" : "Gyroscope Graph",
 							"graphXAxis" : "Time (s)",
@@ -253,15 +273,15 @@
 							"graphXAxis" : "Time (s)",
 							"graphYAxis" : "Magnetometer"
 						},
-						"parameters" : {
-							"xyz" : "off",
-							"scalar" : "on"
-						},
 						"captureOnClick" : "off",
 						"grid" : {
-							"griddisplay" : "on",
-							"columns" : "5",
-							"rows" : "5"
+							"griddisplay" : "off",
+							"columns" : "4",
+							"rows" : "4"
+						},
+						"parameters" : {
+							"xyz" : "on",
+							"scalar" : "on"
 						}
 					},
 					"Luxometer" : {
@@ -270,6 +290,7 @@
 							"label" : "Luxometer"
 						},
 						"graph" : {
+							"graphdisplay" : "off",
 							"graphType" : "spline",
 							"graphTitle" : "Luxometer Graph",
 							"graphXAxis" : "Time (s)",
@@ -286,8 +307,9 @@
 			}
 		},
 		"dataStorageAllowed" : "on",
-		"dataStoragePrefix" : "MagnetismInvestigation",
-		"videoPrefix" : "Magnetism Investigation",
+		"videoAllowed" : "off",
+		"dataStoragePrefix" : "TestStudent_Accel_20161213_111458",
+		"videoPrefix" : "Accel",
 		"graphAutoStart" : "off"
 	}
 }

@@ -242,13 +242,18 @@
 			<h1 class="logo">SNAPLABS<img src="ui/images/GrayLogoColour2.jpg"></h1> 
 
 			<br>
+			<h1 class="logo">Create  ... Investigate ... Share </h1> 
 			<div class="centre-wrapper" >
 				<a href="#signinPage" data-theme="a" data-role="button">Sign In</a>
 				<br>
 				<a href="#signupPage" data-theme="a" data-role="button">Sign Up</a>
+				
 				<br>
-				<a href="#pageMain" data-role="button" onclick="snaplabs.setTeacher()">TESTING - TEACHER</a>
-				<a href="#pageMain" data-role="button" onclick="snaplabs.setStudent()">TESTING - STUDENT</a>
+				<script>
+				// Just to comment out
+				//<a href="#pageMain" data-role="button" onclick="snaplabs.setTeacher()">TESTING - TEACHER</a>
+				//<a href="#pageMain" data-role="button" onclick="snaplabs.setStudent()">TESTING - STUDENT</a>
+				</script>
 			</div>
 
 		</div>
@@ -365,7 +370,7 @@
 		
 		<div data-role="main" class="ui-content">
 			<h1 id="labTitle"  class="logo">Your investigation title goes here <img src="ui/images/GrayLogoColour2.jpg"></h1>
-			<p><strong>Sampling Interval: </strong> <span id ="sampleInterval"> </span></p>
+			<p><strong>Maximum Sampling Interval (ms): </strong> <span id ="sampleInterval"> </span></p>
 			<p/>
 			<div id="experiment"> 
 			 The experiment details should go here.
@@ -458,7 +463,7 @@
 					<label for="name"><strong>Provide an Experiment Title:</strong></label>
 					<input data-theme="a" type="text" name="labTitle" value="" placeholder="SensorTag Investigation" />
 					<div class='ui-field-contain'>
-						<label for='sampleInterval'>Maximum sampling rate:</label>
+						<label for='sampleInterval'>Sampling rate:</label>
 						<select name='sampleInterval' id='select-native-1-quick'>
 							<option value='1000'>1 sample per second</option>
 							<option value='500'>2 samples per second</option>
@@ -512,7 +517,7 @@
 				</div>
 
 				<div class='ui-field-contain'>
-					<label for='sampleInterval'>Maximum sampling rate:</label>
+					<label for='sampleInterval'>Sampling rate:</label>
 					<select name='sampleInterval' id='select-native-1'>
 						<option value='1000'>1 sample per second</option>
 						<option value='500'>2 samples per second</option>

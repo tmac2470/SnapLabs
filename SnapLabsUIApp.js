@@ -105,8 +105,9 @@ snaplabs.ui.populate = function(frm, data) {
 snaplabs.ui.listLocalExperimentFiles = function(entry)
 {
 	var tempName = entry.name.split(".");
+	
 	var returnStr = '<a class="ui-btn ui-btn-icon-right ui-icon-carat-r" href="#pageExperiment" onclick="snaplabs.experimentconfig.readConfigFile(snaplabs.storage.experimentConfigDir,\'' + entry.fullPath + '\')" data-role="button" data-transition="slide">'
-	returnStr += tempName[0] + '</a>'
+	returnStr += tempName[0].replace(/_/g,' ') + '</a>'
 	return returnStr
 
 }
@@ -530,7 +531,7 @@ snaplabs.ui.showElementViewInline = function(el) {
 	document.getElementById(el).style.display = "inline";
 }
 
-
+ 
 
 
 snaplabs.ui.changeButtonColour  = function(elementId, value)
