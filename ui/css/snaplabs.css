@@ -80,7 +80,18 @@ label.error {
 	display: block;
 }
 
+/*  ----------------------------------------------------------
+								FOOTER HEIGHT from http://www.java2s.com/Tutorials/jQuery_Mobile/Example/Footer/Set_footer_height.htm 
+	---------------------------------------------------------- */
+.ui-mobile .ui-page .ui-footer {<!--from  w  w  w.j  av a 2  s. c o  m-->
+  height: 30%; 
+}
 
+.ui-mobile .ui-page .ui-footer>div, .ui-mobile .ui-page .ui-footer ul,
+  .ui-mobile .ui-page .ui-footer ul li, .ui-mobile .ui-page .ui-footer ul li a
+  {
+  height: 100%;
+}
 /*  ----------------------------------------------------------
 								ASELL COLORS
 	---------------------------------------------------------- */

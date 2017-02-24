@@ -2,6 +2,7 @@
  * SnapLabsApp.js
  * Contains the functions and logic for NERLD Gen 2 app for both the teacher and student functionality
  * Carried over from ExperimentApp.js and TeacherApp.js
+ * This file contains core functions 
  */
  
  // A namespace for new functions.  
@@ -20,7 +21,7 @@ var SAVEDDATA_DIR = "SavedData"
 snaplabs.storage = {}
 var sensortagConfigDirectoryName = "SensortagMapingConfigFiles" // Directory for stiring sensortag mapping files
 var sensortagPackagedFile = "sensorTagConfig_default.json"; // The default file name shipped with the packages.  Copied into directory if required.
-var sensortagCurrentFile = "sensorTagConfig_current.json"; // The default file name shipped with the packages.  Copied into directory if required.
+var sensortagCurrentFile = "sensorTagConfig_current.json"; // The defauly name for the current active sensortag file name.
 var expConfigDirectoryName = "ExperimentAppConfigFiles";
 var savedDataDirectoryName = "SavedDataFiles";
 var tempFileName = "tempConfigFile.jsonp";
@@ -72,9 +73,10 @@ snaplabs.onDeviceReady = function() {
 			snaplabs.storage.sensortagConfigDir = dirEntry;
 			document.getElementById("sensortagConfigDirSetting").innerHTML = snaplabs.storage.sensortagConfigDir.fullPath;
 			// Copy Default Sensortag file in this directory as a start if it exists
+			console.log("DEBUG - about to copy default sensortag file " + sensortagPackagedFile)
 			snaplabs.sensortagconfig.copyPackagedConfigFile(sensortagPackagedFile, sensortagPackagedFile)
 			// Read "current" sensortag file or default one if there is no current one
-			snaplabs.sensortagconfig.readCurrentConfigFile()
+			//snaplabs.sensortagconfig.readCurrentConfigFile()
 		}, snaplabs.file.errorHandler);  
 	}, snaplabs.file.errorHandler);
 	 
@@ -377,6 +379,7 @@ snaplabs.sensortagconfig.readCurrentConfigFile = function(){
 	function(fileEntry) {
 		console.log("DEBUG - Current sensortag file exists, read this")
 		snaplabs.sensortagconfig.readSensorTagConfigFile(fileEntry, snaplabs.sensortagconfig.readSensortagConfig, false);
+		snaplabs.sensortagconfig.currentSensorTagConfigFile = fileEntry 
 	}, 
 	function(err) {
 		console.log("DEBUG - Error getting current file " + err.message + ". Attempt to read default file.")
@@ -393,21 +396,25 @@ snaplabs.sensortagconfig.readCurrentConfigFile = function(){
  * Write a local SensorTag mapping to the configuration file directory 
  */
 snaplabs.sensortagconfig.copyPackagedConfigFile = function(fileNameRead, fileNameWrite){
+
 	jQuery.getJSON(fileNameRead, function(data){         
-		//console.log("DEBUG - Data read from local file is " + JSON.stringify(data))
+		console.log("DEBUG - Data read from local file is " + JSON.stringify(data))
 		if(data.sensortagMapping){
 			snaplabs.storage.sensortagConfigDir.getFile(fileNameWrite, {create: true, exclusive: false}, function(fileEntry) {
 				snaplabs.file.writeTextToFile(fileEntry, JSON.stringify(data), false);
 			}, snaplabs.file.errorHandler);
 			//snaplabs.sensortagconfig.readSensortagConfig(data.sensortagMapping, true);
 			console.log("DEBUG - Sensortag mapping package file copied to " + fileNameWrite)
+			snaplabs.sensortagconfig.readCurrentConfigFile()
 		}
 		else{ 
-			console.log("DEBUG - Error in copying default Sensortag mapping file in snaplabs.sensortagconfig.readAndWritePackagedConfigFile")
+			console.log("DEBUG - Error in copying default Sensortag mapping file in copyPackagedConfigFile")
 		}
 	})
+	.fail(function(jqXHR, textStatus, errorThrown) { console.log('ERROR - getJSON request for copying default sensortag mapping failed! ' + textStatus); })
 	
 } 
+
 /*
  * readSensortagConfig
  * 
@@ -422,9 +429,14 @@ snaplabs.sensortagconfig.readSensortagConfig = function(data, supressAlert)
  
  /*
  * Read the SensorTag Configuration file
+ * This function is passed:
+ * fileEntry - the sensorTag configuration file to read
+ * callback - method to perform on successful read with the newData
+ * newData - Data to be added or changed in the sensortag file
  */
 snaplabs.sensortagconfig.readSensorTagConfigFile = function(fileEntry, callback, newData) {
 	console.log("DEBUG - reading file " + fileEntry.fullPath)
+	console.log("DEBUG - reading file new data is " + JSON.stringify(newData))
 	snaplabs.ui.showElementView('sensortagConfigFileData');
 	fileEntry.file(function(file) {
 		var reader = new FileReader();
@@ -438,19 +450,19 @@ snaplabs.sensortagconfig.readSensorTagConfigFile = function(fileEntry, callback,
 				// Invalid JSON, notify of the failure...
 				alert('Could not parse the SensorTag configuration File.  Please create a new one.');
 				snaplabs.ui.showElementView('overwriteSensortagConfigFile');
-				console.log(this.result)
+				console.log("DEBUG error " + this.result)
 			} 
 			if (json){ 
 				//Set html values based on Config file
 				if('sensortagMapping' in json)
 				{	
-					// console.log("DEBUG - sensorTag mapping found" + JSON.stringify(json))
+					console.log("DEBUG - sensorTag mapping found" + JSON.stringify(json))
 					callback(json.sensortagMapping, newData)
 				}
 				else {
 					alert('Could not parse the SensorTag configuration File.  Please create a new one.');
 					snaplabs.ui.showElementView('overwriteSensortagConfigFile');
-					console.log(this.result)
+					console.log("DEBUG error " + this.result)
 				}
 			}
 		};
@@ -463,18 +475,77 @@ snaplabs.sensortagconfig.readSensorTagConfigFile = function(fileEntry, callback,
  * updateInstitutionOwner
  * Get data from the form to update the SensorTag configuration file with a new institution and owner
  */
-snaplabs.sensortagconfig.updateInstitutionOwner = function() 
+/*snaplabs.sensortagconfig.updateInstitutionOwner = function() 
 {
 	var dataObjTemp = $('#sensorTagConfigForm').serializeJSON();
+	console.log("DEBUG - changing institution or owner name - data is: " + JSON.stringify(dataObjTemp))
 	var newMetadata = {}
 	newMetadata.institution = dataObjTemp.institution
 	newMetadata.owner = dataObjTemp.owner
 	
-	snaplabs.sensortagconfig.readSensorTagConfigFile(snaplabs.sensortagconfig.defaultSensortagConfigFile, snaplabs.sensortagconfig.updateSensorTagConfigFileMetadata, newMetadata);
+	// Prompt user to overwrite file or create a copy of current one
+	navigator.notification.prompt(
+		'Please enter the new configuration file name.\nSelect "Overwrite" to use current file - ' 
+			+ snaplabs.sensortagconfig.currentSensorTagConfigFile + '.',  // message
+        function(results){
+			snaplabs.sensortagconfig.selectSensorTagConfigFileToWrite(results, newMetadata);
+		},     // callback to invoke
+		'Overwirte File? ', // title
+		['Overwrite','Create New File'],   // buttonLabels
+		"New File Name"             // defaultText
+	);
+
+	//snaplabs.sensortagconfig.readSensorTagConfigFile(snaplabs.sensortagconfig.currentSensorTagConfigFile, snaplabs.sensortagconfig.updateSensorTagConfigFileMetadata, newMetadata);
 	
-	alert("SensorTag Mapping file updated")
+	
+}*/
+
+/*
+ * updateInstitutionOwner
+ * Get data from the form to update the SensorTag configuration file with a new institution and owner
+ */
+snaplabs.sensortagconfig.newSensortagConfigPrompt = function() 
+{
+	
+	// Prompt user to overwrite file or create a copy of current one
+	navigator.notification.prompt(
+		'Would you like to create a copy of the current file or a new configuration file: \n' 
+			+ snaplabs.sensortagconfig.currentSensorTagConfigFile.fullPath + '.',  // message
+        function(results){
+			snaplabs.sensortagconfig.selectSensorTagConfigFileToWrite(results, newMetadata);
+		},     // callback to invoke
+		'New SensorTag Configuration File ', // title
+		['Create a Copy','Create New File'],   // buttonLabels
+		"New File Name"             // defaultText
+	);
+	//snaplabs.sensortagconfig.readSensorTagConfigFile(snaplabs.sensortagconfig.currentSensorTagConfigFile, snaplabs.sensortagconfig.updateSensorTagConfigFileMetadata, newMetadata);
+	
+	
 }
 
+/*
+ *Update the SensorTag configuration file with a new institution and owner
+ */
+snaplabs.sensortagconfig.updateSensorTagConfigFileMetadata = function(sensorData, newData) 
+{
+	console.log("DEBUG - Updating file with new Sensortag " + JSON.stringify(newData) )
+	console.log("DEBUG - Original Values " + sensorData.institution +" and " + sensorData.owner )
+	if(newData.institution != "")
+	{
+		sensorData.institution = newData.institution; 
+	}
+	if(newData.owner != "")
+	{
+		sensorData.owner = newData.owner; 
+	}
+	var fullSensorData = {}
+	fullSensorData.sensortagMapping = sensorData
+	console.log("DEBUG - checking new data: " + JSON.stringify(fullSensorData))
+	// If the default file is in use, create a "current file" copy
+	
+    snaplabs.file.writeTextToFile(snaplabs.sensortagconfig.currentSensorTagConfigFile, JSON.stringify(fullSensorData), false);
+	//hideElementView("institutionOwnerUpdate");
+}
 
 /*
  * Create a new SensorTag Configuration file
@@ -496,15 +567,61 @@ snaplabs.sensortagconfig.newSensorTagConfigFile = function() {
 	data.sensortagMapping.sensortags = {};
 	console.log("DEBUG - new file string is:" + JSON.stringify(data))
 
-	snaplabs.sensortagconfig.tempSensorTagConfigFileName = fileName
-
-	snaplabs.storage.sensortagConfigDir.getFile(fileName, {create: true, exclusive: false}, function(fileEntry) {
-        snaplabs.file.writeTextToFile(fileEntry, JSON.stringify(data), false); 
-		snaplabs.sensortagconfig.tempSensorTagConfigFileEntry = fileEntry
-		//tempFile = fileEntry;
-    }, snaplabs.file.errorHandler);
-	
+	if(dataObjTemp["copy-or-new-radio"] == "copy")
+	{
+		console.log("DEBUG - Creating a copy of existing file")
+		snaplabs.file.copyFile(snaplabs.storage.sensortagConfigDir, snaplabs.sensortagconfig.currentSensorTagConfigFile.fullPath, fileName) 
+		console.log("DEBUG - reading new file and adding data")
+		snaplabs.storage.sensortagConfigDir.getFile(fileName, {create: true, exclusive: false}, function(fileEntry) {
+			snaplabs.sensortagconfig.currentSensorTagConfigFile = fileEntry
+			snaplabs.sensortagconfig.readSensorTagConfigFile(snaplabs.sensortagconfig.currentSensorTagConfigFile, snaplabs.sensortagconfig.updateSensorTagConfigFileMetadata, data);
+		}, snaplabs.file.errorHandler);
+	}
+	else
+	{
+		console.log("DEBUG - creating new file to write")
+		
+		snaplabs.storage.sensortagConfigDir.getFile(fileName, {create: true, exclusive: false}, function(fileEntry) {
+			snaplabs.file.writeTextToFile(fileEntry, JSON.stringify(data), false); 
+			snaplabs.sensortagconfig.currentSensorTagConfigFile = fileEntry
+		}, snaplabs.file.errorHandler);		
+	}
+		
 	return true;
+}
+
+/*
+* User prompt to overwrite or create new file function
+*
+*/
+snaplabs.sensortagconfig.selectSensorTagConfigFileToWrite = function(overwrite, newMetadata)
+{
+	console.log("DEBUG - chosen option was " + JSON.stringify(overwrite) )
+	if(overwrite.buttonIndex == 1)
+	{
+		console.log("DEBUG - Creating a copy of existing file")
+		snaplabs.file.copyFile(snaplabs.storage.sensortagConfigDir, snaplabs.sensortagconfig.currentSensorTagConfigFile, overwrite.input1) 
+		console.log("DEBUG - reading new file and adding data")
+		snaplabs.storage.sensortagConfigDir.getFile(overwrite.input1, {create: true, exclusive: false}, function(fileEntry) {
+			snaplabs.sensortagconfig.currentSensorTagConfigFile = fileEntry
+			snaplabs.sensortagconfig.readSensorTagConfigFile(snaplabs.sensortagconfig.currentSensorTagConfigFile, snaplabs.sensortagconfig.updateSensorTagConfigFileMetadata, newMetadata);
+		}, snaplabs.file.errorHandler);
+	}
+	else
+	{
+		console.log("DEBUG - creating new file to write")
+		
+		snaplabs.storage.sensortagConfigDir.getFile(overwrite.input1, {create: true, exclusive: false}, function(fileEntry) {
+			snaplabs.file.writeTextToFile(fileEntry, JSON.stringify(data), false); 
+			snaplabs.sensortagconfig.currentSensorTagConfigFile = fileEntry
+		}, snaplabs.file.errorHandler);
+		//snaplabs.storage.sensortagConfigDir.getFile(overwrite.input1, {create: true, exclusive: false}, function(fileEntry) {
+		//	snaplabs.sensortagconfig.readSensorTagConfigFile(fileEntry, snaplabs.sensortagconfig.updateSensorTagConfigFileMetadata, newMetadata);
+		//}
+		//, snaplabs.file.errorHandler);
+	}
+	
+	alert("SensorTag Mapping file updated")
 }
 
 /* 
@@ -555,9 +672,10 @@ snaplabs.sensortagconfig.onResetScanButton = function(){
 snaplabs.sensortagconfig.addToConfig = function(systemID)
 {
 	console.log("DEBUG - addToConfig passed sysID is " + systemID)
+	console.log("DEBUG - addToConfig the current config file is " + snaplabs.sensortagconfig.currentSensorTagConfigFile.fullPath)
 	snaplabs.ui.displayValue("StatusData", "Searching configuration file for SensorTag ...") 
 
-	snaplabs.sensortagconfig.checkForExistingSensortag(snaplabs.sensortagconfig.tempSensorTagConfigFileName,
+	snaplabs.sensortagconfig.checkForExistingSensortag(snaplabs.sensortagconfig.currentSensorTagConfigFile,
 		systemID);
 
 	snaplabs.ui.displayValue(device.address+'Connect', "Connected: " + device.address)
@@ -587,9 +705,9 @@ snaplabs.sensortagconfig.lookUpSensortagMapping = function(systemID)
  */
 snaplabs.sensortagconfig.checkForExistingSensortag = function(fileName, newSysID)
 {
-    snaplabs.storage.sensortagConfigDir.getFile(fileName, {create: false, exclusive: false}, function(fileEntry) {
+	console.log("DEBUG - looking for " + newSysID + " in " + fileName.fullPath)
+    snaplabs.storage.sensortagConfigDir.getFile(fileName.fullPath, {create: false, exclusive: false}, function(fileEntry) {
 		snaplabs.sensortagconfig.readSensorTagConfigFile(fileEntry, function(mappingData){
-			console.log("DEBUG - looking for " + newSysID)
 			if(newSysID in mappingData)
 			{
 				alert("This SensorTag already exists in the configuration file. \nSelect DISCONNECT if you would like to connect to a different SensorTag or press a key on the SensorTag to update the configuration file.")
@@ -605,31 +723,33 @@ snaplabs.sensortagconfig.checkForExistingSensortag = function(fileName, newSysID
 	})
 }
 
-snaplabs.sensortagconfig.addSensor = function(results,device)
+snaplabs.sensortagconfig.addSensor = function(results,systemID)
 {
 	var newSensor = {};
 	newSensor.name = results.input1;
-	newSensor.systemID = snaplabs.devices.getSystemID(device);
+	//newSensor.systemID = snaplabs.devices.getSystemID(device);
+	newSensor.systemID = systemID;
+	console.log("DEBUG - read sensor ID as " + newSensor.systemID)
 	// Add for a new file
-	snaplabs.sensortagconfig.readSensorTagConfigFile(snaplabs.sensortagconfig.tempSensorTagConfigFileEntry, snaplabs.sensortagconfig.updateSensorTagConfigFileSensors, newSensor);
+	snaplabs.sensortagconfig.readSensorTagConfigFile(snaplabs.sensortagconfig.currentSensorTagConfigFile, snaplabs.sensortagconfig.updateSensorTagConfigFileSensors, newSensor);
 }
 
 /*
  * Update the SensorTag configuration file with a new Sensor Name
  */ 
 snaplabs.sensortagconfig.updateSensorTagConfigFileSensors = function(sensorData, newData) {
-	console.log("DEBUG - Updating file with new Sensortag " + JSON.stringify(newData) )
-	if(newData.systemID in sensorData.sensortagMapping.sensortags)
+	console.log("DEBUG - Updating file with new Sensortag " + JSON.stringify(newData) +". Adding to :" +  JSON.stringify(sensorData))
+	if(newData.systemID in sensorData.sensortags)
 	{
-		console.log("Debug - changing name for " + sensorData.sensortagMapping.sensortags[newData.systemID] + " to " + newData.name)
-		sensorData.sensortagMapping.sensortags[newData.systemID] = newData.name; 
-        snaplabs.file.writeTextToFile(snaplabs.sensortagconfig.tempSensorTagConfigFileEntry, JSON.stringify(sensorData), false);
+		console.log("Debug - changing name for " + sensorData.sensortags[newData.systemID] + " to " + newData.name)
+		sensorData.sensortags[newData.systemID] = newData.name; 
+        snaplabs.file.writeTextToFile(snaplabs.sensortagconfig.currentSensorTagConfigFile, JSON.stringify(sensorData), false);
 		alert("Sensortag name updated to " + newData.name + ".\nPlease mark the SensorTag with this name")
 	}else
 	{
 		console.log("DEBUG - adding sensorTag to file")
-		sensorData.sensortagMapping.sensortags[newData.systemID] = newData.name; 
-        snaplabs.file.writeTextToFile(snaplabs.sensortagconfig.tempSensorTagConfigFileEntry, JSON.stringify(sensorData), false);
+		sensorData.sensortags[newData.systemID] = newData.name; 
+        snaplabs.file.writeTextToFile(snaplabs.sensortagconfig.currentSensorTagConfigFile, JSON.stringify(sensorData), false);
 		alert("Sensortag is now named " + newData.name + ".\nPlease mark the SensorTag with this name")
 	}
 }
@@ -802,7 +922,8 @@ snaplabs.experimentconfig.runExperiment = function(data)
 			sensortagAddString += 			"<h3><strong>Status:</strong> <span id=\"StatusData"+id+"\">NOT CONNECTED</span></h3>";
 			sensortagAddString +=		"</div>"
 			sensortagAddString +=	"</div>"
-
+			
+			console.log("DEBUG - list for sensors etc is " + sensortagAddString)
 			experiment.innerHTML += sensortagAddString;
 			
 			// Add each sensor as required
@@ -960,7 +1081,7 @@ snaplabs.experimentconfig.runExperiment = function(data)
 				{
 					snaplabs.experimentconfig.experimentSensortags[id].sensors.push(sensor)
 
-					console.log("DEBUG - the sensortag object for id  " + id + " added " + sensor);
+					//console.log("DEBUG - the sensortag object for id  " + id + " added " + sensor);
 				}
 			}
 			//console.log("DEBUG - Experiment tempString so far is " + experiment.innerHTML)
@@ -1171,12 +1292,12 @@ snaplabs.experimentconfig.checkConfigData = function(dataObjTemp){
 	for(i in dataObjTemp.sensorTags)
 	{
 		var sensorTags = dataObjTemp.sensorTags[i]
-		console.log("Debug - found sensortag " + JSON.stringify(sensorTags))
+		//console.log("Debug - found sensortag " + JSON.stringify(sensorTags))
 		if(sensorTags.connect=="on")
 		{
 			for(j in sensorTags.sensors)
 			{
-				console.log("Debug - found sensor " + j)
+				//console.log("Debug - found sensor " + j)
 				if(sensorTags.sensors[j].graph.graphdisplay == "on")
 					results.graphs = "on"
 				if(sensorTags.sensors[j].grid.griddisplay == "on")
@@ -1281,7 +1402,7 @@ snaplabs.file.writeTextToFile = function(fileEntry, dataString, isAppend) {
     fileEntry.createWriter(function (fileWriter) {
 
 	fileWriter.onwriteend = function() {
-            console.log("DEBUG - Successful file write (writeTextToFile) to file " + fileEntry.fullPath);
+            //console.log("DEBUG - Successful file write (writeTextToFile) to file " + fileEntry.fullPath);
             //readFile(fileEntry);
         };
 
@@ -1645,7 +1766,7 @@ snaplabs.setTeacher = function()
 	var i;
 	snaplabs.session.role = TEACHER_ROLE
 	for (i = 0; i < x.length; i++) {
-		console.log("DEBUG - setting teacher view") 
+		//console.log("DEBUG - setting teacher view") 
 		x[i].style.display = "block";
 	}
 	navigator.notification.alert(

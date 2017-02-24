@@ -407,6 +407,33 @@ snaplabs.ui.buildSensortagConfigHTML = function(id)
 	}
 }
 
+
+snaplabs.ui.showSensorTagConfigFile = function(sensorData)
+{
+	//var sensorData = fileData.sensortagMapping;
+	var fileOutput = document.getElementById('sensortagConfigFileData');
+	fileOutput.innerHTML = "<h2>Current SensorTag Configuration Information:</h2>"; 
+	fileOutput.innerHTML += "<b>Institution: </b>" + sensorData.institution + "<br />"; 
+	fileOutput.innerHTML += "<b>Owner: </b>" + sensorData.owner + "<br /><br />"; 
+	for(sensor in sensorData.sensortags){
+		fileOutput.innerHTML += sensorData.sensortags[sensor] + " : " + sensor + "<br />"; 
+	}
+	snaplabs.ui.showElementView('sensortagConfigHideButton')
+	snaplabs.ui.hideElementView('sensortagConfigShowButton')
+}
+
+/* 
+ * Hide the SensorTag Configuration file
+ */
+snaplabs.ui.hideSensorTagConfigFile = function() 
+{
+	// Hide the file data 
+	document.getElementById('sensortagConfigFileData').innerHTML = ''
+	//Change the buttons to show the file
+	snaplabs.ui.hideElementView('sensortagConfigHideButton')
+	snaplabs.ui.showElementView('sensortagConfigShowButton')
+}
+
 /*
 * Present different labels depenting on flipswitch setting
 */
@@ -464,11 +491,60 @@ snaplabs.ui.displayDeviceList = function()
 				+ '</br>'
 			);
 			$('#found-devices').append(element);
-			console.log("DEBUG - Found element with " + key + " and  details " + JSON.stringify(device))
+			console.log("DEBUG - List - Found element with " + key + " and  details " + JSON.stringify(device))
 		} 
 	}); 
 };
 
+
+ // Display the device list.
+snaplabs.ui.displayConnectionSelectList = function()
+{
+	// Clear device list.
+	$('#popupConnectionList').empty();
+
+	var topElement = $(
+	 '<span data-role="list-divider">Scanning - select a device:</span>'
+	 + '<li><a  onclick=\'snaplabs.devices.connectToAllDevicesExperiment()\'>Nearest Device</a></li>'
+	);
+	$('#popupConnectionList').append(topElement);
+
+	console.log("DEBUG - updating connec	tion popup list")
+			
+	var timeNow = Date.now();
+
+	$.each(snaplabs.devices.found, function(key, device)
+	{
+
+		// Only show devices that are updated during the last 10 seconds.
+		if (device.timeStamp + 10000 > timeNow)
+		//if(true)
+		{
+			// Find if the device is in the sensortag mapping file
+			// This may only apply to ANDROID
+			var tagName =  snaplabs.sensortagconfig.lookUpSensortagMapping(device.address)
+			if (tagName == "Unnamed Tag")
+			{
+				tagName = device.address
+			}
+			
+
+			// Create tag for device data.
+			var element = $(
+			    '<li><a  onclick=\'snaplabs.devices.connectToDeviceExperiment("' + device.address + '",0)\'>' + tagName + '</a></li>'
+
+			);
+
+		
+			$('#popupConnectionList').append(element);
+			var el = document.getElementById('popupConnectionList');
+			var elementHtml = el.innerHTML;
+				console.log("DEBUG - element is: " + elementHtml)			
+		} 
+	}); 
+
+	
+};
 // Display a status message for sensortag scanning
 snaplabs.ui.displayStatus = function(message)
 {

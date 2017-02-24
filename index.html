@@ -1,4 +1,4 @@
- <!DOCTYPE html> 
+<!DOCTYPE html> 
 <html>
  
 <head>
@@ -50,6 +50,7 @@
   
 		function onLoad() {
 			document.addEventListener("deviceready", snaplabs.onDeviceReady, false);
+			console.log("DEBUG - Added device ready listener")
 			
 			// Making the widgets draggable and droppable
 			// Based on http://embed.plnkr.co/WcIZlD/ 
@@ -104,6 +105,7 @@
 			group.height(tallest);
 		}
 		
+
 		//Bind event handler to first select input
 		$(document).ready(function(){
 			// Changed based on http://stackoverflow.com/questions/15948353/jquery-mobile-not-triggering-change-event-on-phonegap-app
@@ -189,6 +191,13 @@
 				}
 			});
 			
+			$("#connectionSelectPopupMenu").popup( {
+				afterclose : function (event, ui) {
+					console.log("DEBUG - popup closed")
+					clearTimeout(updateTimer);
+				}
+			} );
+			
 			$(document).on( "pagecontainerchange", function( event, ui ) {
 				var toPageID = ui.toPage[0].id;
 				if(ui.prevPage) var fromPageID = ui.prevPage[0].id;
@@ -226,7 +235,6 @@
 				{
 					snaplabs.devices.closeAllConnections()
 				}
-
 			});
 			
  		});
@@ -249,13 +257,9 @@
 				<a href="#signupPage" data-theme="a" data-role="button">Sign Up</a>
 				
 				<br>
-				<script>
-				// Just to comment out
-				//<a href="#pageMain" data-role="button" onclick="snaplabs.setTeacher()">TESTING - TEACHER</a>
-				//<a href="#pageMain" data-role="button" onclick="snaplabs.setStudent()">TESTING - STUDENT</a>
-				</script>
+				<a href="#pageMain" data-role="button" onclick="snaplabs.setTeacher()">TESTING - TEACHER</a>
+				<a href="#pageMain" data-role="button" onclick="snaplabs.setStudent()">TESTING - STUDENT</a>
 			</div>
-
 		</div>
 	</div>
 	
@@ -376,7 +380,13 @@
 			 The experiment details should go here.
  			</div>
 			<div id="experimentfooter" data-role="footer" class="ui-bar" data-position="fixed" data-tap-toggle="false" style="height:60px">
-				<a data-role='button' data-icon='recycle' id='footerConnectionButton' onclick='snaplabs.devices.connectToAllDevicesExperiment()'  class='asellbrightgreen'> Connect</a>
+				<a href="#connectionSelectPopupMenu" data-rel="popup" data-transition="slideup" data-role='button' data-icon='recycle' id='footerConnectionButton' onclick='snaplabs.devices.selectDeviceForConnection()'  class='asellbrightgreen'> Connect </a>
+					<div data-role="popup" id="connectionSelectPopupMenu" data-theme="b">
+							<ul data-role="listview" data-inset="true" style="min-width:210px;" id="popupConnectionList">
+								<span data-role="list-divider">Scanning - select a device:</span>
+								<li><a  onclick='snaplabs.devices.connectToAllDevicesExperiment()'>Nearest Device</a></li>
+							</ul>
+					</div>
 				<a data-role='button' data-icon='delete' id='footerDisconnectButton' onclick='snaplabs.devices.closeAllConnections()' class='asellred'  style="display:none"> Disconnect</a>
 				<a data-role='button' data-icon='check'  id='footerCoCButton' onclick='snaplabs.captureOnClick.capture()' style="display:none"> Capture </a>
 				<a data-role='button' data-icon='refresh'  id='footerClearGrid' onclick='snaplabs.grid.clearGrids()' style="display:none"> Clear Grid </a>
@@ -640,19 +650,22 @@
 			</h2>
 			
 			<a data-role="button" onclick="snaplabs.sensortagconfig.readSensorTagConfigFile(snaplabs.sensortagconfig.currentSensorTagConfigFile, snaplabs.ui.showSensorTagConfigFile)" id="sensortagConfigShowButton">View Current Configuration</a>
-			<a onclick="snaplabs.ui.hideElementView('sensortagConfigFileData')" data-role="button" id="sensortagConfigHideButton" style="display:none"> Hide Configuration</a>
+			<a onclick="snaplabs.ui.hideSensorTagConfigFile()" data-role="button" id="sensortagConfigHideButton" style="display:none"> Hide Configuration</a>
 			<div id='sensortagConfigFileData' >
 			</div>
 			
-
-			<div style="display:none">
-						<h2 class="aselltext">
-						<br />
-							Update the current configuration file: (temporarily removed)
-						</h2>			
-						<a href="#pageConfigData" data-role="button"  data-index="new"> Change Institution or Owner </a>
-						<a href="#pageAddSensortags" data-role="button" > Add or Update SensorTag names</a>
-			</div>
+			<script>
+			/* Script tag to comment out 
+			<div style="display:block">
+				<h2 class="aselltext">
+				<br />
+					Update the current configuration file: 
+				</h2>			
+				<a href="#pageConfigData" data-role="button"  data-index="new"> Change Institution or Owner </a>
+				<a href="#pageAddSensortags" data-role="button" > Add or Update SensorTag names</a>
+			</div>*/
+			</script>
+			
 			<h2 class="aselltext">
 			<br />
 			
@@ -705,11 +718,18 @@
 		</header>   
 		
 		<div data-role="content">
-			<div data-role="content" data-theme="b" class="logo">
-				Enter new Institution or Owner names below. <br />
-			</div>
-
 			<form id="newSensorTagConfigForm" >
+
+				<fieldset data-role="controlgroup">
+					<legend class="logo">Would you like to create a copy of the current configuration file or start from scratch?</legend>
+					<input type="radio" name="copy-or-new-radio" id="copy-or-new-radioa" value="copy" checked="checked">
+						<label for="copy-or-new-radioa">Create a copy</label>
+					<input type="radio" name="copy-or-new-radio" id="copy-or-new-radiob" value="new">
+					<label for="copy-or-new-radiob">Start from scratch</label>
+				</fieldset>
+				<br>
+				<br>
+				
 				<label for="sensortagconfigfilename"><strong>SensorTag Configuration File Name:</strong></label>
 				<input type="text" name="sensortagconfigfilename" id="sensortagconfigfilename" placeholder="sensortag_new.json" class="required"/>
 				

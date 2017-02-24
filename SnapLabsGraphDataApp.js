@@ -88,13 +88,12 @@ snaplabs.display.temperatureDisplay = function(id,  ac, af,tc,tf)
 		snaplabs.ui.displayValue(sensorType+'Data'+id, string)
 		// Look if Grid element exists and write to it if it does
 		var gridElement = document.getElementById(sensorType+"Grid"+snaplabs.captureOnClick.value[sensorType+id].gridPosition)
-		//console.log("DEBUG - grid element is " +  gridElement)
 		if(gridElement !== null)
 		{
-			snaplabs.ui.snaplabs.ui.displayValue(sensorType+"Grid"+snaplabs.captureOnClick.value[sensorType+id].gridPosition, string)
+			snaplabs.ui.displayValue(sensorType+"Grid"+snaplabs.captureOnClick.value[sensorType+id].gridPosition, string)
 			equalHeight($(".widgetblock"));
 		}
-
+		
 		var ctime = getTimeInMs();
 		
 		// Prepare values to add to CSV file and graph
@@ -579,7 +578,7 @@ snaplabs.display.singleValDisplay = function(id, sensorType,  string, data, unit
 
 	if(displayValuesFlag)
 	{
-		console.log("DEBUG - testing grids for " + sensorType+id + ". Before flag and position are: " + snaplabs.captureOnClick.value[sensorType+id].flag +", " + snaplabs.captureOnClick.value[sensorType+id].gridPosition)
+		//console.log("DEBUG - testing grids for " + sensorType+id + ". Before flag and position are: " + snaplabs.captureOnClick.value[sensorType+id].flag +", " + snaplabs.captureOnClick.value[sensorType+id].gridPosition)
 		snaplabs.captureOnClick.value[sensorType+id].flag=false;
 
 		// Update the value displayed.
@@ -1119,13 +1118,21 @@ snaplabs.captureOnClick.capture = function()
 				if(!snaplabs.captureOnClick.value[sensorId].flag)
 				{
 					snaplabs.captureOnClick.value[sensorId].flag = true;
-					snaplabs.captureOnClick.value[sensorId].gridPosition++;
+					// Only increment after the first cell has been filled
+					if(snaplabs.captureOnClick.value[sensorId].firstcell)
+					{
+						snaplabs.captureOnClick.value[sensorId].firstcell = false;
+					} 
+					else
+					{
+						snaplabs.captureOnClick.value[sensorId].gridPosition++;
+					}
 				}
-				console.log("DEBUG - set capture on click for " + sensorId + " to " + snaplabs.captureOnClick.value[sensorId].flag )
-				// If it is a grid format, increment the grid position for the next value - doesn't work yet because it starts at 1 and does not interact with frid option well 
+				console.log("DEBUG - set capture on click for " + sensorId + " to " + snaplabs.captureOnClick.value[sensorId].flag)
+				// If it is a grid format, increment the grid position for the next value - doesn't work yet because it starts at 1 and does not interact with grid option well 
 				// sensorId+"Grid"+captureOnClickValue[sensorId].gridPosition ++
-				id++
 			}
+			id++
 		}
 	}
 	else 

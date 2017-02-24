@@ -132,7 +132,7 @@ snaplabs.devices.addDeviceToConfig = function(deviceKey)
 		var characteristic = evothings.ble.getCharacteristic(service, snaplabs.devices.SYSTEM_ID)
 
 		var sID = ""
-		var output = '';
+		var tempSysID = '';
 		
 		evothings.ble.readCharacteristic(
 			device,
@@ -140,17 +140,21 @@ snaplabs.devices.addDeviceToConfig = function(deviceKey)
 			function(data)
 			{
 				sID = new Uint8Array(data)
-				//Read first 3 bytes backward and convert to Hex
-				for (var i=0; i<sID.length; i++){
-					output += sID[i].toString(16);
+				// Changes for System ID to match advertised address format for SensorTag for Android connections
+				for (var i=1; i<sID.length+1; i++){
+					var j = sID.length - i
+					tempSysID += (sID[j] + 0x100).toString(16).slice(1).toUpperCase();
+					if(j > 0)
+						tempSysID += ":"
 				}
+				var output = tempSysID.replace(/00:/g, "");
 				snaplabs.sensortagconfig.addToConfig(output)
 			},
 			function(errorCode)
 			{
 				console.log('readCharacteristic error: ' + errorCode);
 			}
-		);		
+		);	
     }
 	
 	function onDisconnectedAddToConfig(device)
@@ -170,9 +174,13 @@ snaplabs.devices.addDeviceToConfig = function(deviceKey)
 
 snaplabs.devices.connectToAllDevicesExperiment = function()
 {
+	$( "#connectionSelectPopupMenu" ).popup( "close" )
 	console.log("DEBUG - connecting to devices")
 	snaplabs.devices.closeAllConnections 
-	snaplabs.ui.displayValue('footerConnectionButton', "Connecting ...")
+	clearTimeout(scanTimer);
+	clearTimeout(updateTimer);
+	evothings.ble.stopScan();   
+ 	snaplabs.ui.displayValue('footerConnectionButton', "Connecting ...")
 	var connectionCounter = 0;
 	
 	//for(var id in snaplabs.experimentconfig.experimentSensortags)
@@ -208,15 +216,11 @@ snaplabs.devices.connectToAllDevicesExperiment = function()
 		{
 			console.log('Found the TI SensorTag! Clearing Timer')
 
-			// Connect.
 			snaplabs.devices.connectToDeviceExperiment(device, idFound)
 			
 			console.log("DEBUG - stop scan if last found, otherwise scan again " + connectionCounter + " of " + snaplabs.experimentconfig.experimentSensortags.length)
-			if(connectionCounter == snaplabs.experimentconfig.experimentSensortags.length-1)
-			{				
-				clearTimeout(scanTimer);
-				evothings.ble.stopScan();   
-			}				
+			clearTimeout(scanTimer);
+			evothings.ble.stopScan();   
 		} 
 	}
 	
@@ -224,36 +228,79 @@ snaplabs.devices.connectToAllDevicesExperiment = function()
 }
 
 /*
+* snaplabs.devices.selectDeviceForConnection
+* Scan for available devices and show these as options for connections
+*
+*/
+snaplabs.devices.selectDeviceForConnection = function()
+{
+	evothings.ble.startScan(snaplabs.devices.deviceFound, snaplabs.devices.onScanError );
+	updateTimer = setInterval(snaplabs.ui.displayConnectionSelectList, 500);
+}
+
+/*
 * snaplabs.devices.connectToDeviceExperiment
 * Make a connection to the specified device and store this
+* device is specified by the address
 *
 */
 
-snaplabs.devices.connectToDeviceExperiment = function(device, id)
+snaplabs.devices.connectToDeviceExperiment = function(deviceAddress, id)
 {
+	$( "#connectionSelectPopupMenu" ).popup( "close" )
+	snaplabs.devices.closeAllConnections 
+	clearTimeout(scanTimer);
+	clearTimeout(updateTimer);
+	evothings.ble.stopScan();   
+
+	console.log("DEBUG - connecting with specified device address " + deviceAddress)
 	snaplabs.ui.displayValue('StatusData'+id, "CONNECTING ...")
 
-    evothings.ble.connectToDevice(
-        device,
-		function(device){
-			onConnectedExperiment(device, id)
-		},
-        function(error){
-			onDisconnectedExperiment(error, id, device)
-		},
-        snaplabs.devices.onConnectError)
+	//for(var id in snaplabs.experimentconfig.experimentSensortags)
+	function scanForDevice(address)
+	{
+		console.log("DEBUG - scan for device " + id)
+
+		scanTimer = setTimeout(snaplabs.devices.scanTimeOut,
+			20000,
+			function() { console.log("Scan complete"); },
+			function() { console.log("stopScan failed"); }
+		);
+		 
+		// Start scanning. 
+		evothings.ble.startScan(
+			function(device){
+				if (device.name == 'CC2650 SensorTag' && device.address == address) 
+				{
+					console.log('Found specified device with details ' + JSON.stringify(device))
+					evothings.ble.connectToDevice(
+						device,
+						function(device){
+							onConnectedExperiment(device, id)
+						},
+						function(error){
+							onDisconnectedExperiment(error, id, device)
+						},
+						snaplabs.devices.onConnectError)
+				}
+			},
+			snaplabs.devices.onScanError)
+	}
 
     function onConnectedExperiment(device,id)
-    {
+    { 
         console.log('DEBUG - Connected to device. Setting up device ' + id )
 		snaplabs.experimentconfig.experimentSensortags[id].device = device
 		snaplabs.devices.connected[device.address] = device;
 		snaplabs.ui.displayValue('StatusData'+id, "CONNECTED")
+		clearTimeout(updateTimer);
+		clearTimeout(scanTimer);
+		evothings.ble.stopScan();   
 		
 		// Read Devce Info for Name
 		var service = evothings.ble.getService(device, snaplabs.devices.DEVICEINFO_SERVICE)
 		var characteristic = evothings.ble.getCharacteristic(service, snaplabs.devices.SYSTEM_ID)
-		var sysID = ""
+		var tempSysID = ""
 		evothings.ble.readCharacteristic(
 			device,
 			characteristic,
@@ -261,9 +308,16 @@ snaplabs.devices.connectToDeviceExperiment = function(device, id)
 			{
 				var sID = new Uint8Array(data)
 				//Read first 3 bytes backward and convert to Hex
-				for (var i=0; i<sID.length; i++){
-					sysID += sID[i].toString(16);
+				// Changes for System ID to match advertised address format for SensorTag for Android connections
+				// Leading AN removed as trailing :
+				for (var i=1; i<sID.length+1; i++){
+					var j = sID.length - i
+					tempSysID += (sID[j] + 0x100).toString(16).slice(1).toUpperCase();
+					//console.log("DEBUG - reading value " + tempSysID + " at position " + j)
+					if(j > 0)
+						tempSysID += ":"
 				}
+				var sysID = tempSysID.replace(/00:/g, "");
 				var tagName =  snaplabs.sensortagconfig.lookUpSensortagMapping(sysID)
 				snaplabs.ui.displayValue('SystemID'+id, tagName)
 			},
@@ -280,11 +334,14 @@ snaplabs.devices.connectToDeviceExperiment = function(device, id)
 
 		//for(sensor in snaplabs.experimentconfig.experimentSensortags[id].sensors)
 		var enableSensors = snaplabs.experimentconfig.experimentSensortags[id].sensors
-		var movementBits = 0; 
+
+		//Enable KeyPress for all
+		snaplabs.devices.enableKeypress(device, enableSensors, id);
+
+			var movementBits = 0; 
 		// Use for each to ensure asych call in loop is done before next iteration
 		enableSensors.forEach(function(sensor, index)
 		{
-			console.log("Debug - value in loop is " + sensor)
 			sensorType = sensor.toUpperCase()
 			
 			switch(sensor){
@@ -353,6 +410,9 @@ snaplabs.devices.connectToDeviceExperiment = function(device, id)
 
         console.log('Device disconnected from experiment')
     }
+	
+	scanForDevice(deviceAddress)
+
 }
 
 /*
@@ -537,6 +597,8 @@ snaplabs.devices.enableMovementSensor = function(device, bits, id)
 
 } 
 
+
+
 snaplabs.devices.calculateMovement = function(data, id)
 {
 	if(snaplabs.devices.notifyAccelerometer)
@@ -658,19 +720,74 @@ snaplabs.devices.calculateLuxometer = function(data, id)
 }
 
 /*
- * snaplab.devices.calulateTemperature
- * Extract Temperature Data from values
+ * snaplabs.devices.enableKeypress(devices)
+ * Write to Keypress Sensor to Activate
  *
+ */
+snaplabs.devices.enableKeypress = function(device, sensors, id)
+{
+	console.log("DEBUG - activating Keypress with sensors " + JSON.stringify(sensors))
+	var service = evothings.ble.getService(device, snaplabs.devices.KEYPRESS.SERVICE)
+    var dataCharacteristic = evothings.ble.getCharacteristic(service, snaplabs.devices.KEYPRESS.DATA)
+	
+	evothings.ble.enableNotification(
+		device,
+		dataCharacteristic,
+		function(data){
+			console.log("DEBUG - Found Keypress with data " + evothings.util.typedArrayToHexString(data) + " for " + JSON.stringify(sensors))
+			// Only do on key up
+			if(evothings.util.typedArrayToHexString(data) == "00")
+			{
+				console.log("DEBUG - Calculating values on key up")
+				snaplabs.devices.calculateKeypress(data, sensors, id)
+			}
+		},
+		function(err){
+			snaplabs.devices.onEnableError(err)
+		})
+}
+
+ /*
+ * snaplab.devices.calulateKeypress
+ * Extract Pressure Data from values
+ *
+ */
+snaplabs.devices.calculateKeypress = function(data, sensors, id)
+{
+	sensors.forEach(function(sensor, index)
+	{
+		//console.log("DEBUG - Key Pressed for sensor " + sensor + "  and " + id)
+		if( (expConfigData.sensorTags[id].sensors[sensor].captureOnClick == "on" ||
+		expConfigData.sensorTags[id].sensors[sensor].grid.griddisplay == "on") &&
+		!snaplabs.captureOnClick.value[sensor+id].flag)
+		{	
+			snaplabs.captureOnClick.value[sensor+id].flag = true;
+			if(snaplabs.captureOnClick.value[sensor+id].firstcell)
+			{
+				snaplabs.captureOnClick.value[sensor+id].firstcell = false;
+			} 
+			else
+			{
+				//console.log("DEBUG - Incrementing grid position for " + sensor + id)
+				snaplabs.captureOnClick.value[sensor+id].gridPosition++;
+			}
+		}
+	}) 
+}
+
+
+/*
+ * set the period for enabling particular sensors 
  */
  
 snaplabs.devices.setPeriod = function(device, periodCharacteristic, dataCharacteristic, sensorType, id){
-	console.log("DEBUG - setting period for sensor " + sensorType+id )
+	//console.log("DEBUG - setting period for sensor " + sensorType+id )
 	
 	var period = snaplabs.experimentconfig.configuredSampleInterval/10
 	if (sensorType == "Temperature" && period <= 10)
 			period = 30;
-	console.log("DEBUG - setting period to " + period)
-	console.log("DEBUG - device and char are " + device.address + " " + periodCharacteristic)
+	//console.log("DEBUG - setting period to " + period)
+	//console.log("DEBUG - device and char are " + device.address + " " + periodCharacteristic)
 	
 	evothings.ble.writeCharacteristic(
 		device,
@@ -694,7 +811,7 @@ snaplabs.devices.onSetPeriodError = function(error, type)
  *
  */
 snaplabs.devices.onSensorActivated = function(device, characteristic,sensorType, id){
-	console.log("DEBUG - characteristic written for " + sensorType)
+	//console.log("DEBUG - characteristic written for " + sensorType)
 	evothings.ble.enableNotification(
 		device,
 		characteristic,
@@ -781,15 +898,15 @@ snaplabs.devices.disconnect = function(deviceKey)
 */ 
 snaplabs.devices.deviceFound = function(device)
 {
-	//console.log("DEBUG - Device found. Device is " + JSON.stringify(device))
+	console.log("DEBUG - Device found. Device is " + JSON.stringify(device))
 	if (device.name)
 	{
 		// Set timestamp for device (this is used to remove inactive devices).
 		device.timeStamp = Date.now();
 		// Insert the device into table of found devices.
-		// Do this only id it is a sensortag device
+		// Do this only if it is a sensortag device
 		var devName = device.name.toLowerCase()
-		if(devName.includes("sensortag") != null){
+		if(devName.includes("sensortag") != false){
 			snaplabs.devices.found[device.address] = device;
 		}
 	}
@@ -807,7 +924,7 @@ snaplabs.devices.getSystemID = function(device)
 	//console.log("DEBUG - got systemID Data" + JSON.stringify(characteristic))
 
 	var sID = ""
-	var output = '';
+	var tempSysID = "";
 	
 	evothings.ble.readCharacteristic(
 		device,
@@ -817,9 +934,15 @@ snaplabs.devices.getSystemID = function(device)
 			sID = new Uint8Array(data)
 			console.log('readCharacteristic sID: ' + sID);
 			//Read first 3 bytes backward and convert to Hex
-			for (var i=0; i<sID.length; i++){
-				output += sID[i].toString(16);
+			//for (var i=0; i<sID.length; i++){
+			// Changes for System ID to match advertised address format for SensorTag for Android connections
+			for (var i=1; i<sID.length+1; i++){
+				var j = sID.length - i
+				tempSysID += (sID[j] + 0x100).toString(16).slice(1).toUpperCase();
+				if(j > 0)
+					tempSysID += ":"
 			}
+			var output = tempSysID.replace(/00:/g, "");
 			return output;
 		},
 		function(errorCode)
@@ -836,13 +959,15 @@ snaplabs.devices.enableKeyPressNotificationsForAdd = function(device){
 	console.log("DEBUG - keypress service for adding " + JSON.stringify(service) )
 	console.log("DEBUG - keypress data for adding " + JSON.stringify(dataCharacteristic) )
 	device.pressed = 0
+	var systemID = snaplabs.devices.getSystemID(device);
+	console.log("DEBUG - in key press handling - system id is " + systemID)
 	
 	evothings.ble.enableNotification(
 		device,
 		dataCharacteristic,
 		function(data)
 		{
-			console.log("DEBUG - Key Pressed with info " + evothings.ble.fromUtf8(data))
+			console.log("DEBUG - Key Pressed with info " + evothings.ble.fromUtf8(data[0]))
 			// Enter the details only once key press complete
 			if(device.pressed=='0')
 			{
@@ -850,7 +975,7 @@ snaplabs.devices.enableKeyPressNotificationsForAdd = function(device){
 				navigator.notification.prompt(
 					'Please enter the name you would like for this Sensor',  // message
 			        function(results){
-						snaplabs.sensortagconfig.addSensor(results, device);
+						snaplabs.sensortagconfig.addSensor(results, device.address);
 					},     // callback to invoke
 					'SensorTag Name', // title
 					['Ok','Exit'],             // buttonLabels
