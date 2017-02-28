@@ -649,6 +649,7 @@ snaplabs.graph.startGraphs = function()
 			snaplabs.graph.graphDisplay[sensorId]=true;
 			snaplabs.ui.showElementViewInline('footerStopGraphsButton')
 			snaplabs.ui.hideElementView('footerStartGraphsButton')
+			$('.exportGraphButton').show()
 		}
 		id++;
 	}
@@ -845,6 +846,54 @@ snaplabs.graph.resetGraph = function(sensor, id)
 	if(document.getElementById(sensor+id+"GraphCanvas"))
 		document.getElementById(sensor+id+"GraphCanvas").innerHTML = "";
 }
+
+/*
+ * snaplabs.graph.exportGraph
+ * Save the graph as a PDF
+ */
+
+snaplabs.graph.exportGraph = function(canvasName)
+{
+	console.log("DEBUG - export for canvas " + canvasName)
+	//var canvasContainer = document.getElementById(canvasName)
+	var canvas = $("#"+ canvasName + " .canvasjs-chart-canvas").get(0);
+	var dataURL = canvas.toDataURL('image/jpeg');
+
+	var pdf = new jsPDF();
+    pdf.addImage(dataURL, 'JPEG', 0, 0);
+    //pdf.save("SavedDataFiles/download.pdf");
+	
+	getGraphExportFile = function(filePrefix)
+	{
+		var stamp = new Date();
+		console.log("Debug - sent file prefix is " + filePrefix)
+		var graphfilename = snaplabs.session.user 
+		if(filePrefix != "") graphfilename += "_Graph_" + filePrefix
+		logfilename = graphfilename + "_" + stamp.getDate() + "-" + (stamp.getMonth()+1) + "-" + stamp.getFullYear() + "-" + stamp.getHours() + "-" + stamp.getMinutes() + "-" + stamp.getSeconds() + ".pdf";
+		// Added TCM
+		pdf.save(logfilename) 
+		snaplabs.storage.savedDataDir.getFile(logfilename, {create: true, exclusive: false}, 
+			function(fileEntry) {
+				fileEntry.createWriter(function(writer) {
+					writer.write(pdf.output('blob'));
+					writer.onwriteend = function() {
+						alert('PDF ' + logfilename + ' written. ');
+					};
+				},
+				snaplabs.file.errorHandler);
+			},snaplabs.file.errorHandler);
+		
+	}
+
+	var filePrefix = ""
+	if('dataStoragePrefix' in expConfigData) 
+			filePrefix = expConfigData.dataStoragePrefix
+	console.log("DEBUG - File Prefix is " + filePrefix)
+	window.requestFileSystem(LocalFileSystem.PERSISTENT, 0, getGraphExportFile(filePrefix), snaplabs.file.errorHandler);
+}
+
+
+
 /*
  * initGridDrawing
  * Initialise the values for the graphs

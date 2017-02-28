@@ -148,11 +148,22 @@ snaplabs.ui.handleSavedDataFileList = function(entry){
 
 /*
  * handleSensortagFileList 
- * Html for list for handling saved data files the files
+ * Html for list for handling sensortag configuration files the files
  */
 
 snaplabs.ui.handleSensorTagFileList = function(entry){
 	var li = "<li><a class='ui-btn ui-btn-icon-right ui-icon-carat-r' onclick='snaplabs.file.handleSensorTagFile(\"" + entry.fullPath +"\")'> " + entry.name + "</a> </li>"
+	//console.log("DEBUG - going to return " + li)
+	return li
+}
+
+/*
+ * selectSensortagFileList 
+ * Html for list for handling the list of sensortag configuration files to choose
+ */
+
+snaplabs.ui.selectSensorTagFileList = function(entry){
+	var li = "<li><a class='ui-btn ui-btn-icon-right ui-icon-carat-r' onclick='snaplabs.file.selectSensorTagFile(\"" + entry.fullPath +"\")'> " + entry.name + "</a> </li>"
 	//console.log("DEBUG - going to return " + li)
 	return li
 }
@@ -509,7 +520,7 @@ snaplabs.ui.displayConnectionSelectList = function()
 	);
 	$('#popupConnectionList').append(topElement);
 
-	console.log("DEBUG - updating connec	tion popup list")
+	console.log("DEBUG - updating connection popup list")
 			
 	var timeNow = Date.now();
 
@@ -531,7 +542,7 @@ snaplabs.ui.displayConnectionSelectList = function()
 
 			// Create tag for device data.
 			var element = $(
-			    '<li><a  onclick=\'snaplabs.devices.connectToDeviceExperiment("' + device.address + '",0)\'>' + tagName + '</a></li>'
+			    '<li><a  onclick=\'snaplabs.devices.connectToDeviceAddressExperiment("' + device.address + '",0)\'>' + tagName + '</a></li>'
 
 			);
 
@@ -545,12 +556,18 @@ snaplabs.ui.displayConnectionSelectList = function()
 
 	
 };
+ 
 // Display a status message for sensortag scanning
-snaplabs.ui.displayStatus = function(message)
+snaplabs.ui.displayConnectButtonStatus = function(message)
+{
+	$('#footerConnectionButton').html(message);
+};
+
+// Display a status message for sensortag scanning
+snaplabs.ui.displayScanStatus = function(message)
 {
 	$('#scan-status').html(message);
 };
-
  
 /*
 * listFilesInDiv
@@ -592,6 +609,7 @@ snaplabs.ui.listFilesInDiv = function(dirType, viewID, listHTMLFunction)
 snaplabs.ui.showElementView = function(el) {
 	document.getElementById(el).style.display = "block";
 }
+
 
 /*
  * Hide element view

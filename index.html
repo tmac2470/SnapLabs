@@ -40,6 +40,8 @@
 	<script src="libs/jquery/jquery.validate.min.js"></script>
 	<script type="text/javascript" src="libs/js/canvasjs.min.js"></script>
 	<script src="libs/jquery/jquery.ui.touch-punch.min.js"></script> 
+	<script type="text/javascript" src="libs/js/jspdf.min.js"></script>
+
 
 </head> 
 
@@ -230,6 +232,10 @@
 					snaplabs.ui.listFilesInDiv("EXPERIMENT_DIR",'handleExperimentFileList',snaplabs.ui.handleExperimentFileList)
 					snaplabs.ui.listFilesInDiv("SAVEDDATA_DIR",'handleSavedDataFileList',snaplabs.ui.handleSavedDataFileList)
 					snaplabs.ui.listFilesInDiv("SENSORTAG_DIR",'handleSensortagFileList',snaplabs.ui.handleSensorTagFileList)
+				}
+				if(toPageID == "pageSensortagConfig")
+				{
+					snaplabs.ui.listFilesInDiv("SENSORTAG_DIR",'selectSensortagFileList',snaplabs.ui.selectSensorTagFileList)
 				}
 				if(fromPageID == "pageAddSensortags" || fromPageID == "pageExperiment")
 				{
@@ -673,38 +679,17 @@
 			</h2>	
 			<a id="overwriteSensortagConfigFile" href="#newConfigData" data-role="button" > Create new Sensortag configuration</a>
 	
-		</div>
-	</div>
-
-	<div id="pageConfigData" data-role="page"  data-theme="b">
-		<header data-role ="header" data-add-back-btn="true"> 
-		  <h1 class="ui-title logo" role="heading" >SnapLabs App</h1>
-			<div class="ui-btn-right" data-role="controlgroup" data-type="horizontal">
-				<a href="#pageSettings" data-role="button" data-icon="bars" >File Handling</a>
-				<a href="#pageHome" data-role="button" data-icon="gear">Logout</a>
-			</div>
-		</header>   
-		
-		
-		<div data-role="main" class="ui-content">
-			<p class='logo' >
-				<h1 class="logo"> Update Institution or <img src="ui/images/GrayLogoColour2.jpg"></h1>
-				<h1 class="logo">  Owner </h1>
-			</p>
-
-			<h2 class="aselltext">Enter new Institution or Owner names below. To keep existing values, leave the field blank. 
-			</h2>
-			<br/>
-			<form id="sensorTagConfigForm" >
-				<label for="institution"><strong>New Institution Name:</strong></label>
-				<input type="text" name="institution" id="institution" data-theme="a" value="" />
-
-				<label for="owner"><strong>New Owner Name:</strong></label>
-				<input type="text" name="owner" id="owner" value="" data-theme="a"/>
-
-				<a href="#pageSensortagConfig" data-inline="true" data-icon="delete" data-theme="a" data-role="button" >Cancel</a>
-				<input type="button" data-inline="true" data-icon="check" data-theme="b" name="submit" id="institutionOwnerUpdateSubmit" value="Update" onclick="snaplabs.sensortagconfig.updateInstitutionOwner()">
-			</form>
+			<h2 class="aselltext">
+			<br />
+			
+				Select a configuration file to use on this device:
+			</h2>	
+			<div  data-role="collapsible" data-content-theme="b" class='asellList teacherview'>
+			   <h3>Sensortag Mapping Configuration files in:<br> <span id="sensortagConfigDirSetting"></span></h3>
+				<ul id="selectSensortagFileList" data-role="listview" data-inset="true" >
+				</ul>
+				<a data-theme="a" onclick="snaplabs.ui.listFilesInDiv('SENSORTAG_DIR','selectSensortagFileList',snaplabs.ui.selectSensorTagFileList)" data-role="button" data-mini="true"> Refresh file list </a>
+			</div> 
 		</div>
 	</div>
 
@@ -794,6 +779,8 @@
 
 			<div data-inset="true" id="found-devices" class="dynamic"></div>
 			</div>
+
+			<a href="#pageSensortagConfig" data-inline="true" data-icon="delete" data-theme="a" data-role="button" >Complete</a>
 
 		</div>
 	</div>

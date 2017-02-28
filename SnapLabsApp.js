@@ -435,7 +435,7 @@ snaplabs.sensortagconfig.readSensortagConfig = function(data, supressAlert)
  * newData - Data to be added or changed in the sensortag file
  */
 snaplabs.sensortagconfig.readSensorTagConfigFile = function(fileEntry, callback, newData) {
-	console.log("DEBUG - reading file " + fileEntry.fullPath)
+	//console.log("DEBUG - reading file " + fileEntry.fullPath + " with callback " + callback )
 	console.log("DEBUG - reading file new data is " + JSON.stringify(newData))
 	snaplabs.ui.showElementView('sensortagConfigFileData');
 	fileEntry.file(function(file) {
@@ -448,7 +448,7 @@ snaplabs.sensortagconfig.readSensorTagConfigFile = function(fileEntry, callback,
 			}
 			catch (ex){   
 				// Invalid JSON, notify of the failure...
-				alert('Could not parse the SensorTag configuration File.  Please create a new one.');
+				alert('1. Could not parse the SensorTag configuration File.  Please create a new one.');
 				snaplabs.ui.showElementView('overwriteSensortagConfigFile');
 				console.log("DEBUG error " + this.result)
 			} 
@@ -460,7 +460,7 @@ snaplabs.sensortagconfig.readSensorTagConfigFile = function(fileEntry, callback,
 					callback(json.sensortagMapping, newData)
 				}
 				else {
-					alert('Could not parse the SensorTag configuration File.  Please create a new one.');
+					alert('2. Could not parse the SensorTag configuration File.  Please create a new one.');
 					snaplabs.ui.showElementView('overwriteSensortagConfigFile');
 					console.log("DEBUG error " + this.result)
 				}
@@ -469,82 +469,6 @@ snaplabs.sensortagconfig.readSensorTagConfigFile = function(fileEntry, callback,
 		reader.readAsText(file);
 	}, snaplabs.file.errorHandler);
 
-}
-
-/*
- * updateInstitutionOwner
- * Get data from the form to update the SensorTag configuration file with a new institution and owner
- */
-/*snaplabs.sensortagconfig.updateInstitutionOwner = function() 
-{
-	var dataObjTemp = $('#sensorTagConfigForm').serializeJSON();
-	console.log("DEBUG - changing institution or owner name - data is: " + JSON.stringify(dataObjTemp))
-	var newMetadata = {}
-	newMetadata.institution = dataObjTemp.institution
-	newMetadata.owner = dataObjTemp.owner
-	
-	// Prompt user to overwrite file or create a copy of current one
-	navigator.notification.prompt(
-		'Please enter the new configuration file name.\nSelect "Overwrite" to use current file - ' 
-			+ snaplabs.sensortagconfig.currentSensorTagConfigFile + '.',  // message
-        function(results){
-			snaplabs.sensortagconfig.selectSensorTagConfigFileToWrite(results, newMetadata);
-		},     // callback to invoke
-		'Overwirte File? ', // title
-		['Overwrite','Create New File'],   // buttonLabels
-		"New File Name"             // defaultText
-	);
-
-	//snaplabs.sensortagconfig.readSensorTagConfigFile(snaplabs.sensortagconfig.currentSensorTagConfigFile, snaplabs.sensortagconfig.updateSensorTagConfigFileMetadata, newMetadata);
-	
-	
-}*/
-
-/*
- * updateInstitutionOwner
- * Get data from the form to update the SensorTag configuration file with a new institution and owner
- */
-snaplabs.sensortagconfig.newSensortagConfigPrompt = function() 
-{
-	
-	// Prompt user to overwrite file or create a copy of current one
-	navigator.notification.prompt(
-		'Would you like to create a copy of the current file or a new configuration file: \n' 
-			+ snaplabs.sensortagconfig.currentSensorTagConfigFile.fullPath + '.',  // message
-        function(results){
-			snaplabs.sensortagconfig.selectSensorTagConfigFileToWrite(results, newMetadata);
-		},     // callback to invoke
-		'New SensorTag Configuration File ', // title
-		['Create a Copy','Create New File'],   // buttonLabels
-		"New File Name"             // defaultText
-	);
-	//snaplabs.sensortagconfig.readSensorTagConfigFile(snaplabs.sensortagconfig.currentSensorTagConfigFile, snaplabs.sensortagconfig.updateSensorTagConfigFileMetadata, newMetadata);
-	
-	
-}
-
-/*
- *Update the SensorTag configuration file with a new institution and owner
- */
-snaplabs.sensortagconfig.updateSensorTagConfigFileMetadata = function(sensorData, newData) 
-{
-	console.log("DEBUG - Updating file with new Sensortag " + JSON.stringify(newData) )
-	console.log("DEBUG - Original Values " + sensorData.institution +" and " + sensorData.owner )
-	if(newData.institution != "")
-	{
-		sensorData.institution = newData.institution; 
-	}
-	if(newData.owner != "")
-	{
-		sensorData.owner = newData.owner; 
-	}
-	var fullSensorData = {}
-	fullSensorData.sensortagMapping = sensorData
-	console.log("DEBUG - checking new data: " + JSON.stringify(fullSensorData))
-	// If the default file is in use, create a "current file" copy
-	
-    snaplabs.file.writeTextToFile(snaplabs.sensortagconfig.currentSensorTagConfigFile, JSON.stringify(fullSensorData), false);
-	//hideElementView("institutionOwnerUpdate");
 }
 
 /*
@@ -591,6 +515,29 @@ snaplabs.sensortagconfig.newSensorTagConfigFile = function() {
 }
 
 /*
+ *Update the SensorTag configuration file with a new institution and owner
+ */
+snaplabs.sensortagconfig.updateSensorTagConfigFileMetadata = function(sensorData, newData) 
+{
+	console.log("DEBUG - Updating file with new Sensortag " + JSON.stringify(newData) )
+	console.log("DEBUG - Original Values " + sensorData.institution +" and " + sensorData.owner )
+	if(newData.institution != "")
+	{
+		sensorData.institution = newData.institution; 
+	}
+	if(newData.owner != "")
+	{
+		sensorData.owner = newData.owner; 
+	}
+	var fullSensorData = {}
+	fullSensorData.sensortagMapping = sensorData
+	console.log("DEBUG - checking new data: " + JSON.stringify(fullSensorData))
+	// If the default file is in use, create a "current file" copy
+	
+    snaplabs.file.writeTextToFile(snaplabs.sensortagconfig.currentSensorTagConfigFile, JSON.stringify(fullSensorData), false);
+	//hideElementView("institutionOwnerUpdate");
+}
+/*
 * User prompt to overwrite or create new file function
 *
 */
@@ -632,7 +579,7 @@ snaplabs.sensortagconfig.selectSensorTagConfigFileToWrite = function(overwrite, 
 snaplabs.sensortagconfig.onStartScanButton = function() 
 {
 	evothings.ble.startScan(snaplabs.devices.deviceFound, snaplabs.devices.onScanError );
-	snaplabs.ui.displayStatus('Scanning...');
+	snaplabs.ui.displayScanStatus('Scanning...');
 	updateTimer = setInterval(snaplabs.ui.displayDeviceList, 500);
 	snaplabs.ui.displayValue('StatusData', "Searching for SensorTags. To connect, press one of the green SensorTag connection buttons below.")
 	snaplabs.ui.hideElementView("startScanButton")
@@ -645,7 +592,7 @@ snaplabs.sensortagconfig.onPauseScanButton = function()
 {
 	evothings.ble.stopScan();
 	snaplabs.devices.found = {};
-	snaplabs.ui.displayStatus('Scan Paused');
+	snaplabs.ui.displayScanStatus('Scan Paused');
 	snaplabs.ui.displayValue("StatusData","Scanning Paused. Click on a green SensorTag connection button to add or change configuration file.")
 	clearInterval(updateTimer);
 	snaplabs.ui.showElementView("startScanButton")
@@ -656,7 +603,7 @@ snaplabs.sensortagconfig.onPauseScanButton = function()
 snaplabs.sensortagconfig.onResetScanButton = function(){
 	evothings.ble.stopScan();
 	snaplabs.devices.found = {};
-	snaplabs.ui.displayStatus('Scan Paused');
+	snaplabs.ui.displayScanStatus('Scan Paused');
 	snaplabs.ui.displayValue("StatusData","Scanning Paused. Click on a green SensorTag connection button to add or change configuration file.")
 	//displayDeviceList();
 	clearInterval(updateTimer);
@@ -737,18 +684,23 @@ snaplabs.sensortagconfig.addSensor = function(results,systemID)
 /*
  * Update the SensorTag configuration file with a new Sensor Name
  */ 
-snaplabs.sensortagconfig.updateSensorTagConfigFileSensors = function(sensorData, newData) {
+snaplabs.sensortagconfig.updateSensorTagConfigFileSensors = function(data, newData) {
+	var sensorData = {}
+	sensorData.sensortagMapping = {}
+	sensorData.sensortagMapping.sensortags = data.sensortags
+	console.log("DEBUG - new created valriable is " + JSON.stringify(sensorData))
 	console.log("DEBUG - Updating file with new Sensortag " + JSON.stringify(newData) +". Adding to :" +  JSON.stringify(sensorData))
-	if(newData.systemID in sensorData.sensortags)
+	console.log("DEBUG - Looking for " + newData.systemID + " in  " +  JSON.stringify(sensorData.sensortagMapping.sensortags))
+	if(newData.systemID in sensorData.sensortagMapping.sensortags)
 	{
-		console.log("Debug - changing name for " + sensorData.sensortags[newData.systemID] + " to " + newData.name)
-		sensorData.sensortags[newData.systemID] = newData.name; 
+		console.log("Debug - changing name for " + sensorData.sensortagMapping.sensortags[newData.systemID] + " to " + newData.name)
+		sensorData.sensortagMapping.sensortags[newData.systemID] = newData.name; 
         snaplabs.file.writeTextToFile(snaplabs.sensortagconfig.currentSensorTagConfigFile, JSON.stringify(sensorData), false);
 		alert("Sensortag name updated to " + newData.name + ".\nPlease mark the SensorTag with this name")
 	}else
 	{
 		console.log("DEBUG - adding sensorTag to file")
-		sensorData.sensortags[newData.systemID] = newData.name; 
+		sensorData.sensortagMapping.sensortags[newData.systemID] = newData.name; 
         snaplabs.file.writeTextToFile(snaplabs.sensortagconfig.currentSensorTagConfigFile, JSON.stringify(sensorData), false);
 		alert("Sensortag is now named " + newData.name + ".\nPlease mark the SensorTag with this name")
 	}
@@ -961,7 +913,7 @@ snaplabs.experimentconfig.runExperiment = function(data)
 				var sensorAddGraphString = ""
 				if (sensorProps.graph.graphdisplay=="on")
 				{
-					//console.log("DEBUG - Adding Graph for " + sensor+ id)
+					console.log("DEBUG - Adding Graph for " + sensor+ id)
 
 					sensorAddGraphString += "<div id=\""+sensor+id+"Graph\"  class='ui-bar ui-bar-a ui-corner-all graphdiv'>"
 					//Set up each div for the sensors graph display
@@ -969,6 +921,8 @@ snaplabs.experimentconfig.runExperiment = function(data)
 					sensorAddGraphString += 		"<span id=\""+sensor+"GraphTitle"+id+"\" class=\"sensorGraphTitle\">"
 					sensorAddGraphString +=			"</span>"
 					sensorAddGraphString +=		"</div>"
+					sensorAddGraphString +=    "<a data-role='button' data-icon='cloud' class='exportGraphButton' onclick='snaplabs.graph.exportGraph(\""+sensor+id+"GraphCanvas\")' class='asellorange' style=\"display:none\"> Save graph to PDF </a>"
+					sensorAddGraphString +=	"</div>"
 					//Set up each div for the sensors start/stop graph button
 					//sensorAddGraphString +=		"<div class='ui-grid-a ui-responsive'>"
 					//sensorAddGraphString +=			"<div class='ui-block-a'>"
@@ -986,7 +940,9 @@ snaplabs.experimentconfig.runExperiment = function(data)
 					//sensorAddGraphString +=	"</div><p>"
 				}
 
-				/*
+				console.log("DEBUG - Graph string is " + sensorAddGraphString)
+
+					/*
 				* Set up each div for the sensors grid display
 				*/	
 				var sensorAddGridString = ""
@@ -1065,8 +1021,8 @@ snaplabs.experimentconfig.runExperiment = function(data)
 
 				if(expConfigData.graphAutoStart == "on" && sensorProps.graph.graphdisplay==="on"){
 					document.getElementById("toggleGraphButton"+sensor+id).style.display = sensorProps.graph.graphdisplay==="on" && expConfigData.graphAutoStart != "on" ? "block" : "none";
-					graphDisplay[sensor+id]=true;
-					changeButtonColour("resetGraphButton"+sensor+id,"asellbrightgreen")
+					snaplabs.graph.graphDisplay[sensor+id]=true;
+					snaplabs.ui.changeButtonColour("resetGraphButton"+sensor+id,"asellbrightgreen")
 					console.log("Debug - setting graph diplay true for " + sensor+id)
 				}
 				// Reset the graphs if they have been created before
@@ -1625,6 +1581,21 @@ snaplabs.file.handleSensorTagFile = function(fileName) {
 		['View','Share','Delete']     // buttonLabels
 	);
 }
+
+/*
+ * snaplabs.file.selectSensorTagFil
+ * selected file to read in new config data
+*/
+snaplabs.file.selectSensorTagFile = function(fileName) {
+	console.log("DEBUG - getting file name " + fileName)
+
+	snaplabs.storage.sensortagConfigDir.getFile(fileName, { create: false }, function (fileEntry) {
+		snaplabs.sensortagconfig.currentSensorTagConfigFile = fileEntry
+		snaplabs.sensortagconfig.readSensorTagConfigFile(fileEntry, snaplabs.sensortagconfig.readSensortagConfig, false);
+	}
+	,snaplabs.file.errorHandler);
+} 
+
 /*
  * Read and dump generic file 
  */

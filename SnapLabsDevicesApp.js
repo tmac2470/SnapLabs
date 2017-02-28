@@ -74,13 +74,14 @@ snaplabs.devices.notifyAccelerometer = false;
  */
  
 snaplabs.devices.closeAllConnections = function(){
-	console.log("DEBUG - evothings.easyble.closeConnectedDevices disconnecting devices")
-	snaplabs.ui.displayStatus('Connect');
+	console.log("DEBUG - snaplabs.devices.closeAllConnections disconnecting devices")
+	snaplabs.ui.displayConnectButtonStatus('Connect');
 	snaplabs.ui.hideElementView('footerDisconnectButton')
 	snaplabs.ui.showElementViewInline('footerConnectionButton')
 
 	for(i=0; i<2;i++)
 	{
+		snaplabs.ui.displayValue('SystemID'+i, "NOT CONNECTED")
 		snaplabs.ui.displayValue('StatusData'+i, "NOT CONNECTED")
 	}
 	for (var key in snaplabs.devices.connected)
@@ -106,7 +107,7 @@ snaplabs.devices.closeAllConnections = function(){
  
 snaplabs.devices.addDeviceToConfig = function(deviceKey)
 {
-	snaplabs.ui.displayStatus('Connecting ... ');
+	snaplabs.ui.displayScanStatus('Connecting ... ');
 	evothings.ble.stopScan();
 	clearInterval(updateTimer);
 	console.log("DEBUG - connecting to device with key " + deviceKey + " referring to device" + JSON.stringify(snaplabs.devices.found[deviceKey]))
@@ -122,7 +123,7 @@ snaplabs.devices.addDeviceToConfig = function(deviceKey)
 	 
 	function onConnectedAddToConfig(device)
     {
-		snaplabs.ui.displayStatus('Connected');
+		snaplabs.ui.displayScanStatus('Connected');
 		snaplabs.ui.showElementViewInline('footerDisconnectButton')
 		snaplabs.ui.hideElementView('footerConnectionButton')
 
@@ -159,7 +160,7 @@ snaplabs.devices.addDeviceToConfig = function(deviceKey)
 	
 	function onDisconnectedAddToConfig(device)
     {
-		snaplabs.ui.displayStatus('Disconnected');
+		snaplabs.ui.displayScanStatus('Disconnected');
 		delete snaplabs.devices.connected[device.address];
         console.log('Disconnected from device: ' + device.name);
     }
@@ -180,7 +181,7 @@ snaplabs.devices.connectToAllDevicesExperiment = function()
 	clearTimeout(scanTimer);
 	clearTimeout(updateTimer);
 	evothings.ble.stopScan();   
- 	snaplabs.ui.displayValue('footerConnectionButton', "Connecting ...")
+ 	snaplabs.ui.displayConnectButtonStatus('Connecting ... ');
 	var connectionCounter = 0;
 	
 	//for(var id in snaplabs.experimentconfig.experimentSensortags)
@@ -218,9 +219,13 @@ snaplabs.devices.connectToAllDevicesExperiment = function()
 
 			snaplabs.devices.connectToDeviceExperiment(device, idFound)
 			
-			console.log("DEBUG - stop scan if last found, otherwise scan again " + connectionCounter + " of " + snaplabs.experimentconfig.experimentSensortags.length)
-			clearTimeout(scanTimer);
-			evothings.ble.stopScan();   
+			console.log("DEBUG - stop scan if last found, otherwise scan again")
+			if(connectionCounter == snaplabs.experimentconfig.experimentSensortags.length-1)
+			{				
+				console.log("DEBUG - Last found -  stop scan ")
+				clearTimeout(scanTimer);
+				evothings.ble.stopScan();   
+			}	
 		} 
 	}
 	
@@ -235,72 +240,41 @@ snaplabs.devices.connectToAllDevicesExperiment = function()
 snaplabs.devices.selectDeviceForConnection = function()
 {
 	evothings.ble.startScan(snaplabs.devices.deviceFound, snaplabs.devices.onScanError );
-	updateTimer = setInterval(snaplabs.ui.displayConnectionSelectList, 500);
+	updateTimer = setInterval(snaplabs.ui.displayConnectionSelectList, 1000);
 }
+
 
 /*
 * snaplabs.devices.connectToDeviceExperiment
 * Make a connection to the specified device and store this
-* device is specified by the address
 *
 */
 
-snaplabs.devices.connectToDeviceExperiment = function(deviceAddress, id)
+snaplabs.devices.connectToDeviceExperiment = function(device, id)
 {
-	$( "#connectionSelectPopupMenu" ).popup( "close" )
-	snaplabs.devices.closeAllConnections 
-	clearTimeout(scanTimer);
-	clearTimeout(updateTimer);
-	evothings.ble.stopScan();   
-
-	console.log("DEBUG - connecting with specified device address " + deviceAddress)
 	snaplabs.ui.displayValue('StatusData'+id, "CONNECTING ...")
 
-	//for(var id in snaplabs.experimentconfig.experimentSensortags)
-	function scanForDevice(address)
-	{
-		console.log("DEBUG - scan for device " + id)
-
-		scanTimer = setTimeout(snaplabs.devices.scanTimeOut,
-			20000,
-			function() { console.log("Scan complete"); },
-			function() { console.log("stopScan failed"); }
-		);
-		 
-		// Start scanning. 
-		evothings.ble.startScan(
-			function(device){
-				if (device.name == 'CC2650 SensorTag' && device.address == address) 
-				{
-					console.log('Found specified device with details ' + JSON.stringify(device))
-					evothings.ble.connectToDevice(
-						device,
-						function(device){
-							onConnectedExperiment(device, id)
-						},
-						function(error){
-							onDisconnectedExperiment(error, id, device)
-						},
-						snaplabs.devices.onConnectError)
-				}
-			},
-			snaplabs.devices.onScanError)
-	}
+    evothings.ble.connectToDevice(
+        device,
+		function(device){
+			onConnectedExperiment(device, id)
+		},
+        function(error){
+			onDisconnectedExperiment(error, id, device)
+		},
+        snaplabs.devices.onConnectError)
 
     function onConnectedExperiment(device,id)
-    { 
+    {
         console.log('DEBUG - Connected to device. Setting up device ' + id )
 		snaplabs.experimentconfig.experimentSensortags[id].device = device
 		snaplabs.devices.connected[device.address] = device;
 		snaplabs.ui.displayValue('StatusData'+id, "CONNECTED")
-		clearTimeout(updateTimer);
-		clearTimeout(scanTimer);
-		evothings.ble.stopScan();   
 		
 		// Read Devce Info for Name
 		var service = evothings.ble.getService(device, snaplabs.devices.DEVICEINFO_SERVICE)
 		var characteristic = evothings.ble.getCharacteristic(service, snaplabs.devices.SYSTEM_ID)
-		var tempSysID = ""
+		var sysID = ""
 		evothings.ble.readCharacteristic(
 			device,
 			characteristic,
@@ -308,16 +282,9 @@ snaplabs.devices.connectToDeviceExperiment = function(deviceAddress, id)
 			{
 				var sID = new Uint8Array(data)
 				//Read first 3 bytes backward and convert to Hex
-				// Changes for System ID to match advertised address format for SensorTag for Android connections
-				// Leading AN removed as trailing :
-				for (var i=1; i<sID.length+1; i++){
-					var j = sID.length - i
-					tempSysID += (sID[j] + 0x100).toString(16).slice(1).toUpperCase();
-					//console.log("DEBUG - reading value " + tempSysID + " at position " + j)
-					if(j > 0)
-						tempSysID += ":"
+				for (var i=0; i<sID.length; i++){
+					sysID += sID[i].toString(16);
 				}
-				var sysID = tempSysID.replace(/00:/g, "");
 				var tagName =  snaplabs.sensortagconfig.lookUpSensortagMapping(sysID)
 				snaplabs.ui.displayValue('SystemID'+id, tagName)
 			},
@@ -334,14 +301,11 @@ snaplabs.devices.connectToDeviceExperiment = function(deviceAddress, id)
 
 		//for(sensor in snaplabs.experimentconfig.experimentSensortags[id].sensors)
 		var enableSensors = snaplabs.experimentconfig.experimentSensortags[id].sensors
-
-		//Enable KeyPress for all
-		snaplabs.devices.enableKeypress(device, enableSensors, id);
-
-			var movementBits = 0; 
+		var movementBits = 0; 
 		// Use for each to ensure asych call in loop is done before next iteration
 		enableSensors.forEach(function(sensor, index)
 		{
+			console.log("Debug - value in loop is " + sensor)
 			sensorType = sensor.toUpperCase()
 			
 			switch(sensor){
@@ -410,8 +374,54 @@ snaplabs.devices.connectToDeviceExperiment = function(deviceAddress, id)
 
         console.log('Device disconnected from experiment')
     }
-	
-	scanForDevice(deviceAddress)
+}
+
+/*
+* snaplabs.devices.connectToDeviceExperiment
+* Make a connection to the specified device and store this
+* device is specified by the address
+*
+*/
+
+snaplabs.devices.connectToDeviceAddressExperiment = function(deviceAddress, id)
+{
+	$( "#connectionSelectPopupMenu" ).popup( "close" )
+	snaplabs.devices.closeAllConnections 
+	clearTimeout(scanTimer);
+	clearTimeout(updateTimer);
+	evothings.ble.stopScan();   
+
+	console.log("DEBUG - snaplabs.devices.connectToDeviceAddressExperiment connecting with specified device address " + deviceAddress)
+	snaplabs.ui.displayValue('StatusData'+id, "CONNECTING ...")
+
+	//for(var id in snaplabs.experimentconfig.experimentSensortags)
+	function scanForDevice(address)
+	{
+		console.log("DEBUG - scan for device " + id)
+
+		scanTimer = setTimeout(snaplabs.devices.scanTimeOut,
+			20000,
+			function() { console.log("Scan complete"); },
+			function() { console.log("stopScan failed"); }
+		);
+		 
+		// Start scanning. 
+		evothings.ble.startScan(
+			function(device){
+				if (device.name == 'CC2650 SensorTag' && device.address == address) 
+				{
+					console.log('DEBUG - Found the TI SensorTag! Clearing Timer (snaplabs.devices.connectToDeviceAddressExperiment)')
+					clearTimeout(scanTimer);
+					evothings.ble.stopScan();   
+
+					snaplabs.devices.connectToDeviceExperiment(device, id)
+
+				}
+			},
+			snaplabs.devices.onScanError)
+	}
+
+	scanForDevice(deviceAddress) 
 
 }
 
@@ -988,17 +998,17 @@ snaplabs.devices.enableKeyPressNotificationsForAdd = function(device){
 }
 
 snaplabs.devices.onScanError = function(errorCode){
-	snaplabs.ui.displayStatus('Scan Error: ' + errorCode);
+	snaplabs.ui.displayScanStatus('Scan Error: ' + errorCode);
 }
 
 snaplabs.devices.onConnectError = function(errorCode){
 	console.log("DEBUG - Connection Error: " + errorCode); 
-	snaplabs.ui.displayStatus('Connection Error: ' + errorCode);
+	snaplabs.ui.displayScanStatus('Connection Error: ' + errorCode);
 }
 
 snaplabs.devices.onEnableError = function(errorCode){
 	console.log("DEBUG - Enable Error: " + errorCode); 
-	snaplabs.ui.displayStatus('Enable Error: ' + errorCode);
+	snaplabs.ui.displayScanStatus('Enable Error: ' + errorCode);
 }
 
 function dec2bin(dec){
