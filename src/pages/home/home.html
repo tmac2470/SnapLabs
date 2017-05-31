@@ -1,14 +1,24 @@
 <ion-header>
   <ion-navbar>
     <ion-title>
-      Ionic Blank
+      Snap Labs Inc.
     </ion-title>
+    <ion-buttons end>
+      <button (click)="startScanning()">Scan</button>
+    </ion-buttons>
   </ion-navbar>
 </ion-header>
 
-<ion-content padding>
-  The world is your oyster.
-  <p>
-    If you get lost, the <a href="http://ionicframework.com/docs/v2">docs</a> will be your guide.
-  </p>
+<ion-content>
+  <ion-list inset>
+    <ion-item-sliding *ngFor="let device of devices" #slidingItem>
+      <button ion-item (click)="connectToDevice(device)">
+        <h2>{{device.name}}</h2>
+        <p>{{device.id}}</p>
+        <p>{{device.rssi}}</p>
+      </button>
+
+    </ion-item-sliding>
+  </ion-list>
+  <ion-spinner *ngIf="isScanning==true" name="circles"></ion-spinner>
 </ion-content>
