@@ -1,26 +1,25 @@
-This is a starter template for [Ionic](http://ionicframework.com/docs/) projects.
+## Prerequisites
+Install Ionic and cordova:
 
-## How to use this template
+    npm install -g cordova ionic
 
-*This template does not work on its own*. The shared files for each starter are found in the [ionic2-app-base repo](https://github.com/ionic-team/ionic2-app-base).
+Make sure you have the following configuration:
 
-To use this template, either create a new ionic project using the ionic node.js utility, or copy the files from this repository into the [Starter App Base](https://github.com/ionic-team/ionic2-app-base).
+    global packages:
 
-### With the Ionic CLI:
+        @ionic/cli-utils : 1.2.0
+        Ionic CLI        : 3.2.0
 
-Take the name after `ionic2-starter-`, and that is the name of the template to be used when using the `ionic start` command below:
+    local packages:
 
-```bash
-$ sudo npm install -g ionic cordova
-$ ionic start myBlank blank
-```
+        @ionic/app-scripts              : 1.3.7
+        @ionic/cli-plugin-ionic-angular : 1.2.0
+        Ionic Framework                 : ionic-angular 3.3.0
 
-Then, to run it, cd into `myBlank` and run:
+    System:
 
-```bash
-$ ionic cordova platform add ios
-$ ionic cordova run ios
-```
-
-Substitute ios for android if not on a Mac.
-
+        Node       : v6.8.1
+        OS         : macOS Sierra
+        Xcode      : Xcode 8.3.2 Build version 8E2002
+        ios-deploy : 1.9.1
+        ios-sim    : 5.0.13
