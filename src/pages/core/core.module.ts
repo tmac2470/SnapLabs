@@ -7,6 +7,10 @@ import {
   EmailValidatorDirective,
   HideKeyboardOnGoDirective
 } from './directive';
+import {
+  StorageService,
+  ToastService
+} from './service';
 
 const directives = [
   EmailValidatorDirective,
@@ -29,7 +33,11 @@ const directives = [
 export class CoreModule {
   static forRoot(): ModuleWithProviders {
     return {
-      ngModule: CoreModule
+      ngModule: CoreModule,
+      providers: [
+        StorageService,
+        ToastService
+      ]
     };
   }
 
