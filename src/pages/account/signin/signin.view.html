@@ -6,18 +6,18 @@
   </ion-navbar>
 </ion-header>
 
-<ion-content padding>
-  <form #signinForm="ngForm" margin-top>
-    <ion-list no-lines>
+<ion-content>
+  <form #signinForm="ngForm" margin-top vertical-middle>
+    <ion-list inset>
       <ion-item>
         <ion-label stacked>Email</ion-label>
-        <ion-input type="email" appValidateEmail name="emailAddress" [(ngModel)]="credentials.email" required>
+        <ion-input type="email" appValidateEmail appHideKeyBoardGo name="emailAddress" [(ngModel)]="credentials.email" required>
         </ion-input>
       </ion-item>
 
       <ion-item>
         <ion-label stacked>Password</ion-label>
-        <ion-input type="password" name="password" minlength="3" [(ngModel)]="credentials.password" required>
+        <ion-input type="password" name="password" appHideKeyBoardGo minlength="3" [(ngModel)]="credentials.password" required>
         </ion-input>
       </ion-item>
 
@@ -27,7 +27,7 @@
 </ion-content>
 
 <ion-footer>
-  <button ion-button color="secondary" full no-margin (click)="signin()" [disabled]="!signinForm.form.valid">
+  <button ion-button color="secondary" full no-margin (click)="signin(credentials)" [disabled]="!signinForm.form.valid">
     Sign In
   </button>
 </ion-footer>
