@@ -4,7 +4,7 @@ import { Component } from '@angular/core';
 import { NavController } from 'ionic-angular';
 // SnapApp
 import { ConnectPageComponent } from '../connect';
-import { SigninPageComponent } from '../account';
+import { SigninPageComponent, SignupPageComponent } from '../account';
 
 @Component({
   selector: 'home-page-component',
@@ -14,6 +14,7 @@ import { SigninPageComponent } from '../account';
 export class HomePageComponent {
   connectPageComponent = ConnectPageComponent;
   signinPageComponent = SigninPageComponent;
+  signupPageComponent = SignupPageComponent;
 
   constructor(
     private _navCtrl: NavController

@@ -4,10 +4,12 @@ import { ModuleWithProviders, NgModule, Optional, SkipSelf } from '@angular/core
 import { IonicModule } from 'ionic-angular';
 // Leezair
 import { SigninPageComponent } from './signin';
+import { SignupPageComponent } from './signup';
 import { CoreModule } from '../core/core.module';
 
 const pages = [
-  SigninPageComponent
+  SigninPageComponent,
+  SignupPageComponent
 ];
 
 @NgModule({

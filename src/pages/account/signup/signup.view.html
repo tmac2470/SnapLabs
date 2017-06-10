@@ -1,0 +1,46 @@
+<ion-header>
+  <ion-navbar>
+    <ion-title>
+      Sign Up
+    </ion-title>
+  </ion-navbar>
+</ion-header>
+
+<ion-content>
+  <form #signupForm="ngForm" margin-top vertical-middle>
+    <ion-list inset>
+
+      <ion-item>
+        <ion-label stacked>Username</ion-label>
+        <ion-input type="text" appHideKeyBoardGo name="username" [(ngModel)]="credentials.username" required>
+        </ion-input>
+      </ion-item>
+
+      <ion-item>
+        <ion-label stacked>Email</ion-label>
+        <ion-input type="email" appValidateEmail appHideKeyBoardGo name="emailAddress" [(ngModel)]="credentials.email" required>
+        </ion-input>
+      </ion-item>
+
+      <ion-item>
+        <ion-label stacked>Password</ion-label>
+
+        <ion-input type="password" name="password" appHideKeyBoardGo *ngIf="passwordDataType === DataType.PASSWORD" [(ngModel)]="credentials.password" minlength="3" required></ion-input>
+
+        <ion-input type="string" name="password" lzHideKeyBoardGo *ngIf="passwordDataType === DataType.STRING" [(ngModel)]="credentials.password" minlength="3" required></ion-input>
+
+        <button ion-button clear icon-only (click)="togglePasswordVisibility()" item-right>
+          <ion-icon color="dark" [name]="passwordDataType !== DataType.PASSWORD ? 'eye-off-outline' : 'eye-outline'"></ion-icon>
+        </button>
+      </ion-item>
+
+    </ion-list>
+  </form>
+
+</ion-content>
+
+<ion-footer>
+  <button ion-button color="secondary" full no-margin (click)="signup(credentials)" [disabled]="!signupForm.form.valid">
+    Submit
+  </button>
+</ion-footer>
