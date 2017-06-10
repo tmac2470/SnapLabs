@@ -1,0 +1,33 @@
+<ion-header>
+  <ion-navbar>
+    <ion-title>
+      Sign In
+    </ion-title>
+  </ion-navbar>
+</ion-header>
+
+<ion-content padding>
+  <form #signinForm="ngForm" margin-top>
+    <ion-list no-lines>
+      <ion-item>
+        <ion-label stacked>Email</ion-label>
+        <ion-input type="email" appValidateEmail name="emailAddress" [(ngModel)]="credentials.email" required>
+        </ion-input>
+      </ion-item>
+
+      <ion-item>
+        <ion-label stacked>Password</ion-label>
+        <ion-input type="password" name="password" minlength="3" [(ngModel)]="credentials.password" required>
+        </ion-input>
+      </ion-item>
+
+    </ion-list>
+  </form>
+
+</ion-content>
+
+<ion-footer>
+  <button ion-button color="secondary" full no-margin (click)="signin()" [disabled]="!signinForm.form.valid">
+    Sign In
+  </button>
+</ion-footer>
