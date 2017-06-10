@@ -4,13 +4,16 @@ import { IonicApp, IonicErrorHandler, IonicModule } from 'ionic-angular';
 import { SplashScreen } from '@ionic-native/splash-screen';
 import { StatusBar } from '@ionic-native/status-bar';
 
+// SnapLabApp
 import { SnapLabApp } from './app.component';
 import { HomePageComponent } from '../pages/home';
+import { ConnectPageComponent } from '../pages/connect';
 
 @NgModule({
   declarations: [
     SnapLabApp,
-    HomePageComponent
+    HomePageComponent,
+    ConnectPageComponent
   ],
   imports: [
     BrowserModule,
@@ -19,7 +22,8 @@ import { HomePageComponent } from '../pages/home';
   bootstrap: [IonicApp],
   entryComponents: [
     SnapLabApp,
-    HomePageComponent
+    HomePageComponent,
+    ConnectPageComponent
   ],
   providers: [
     StatusBar,

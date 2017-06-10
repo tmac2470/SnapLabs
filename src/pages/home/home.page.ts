@@ -3,49 +3,22 @@ import { Component } from '@angular/core';
 // Ionic
 import { NavController } from 'ionic-angular';
 import { BLE } from '@ionic-native/ble';
+// SnapApp
+import { ConnectPageComponent } from '../connect';
 
 @Component({
   selector: 'home-page-component',
   templateUrl: 'home.view.html'
 })
 export class HomePageComponent {
-  devices: string[] = [];
-  isScanning: boolean = false;
+  connectPageComponent = ConnectPageComponent;
 
-  constructor(public navCtrl: NavController) {
-    this.devices = [];
-    this.isScanning = false;
+  constructor(
+    private _navCtrl: NavController
+  ) { }
+
+  // Helper to open a given page
+  openPage(page: any) {
+    this._navCtrl.push(page);
   }
-
-  ionViewDidEnter() {
-    // this.startScanning();
-  }
-
-  // Scan for bluetooth devices nearby
-  startScanning() {
-    this.isScanning = true;
-    const ble = new BLE();
-
-    ble.startScan([]).subscribe(device => {
-      this.devices.push(device);
-    });
-
-    // Scan for 3 seconds and then stop
-    setTimeout(() => {
-      ble.stopScan().then(() => {
-        console.log('Scanning has stopped');
-        console.log(JSON.stringify(this.devices))
-        this.isScanning = false;
-      });
-    }, 3000);
-  }
-
-  connectToDevice(device) {
-    console.log('Connect To Device');
-    console.log(JSON.stringify(device))
-    // this.nav.push(DevicePage, {
-    //   device: device
-    // });
-  }
-
 }
