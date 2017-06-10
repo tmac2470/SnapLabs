@@ -1,19 +1,19 @@
-// // Angular
-// import { Directive, HostListener } from '@angular/core';
-// // Ionic
-// import { Keyboard } from 'ionic-native';
+// Angular
+import { Directive, HostListener } from '@angular/core';
+// Ionic
+import { Keyboard } from '@ionic-native/keyboard';
 
-// @Directive({
-//   selector: '[appHideKeyBoardGo]'
-// })
-// export class HideKeyboardOnGoDirective {
-//   @HostListener('keypress', ['$event'])
-//   onKeypress(event: KeyboardEvent) {
-//     if (event.keyCode === 13) {
-//       Keyboard.close();
-//     }
-//   }
+@Directive({
+  selector: '[appHideKeyBoardGo]'
+})
+export class HideKeyboardOnGoDirective {
+  constructor(private keyboard: Keyboard) { }
 
-//   constructor() {
-//   }
-//  };
+  @HostListener('keypress', ['$event'])
+  onKeypress(event: KeyboardEvent) {
+    if (event.keyCode === 13) {
+      this.keyboard.close();
+    }
+  }
+
+};

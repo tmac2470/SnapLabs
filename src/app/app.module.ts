@@ -3,6 +3,8 @@ import { ErrorHandler, NgModule } from '@angular/core';
 import { IonicApp, IonicErrorHandler, IonicModule } from 'ionic-angular';
 import { SplashScreen } from '@ionic-native/splash-screen';
 import { StatusBar } from '@ionic-native/status-bar';
+import { BLE } from '@ionic-native/ble'
+import { Keyboard } from '@ionic-native/keyboard';
 
 // SnapLabApp
 import { SnapLabApp } from './app.component';
@@ -34,8 +36,10 @@ import { CoreModule } from '../pages/core/core.module';
     ConnectPageComponent
   ],
   providers: [
-    StatusBar,
+    BLE,
+    Keyboard,
     SplashScreen,
+    StatusBar,
     { provide: ErrorHandler, useClass: IonicErrorHandler }
   ]
 })

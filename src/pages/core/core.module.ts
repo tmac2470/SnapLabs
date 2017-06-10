@@ -3,10 +3,14 @@ import { ModuleWithProviders, NgModule, Optional, SkipSelf } from '@angular/core
 // Ionic
 import { IonicModule } from 'ionic-angular';
 // Leezair
-import { EmailValidatorDirective } from './directive';
+import {
+  EmailValidatorDirective,
+  HideKeyboardOnGoDirective
+} from './directive';
 
 const directives = [
-  EmailValidatorDirective
+  EmailValidatorDirective,
+  HideKeyboardOnGoDirective
 ];
 
 @NgModule({
