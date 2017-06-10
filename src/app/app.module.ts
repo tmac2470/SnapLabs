@@ -17,7 +17,9 @@ import { ConnectPageComponent } from '../pages/connect';
   ],
   imports: [
     BrowserModule,
-    IonicModule.forRoot(SnapLabApp)
+    IonicModule.forRoot(SnapLabApp,{
+      backButtonText: '',
+    })
   ],
   bootstrap: [IonicApp],
   entryComponents: [
