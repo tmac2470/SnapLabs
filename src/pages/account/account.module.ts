@@ -5,6 +5,7 @@ import { IonicModule } from 'ionic-angular';
 // Leezair
 import { SigninPageComponent } from './signin';
 import { SignupPageComponent } from './signup';
+import { AccountService } from './account.service';
 import { CoreModule } from '../core/core.module';
 
 const pages = [
@@ -30,7 +31,10 @@ const pages = [
 export class AccountModule {
   static forRoot(): ModuleWithProviders {
     return {
-      ngModule: AccountModule
+      ngModule: AccountModule,
+      providers: [
+        AccountService
+      ]
     };
   }
 
