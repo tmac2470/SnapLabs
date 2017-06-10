@@ -2,13 +2,13 @@
 import { Component } from '@angular/core';
 // Ionic
 import { NavController } from 'ionic-angular';
-import { BLE } from '@ionic-native/ble';
 // SnapApp
 import { ConnectPageComponent } from '../connect';
 
 @Component({
   selector: 'home-page-component',
-  templateUrl: 'home.view.html'
+  templateUrl: 'home.view.html',
+  styles: ['./home.styles.scss']
 })
 export class HomePageComponent {
   connectPageComponent = ConnectPageComponent;

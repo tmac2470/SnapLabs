@@ -1,16 +1,28 @@
 <ion-header>
   <ion-navbar>
     <ion-title>
-      Snap Labs Inc.
+      SnapLabs
     </ion-title>
   </ion-navbar>
 </ion-header>
 
-<ion-content>
+<ion-content padding>
+  <img margin-top full-width src="../../assets/images/GrayLogoColour.jpg" />
+
+  <h2 text-center>Create. Investigate. Share.</h2>
+
+  <p class="margin-top">
+    <button ion-button block>Sign In</button>
+  </p>
+
+  <p>
+    <button ion-button block>Sign Up</button>
+  </p>
+
 </ion-content>
 
 <ion-footer>
-  <button ion-button full no-margin (click)="openPage(connectPageComponent)">
+  <button ion-button color="secondary" full no-margin (click)="openPage(connectPageComponent)">
     Connect
   </button>
 </ion-footer>
