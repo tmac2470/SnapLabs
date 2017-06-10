@@ -8,6 +8,8 @@ import { StatusBar } from '@ionic-native/status-bar';
 import { SnapLabApp } from './app.component';
 import { HomePageComponent } from '../pages/home';
 import { ConnectPageComponent } from '../pages/connect';
+import { AccountModule } from '../pages/account/account.module';
+import { CoreModule } from '../pages/core/core.module';
 
 @NgModule({
   declarations: [
@@ -17,9 +19,13 @@ import { ConnectPageComponent } from '../pages/connect';
   ],
   imports: [
     BrowserModule,
-    IonicModule.forRoot(SnapLabApp,{
+    IonicModule.forRoot(SnapLabApp, {
       backButtonText: '',
-    })
+    }),
+
+    // SnapLabs
+    AccountModule.forRoot(),
+    CoreModule.forRoot()
   ],
   bootstrap: [IonicApp],
   entryComponents: [
@@ -30,7 +36,7 @@ import { ConnectPageComponent } from '../pages/connect';
   providers: [
     StatusBar,
     SplashScreen,
-    {provide: ErrorHandler, useClass: IonicErrorHandler}
+    { provide: ErrorHandler, useClass: IonicErrorHandler }
   ]
 })
-export class AppModule {}
+export class AppModule { }
