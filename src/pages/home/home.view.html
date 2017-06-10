@@ -9,15 +9,34 @@
 <ion-content padding>
   <img margin-top full-width src="../../assets/images/GrayLogoColour.jpg" />
 
-  <h2 text-center>Create. Investigate. Share.</h2>
+  <div *ngIf="!isLoggedIn">
+    <h2 text-center margin-top>Create. Investigate. Share.</h2>
 
-  <p class="margin-top">
-    <button ion-button block (click)="openPage(signinPageComponent)">Sign In</button>
-  </p>
+    <p class="margin-top">
+      <button ion-button block (click)="openPage(signinPageComponent)">Sign In</button>
+    </p>
 
-  <p>
-    <button ion-button block (click)="openPage(signupPageComponent)">Sign Up</button>
-  </p>
+    <p>
+      <button ion-button block (click)="openPage(signupPageComponent)">Sign Up</button>
+    </p>
+  </div>
+
+  <div *ngIf="isLoggedIn">
+    <h2 text-center margin-top>What would you like to do?</h2>
+
+    <p class="margin-top">
+      <button ion-button block (click)="openPage()">
+        Select a local investigation
+      </button>
+    </p>
+
+    <p>
+      <button ion-button block (click)="openPage()">
+        Download a new investigation
+      </button>
+    </p>
+  </div>
+
 
 </ion-content>
 

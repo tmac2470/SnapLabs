@@ -4,7 +4,7 @@ import { Component } from '@angular/core';
 import { NavController } from 'ionic-angular';
 // SnapApp
 import { ConnectPageComponent } from '../connect';
-import { SigninPageComponent, SignupPageComponent } from '../account';
+import { SigninPageComponent, SignupPageComponent, AccountService } from '../account';
 
 @Component({
   selector: 'home-page-component',
@@ -16,9 +16,20 @@ export class HomePageComponent {
   signinPageComponent = SigninPageComponent;
   signupPageComponent = SignupPageComponent;
 
+  isLoggedIn: boolean = false;
+
   constructor(
+    private _accountService: AccountService,
     private _navCtrl: NavController
   ) { }
+
+  // LifeCycle methods
+  ionViewWillEnter() {
+    this._accountService.getUser()
+      .subscribe(user => {
+        this.isLoggedIn = !!user && !!user.email;
+      });
+  }
 
   // Helper to open a given page
   openPage(page: any) {
