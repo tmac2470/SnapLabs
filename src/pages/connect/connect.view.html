@@ -11,6 +11,17 @@
 </ion-header>
 
 <ion-content>
+  <ion-toolbar margin-top *ngIf="!isBluetoothEnabled">
+    <ion-title class="bluetooth-connectivity-error">
+      <span *ngIf="isAndroidDevice">Click to enable bluetooth</span>
+      <span *ngIf="!isAndroidDevice">Please enable bluetooth</span>
+    </ion-title>
+
+    <ion-buttons end *ngIf="isAndroidDevice">
+      <button ion-button color="primary" outline (click)="enableBluetooth()">Enable</button>
+    </ion-buttons>
+  </ion-toolbar>
+
   <ion-list inset>
     <ion-item-sliding *ngFor="let device of devices" #slidingItem>
       <button ion-item (click)="connectToDevice(device)">
@@ -18,8 +29,6 @@
         <p>{{device.id}}</p>
         <p>{{device.rssi}}</p>
       </button>
-
     </ion-item-sliding>
   </ion-list>
-  <ion-spinner *ngIf="isScanning==true" name="circles"></ion-spinner>
 </ion-content>

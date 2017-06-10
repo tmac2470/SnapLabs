@@ -1,27 +1,83 @@
 // Angular
 import { Component } from '@angular/core';
 // Ionic
-import { NavController, Platform } from 'ionic-angular';
+import { NavController, Platform, LoadingController } from 'ionic-angular';
 import { BLE } from '@ionic-native/ble';
+// App
+import { ToastService } from '../core/service';
 
 @Component({
   selector: 'connect-page-component',
-  templateUrl: 'connect.view.html'
+  templateUrl: 'connect.view.html',
+  styles: ['./connect.styles.scss']
 })
 export class ConnectPageComponent {
-  devices: string[] = [];
-  isScanning: boolean = false;
+  devices: string[]
+  isBluetoothEnabled: boolean = false;
+  isAndroidDevice: boolean = false;
 
   constructor(
-    private navCtrl: NavController,
+    private _navCtrl: NavController,
+    private _loadingCtrl: LoadingController,
+    private _toastService: ToastService,
+    private ble: BLE,
     private platform: Platform
   ) {
-    this.devices = [];
-    this.isScanning = false;
+    if (this.platform.is('android')) {
+      this.isAndroidDevice = true;
+    }
   }
 
   ionViewDidEnter() {
-    this.startScanning();
+    this.checkIfBluetoothEnabled();
+  }
+
+  // Checks if the bluetooth is enabled.
+  // If yes, scan for devices
+  // Else, throw an error
+  checkIfBluetoothEnabled() {
+    this.ble.isEnabled()
+      .then(connected => {
+        console.log('connected in bluetooth', connected);
+        this.isBluetoothEnabled = true;
+        this.startScanning();
+      }).catch(error => {
+        console.log('error in bluetooth', error);
+        this.isBluetoothEnabled = false;
+        this._toastService.present({
+          message: 'Please enable bluetooth!',
+          duration: 10000,
+        });
+      });
+  }
+
+  // Enable bluetooth directly from the app
+  // Only for android apps!
+  enableBluetooth() {
+    this.ble.enable()
+      .then(enabled => {
+        console.log('bluetooth enabled', enabled);
+        this._toastService.present({
+          message: 'Bluetooth enabled!',
+          duration: 1500,
+        });
+        this.checkIfBluetoothEnabled();
+      }).catch(error => {
+        console.log('error enabling bluetooth', error);
+
+        this._toastService.present({
+          message: 'Please enable bluetooth!',
+          duration: 10000
+        });
+      });
+  }
+
+  loading() {
+    let loader = this._loadingCtrl.create({
+      content: "Scanning..."
+    });
+    loader.present();
+    return loader;
   }
 
   // Scan for bluetooth devices nearby
@@ -30,19 +86,20 @@ export class ConnectPageComponent {
       return;
     }
 
-    this.isScanning = true;
-    const ble = new BLE();
+    this.devices = [];
+    // Get the loading modal
+    const loading = this.loading();
 
-    ble.startScan([]).subscribe(device => {
+    this.ble.startScan([]).subscribe(device => {
       this.devices.push(device);
     });
 
     // Scan for 3 seconds and then stop
     setTimeout(() => {
-      ble.stopScan().then(() => {
+      this.ble.stopScan().then(() => {
         console.log('Scanning has stopped');
         console.log(JSON.stringify(this.devices))
-        this.isScanning = false;
+        loading.dismiss();
       });
     }, 3000);
   }
@@ -50,9 +107,9 @@ export class ConnectPageComponent {
   connectToDevice(device) {
     console.log('Connect To Device');
     console.log(JSON.stringify(device))
-    // this.nav.push(DevicePage, {
-    //   device: device
-    // });
+    this.ble.connect(device.id).subscribe(data => {
+      console.log('device connected', device);
+    });
   }
 
 }
