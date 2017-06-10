@@ -12,6 +12,10 @@ export class ToastService {
   }
 
   present(options?: ToastOptions): Promise<Toast> {
+    // Set a default timeout of 3 seconds
+    options.duration = options && options.duration ? options.duration : 3000;
+    options.showCloseButton = true;
+
     const toast = this._toastController.create(options);
     return toast.present().then(_ => toast);
   }
