@@ -4,24 +4,25 @@ import { Component } from '@angular/core';
 import { NavController } from 'ionic-angular';
 import { BLE } from '@ionic-native/ble';
 
-
 @Component({
-  selector: 'page-home',
-  templateUrl: 'home.html'
+  selector: 'home-page-component',
+  templateUrl: 'home.view.html'
 })
-export class HomePage {
-  devices: string[];
-  isScanning: boolean;
+export class HomePageComponent {
+  devices: string[] = [];
+  isScanning: boolean = false;
 
   constructor(public navCtrl: NavController) {
     this.devices = [];
     this.isScanning = false;
   }
 
+  ionViewDidEnter() {
+    // this.startScanning();
+  }
 
+  // Scan for bluetooth devices nearby
   startScanning() {
-    console.log('Scanning Started');
-    this.devices = [];
     this.isScanning = true;
     const ble = new BLE();
 
@@ -29,6 +30,7 @@ export class HomePage {
       this.devices.push(device);
     });
 
+    // Scan for 3 seconds and then stop
     setTimeout(() => {
       ble.stopScan().then(() => {
         console.log('Scanning has stopped');
