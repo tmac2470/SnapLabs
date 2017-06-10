@@ -1,7 +1,7 @@
 // Angular
 import { Component } from '@angular/core';
 // Ionic
-import { NavController } from 'ionic-angular';
+import { NavController, Platform } from 'ionic-angular';
 import { BLE } from '@ionic-native/ble';
 
 @Component({
@@ -12,17 +12,24 @@ export class ConnectPageComponent {
   devices: string[] = [];
   isScanning: boolean = false;
 
-  constructor(public navCtrl: NavController) {
+  constructor(
+    private navCtrl: NavController,
+    private platform: Platform
+  ) {
     this.devices = [];
     this.isScanning = false;
   }
 
   ionViewDidEnter() {
-    // this.startScanning();
+    this.startScanning();
   }
 
   // Scan for bluetooth devices nearby
   startScanning() {
+    if (!this.platform.is('cordova')) {
+      return;
+    }
+
     this.isScanning = true;
     const ble = new BLE();
 
