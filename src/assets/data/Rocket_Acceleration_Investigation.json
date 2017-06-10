@@ -1,0 +1,319 @@
+{
+	"experimentConfig" : {
+		"labTitle" : "Acceleration Investigation",
+		"sampleInterval" : "100",
+		"captureOnClick" : "off",
+		"graphs" : "on",
+		"grids" : "off",
+		"sensorTags" : {
+			"0" : {
+				"connect" : "on",
+				"sensors" : {
+					"Accelerometer" : {
+						"graph" : {
+							"graphdisplay" : "on",
+							"graphType" : "spline",
+							"graphTitle" : "Rocket Acceleration",
+							"graphXAxis" : "Time (s)",
+							"graphYAxis" : "Acceleration (m/s2)"
+						},
+						"data" : {
+							"display" : "on",
+							"label" : "Accelerometer"
+						},
+						"captureOnClick" : "off",
+						"sampleinterval" : "100",
+						"grid" : {
+							"griddisplay" : "off",
+							"columns" : "4",
+							"rows" : "4"
+						},
+						"parameters" : {
+							"xyz" : "off", 
+							"scalar" : "on"
+						}
+					},
+					"Temperature" : {
+						"data" : {
+							"display" : "off",
+							"label" : "Temperature"
+						},
+						"graph" : {
+							"graphdisplay" : "off",
+							"graphType" : "spline",
+							"graphTitle" : "Temperature Graph",
+							"graphXAxis" : "Time (s)",
+							"graphYAxis" : "Temperature"
+						},
+						"captureOnClick" : "off",
+						"grid" : {
+							"griddisplay" : "off",
+							"columns" : "4",
+							"rows" : "4"
+						},
+						"parameters" : {
+							"ambient" : "on",
+							"IR" : "on"
+						}
+					},
+					"Humidity" : {
+						"data" : {
+							"display" : "off",
+							"label" : "Humidity"
+						},
+						"graph" : {
+							"graphdisplay" : "off",
+							"graphType" : "spline",
+							"graphTitle" : "Humidity Graph",
+							"graphXAxis" : "Time (s)",
+							"graphYAxis" : "Humidity"
+						},
+						"captureOnClick" : "off",
+						"grid" : {
+							"griddisplay" : "off",
+							"columns" : "4",
+							"rows" : "4"
+						}
+					},
+					"Barometer" : {
+						"data" : {
+							"display" : "off",
+							"label" : "Barometer"
+						},
+						"graph" : {
+							"graphdisplay" : "off",
+							"graphType" : "spline",
+							"graphTitle" : "Barometer Graph",
+							"graphXAxis" : "Time (s)",
+							"graphYAxis" : "Barometer"
+						},
+						"captureOnClick" : "off",
+						"grid" : {
+							"griddisplay" : "off",
+							"columns" : "4",
+							"rows" : "4"
+						}
+					},
+					"Gyroscope" : {
+						"data" : {
+							"display" : "off",
+							"label" : "Gyroscope"
+						},
+						"graph" : {
+							"graphdisplay" : "off",
+							"graphType" : "spline",
+							"graphTitle" : "Gyroscope Graph",
+							"graphXAxis" : "Time (s)",
+							"graphYAxis" : "Gyroscope"
+						},
+						"captureOnClick" : "off",
+						"grid" : {
+							"griddisplay" : "off",
+							"columns" : "4",
+							"rows" : "4"
+						}
+					},
+					"Magnetometer" : {
+						"data" : {
+							"display" : "off",
+							"label" : "Magnetometer"
+						},
+						"graph" : {
+							"graphdisplay" : "off",
+							"graphType" : "spline",
+							"graphTitle" : "Magnetometer Graph",
+							"graphXAxis" : "Time (s)",
+							"graphYAxis" : "Magnetometer"
+						},
+						"captureOnClick" : "off",
+						"grid" : {
+							"griddisplay" : "off",
+							"columns" : "4",
+							"rows" : "4"
+						},
+						"parameters" : {
+							"xyz" : "off",
+							"scalar" : "off"
+						}
+					},
+					"Luxometer" : {
+						"data" : {
+							"display" : "off",
+							"label" : "Luxometer"
+						},
+						"graph" : {
+							"graphdisplay" : "off",
+							"graphType" : "spline",
+							"graphTitle" : "Luxometer Graph",
+							"graphXAxis" : "Time (s)",
+							"graphYAxis" : "Luxometer"
+						},
+						"captureOnClick" : "off",
+						"grid" : {
+							"griddisplay" : "off",
+							"columns" : "4",
+							"rows" : "4"
+						}
+					}
+				},
+				"title" : "SensorTag"
+			},
+			"1" : {
+				"connect" : "off",
+				"title" : "SensorTag",
+				"sensors" : {
+					"Temperature" : {
+						"data" : {
+							"display" : "off",
+							"label" : "Temperature"
+						},
+						"graph" : {
+							"graphdisplay" : "off",
+							"graphType" : "spline",
+							"graphTitle" : "Temperature Graph",
+							"graphXAxis" : "Time (s)",
+							"graphYAxis" : "Temperature"
+						},
+						"captureOnClick" : "off",
+						"grid" : {
+							"griddisplay" : "off",
+							"columns" : "4",
+							"rows" : "4"
+						},
+						"parameters" : {
+							"ambient" : "on",
+							"IR" : "on"
+						}
+					},
+					"Humidity" : {
+						"data" : {
+							"display" : "off",
+							"label" : "Humidity"
+						},
+						"graph" : {
+							"graphdisplay" : "off",
+							"graphType" : "spline",
+							"graphTitle" : "Humidity Graph",
+							"graphXAxis" : "Time (s)",
+							"graphYAxis" : "Humidity"
+						},
+						"captureOnClick" : "off",
+						"grid" : {
+							"griddisplay" : "off",
+							"columns" : "4",
+							"rows" : "4"
+						}
+					},
+					"Barometer" : {
+						"data" : {
+							"display" : "off",
+							"label" : "Barometer"
+						},
+						"graph" : {
+							"graphdisplay" : "off",
+							"graphType" : "spline",
+							"graphTitle" : "Barometer Graph",
+							"graphXAxis" : "Time (s)",
+							"graphYAxis" : "Barometer"
+						},
+						"captureOnClick" : "off",
+						"grid" : {
+							"griddisplay" : "off",
+							"columns" : "4",
+							"rows" : "4"
+						}
+					},
+					"Accelerometer" : {
+						"data" : {
+							"display" : "off",
+							"label" : "Accelerometer"
+						},
+						"graph" : {
+							"graphdisplay" : "off",
+							"graphType" : "spline",
+							"graphTitle" : "Accelerometer Graph",
+							"graphXAxis" : "Time (s)",
+							"graphYAxis" : "Accelerometer"
+						},
+						"captureOnClick" : "off",
+						"grid" : {
+							"griddisplay" : "off",
+							"columns" : "4",
+							"rows" : "4"
+						},
+						"parameters" : {
+							"xyz" : "off",
+							"scalar" : "on"
+						}
+					},
+					"Gyroscope" : {
+						"data" : {
+							"display" : "off",
+							"label" : "Gyroscope"
+						},
+						"graph" : {
+							"graphdisplay" : "off",
+							"graphType" : "spline",
+							"graphTitle" : "Gyroscope Graph",
+							"graphXAxis" : "Time (s)",
+							"graphYAxis" : "Gyroscope"
+						},
+						"captureOnClick" : "off",
+						"grid" : {
+							"griddisplay" : "off",
+							"columns" : "4",
+							"rows" : "4"
+						}
+					},
+					"Magnetometer" : {
+						"data" : {
+							"display" : "off",
+							"label" : "Magnetometer"
+						},
+						"graph" : {
+							"graphdisplay" : "off",
+							"graphType" : "spline",
+							"graphTitle" : "Magnetometer Graph",
+							"graphXAxis" : "Time (s)",
+							"graphYAxis" : "Magnetometer"
+						},
+						"captureOnClick" : "off",
+						"grid" : {
+							"griddisplay" : "off",
+							"columns" : "4",
+							"rows" : "4"
+						},
+						"parameters" : {
+							"xyz" : "on",
+							"scalar" : "on"
+						}
+					},
+					"Luxometer" : {
+						"data" : {
+							"display" : "off",
+							"label" : "Luxometer"
+						},
+						"graph" : {
+							"graphdisplay" : "off",
+							"graphType" : "spline",
+							"graphTitle" : "Luxometer Graph",
+							"graphXAxis" : "Time (s)",
+							"graphYAxis" : "Luxometer"
+						},
+						"captureOnClick" : "off",
+						"grid" : {
+							"griddisplay" : "off",
+							"columns" : "4",
+							"rows" : "4"
+						}
+					}
+				}
+			}
+		},
+		"dataStorageAllowed" : "on",
+		"videoAllowed" : "on",
+		"dataStoragePrefix" : "accelerationData",
+		"videoPrefix" : "accelerationVideo",
+		"graphAutoStart" : "off"
+	}
+}
