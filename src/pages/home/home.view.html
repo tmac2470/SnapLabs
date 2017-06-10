@@ -1,9 +1,14 @@
 <ion-header>
-  <ion-navbar>
+  <ion-toolbar>
     <ion-title>
       SnapLabs
     </ion-title>
-  </ion-navbar>
+    <ion-buttons end>
+      <button ion-button outline *ngIf="isLoggedIn" (click)="logout()">
+        Logout
+      </button>
+    </ion-buttons>
+  </ion-toolbar>
 </ion-header>
 
 <ion-content padding>

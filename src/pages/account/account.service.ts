@@ -32,8 +32,8 @@ export class AccountService {
     return this._storageService.storage.set(StorageKey.USER_KEY, user);
   }
 
-  private _cleanUserFromLocalStorage(): void {
-    this._storageService.storage.remove(StorageKey.USER_KEY);
+  private _cleanUserFromLocalStorage(): Promise<any> {
+    return this._storageService.storage.remove(StorageKey.USER_KEY);
   }
 
   getUser(): Observable<IUserCredentials> {
@@ -61,7 +61,7 @@ export class AccountService {
   }
 
   logout(): Observable<any> {
-    this._cleanUserFromLocalStorage();
-    return new Observable();
+    const deleteUser = this._cleanUserFromLocalStorage();
+    return Observable.fromPromise(deleteUser);
   }
 }

@@ -24,3 +24,10 @@
 [vertical-middle]{
   margin-top: 50% !important;
 }
+
+// Prevent ionic from uppercasing the text in android
+ion-navbar, ion-toolbar {
+  button {
+    text-transform: none !important;
+  }
+}
