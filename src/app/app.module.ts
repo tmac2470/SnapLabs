@@ -14,6 +14,7 @@ import { AccountModule } from '../pages/account/account.module';
 import { CoreModule } from '../pages/core/core.module';
 import { ConnectModule } from '../pages/connect/connect.module';
 import { HomeModule } from '../pages/home/home.module';
+import { InvestigationsModule } from '../pages/investigations/investigations.module';
 import { AppShellPageComponent } from '../pages/app-shell/app-shell.component';
 
 @NgModule({
@@ -33,7 +34,8 @@ import { AppShellPageComponent } from '../pages/app-shell/app-shell.component';
     AccountModule.forRoot(),
     ConnectModule.forRoot(),
     CoreModule.forRoot(),
-    HomeModule.forRoot()
+    HomeModule.forRoot(),
+    InvestigationsModule.forRoot()
   ],
   bootstrap: [IonicApp],
   entryComponents: [

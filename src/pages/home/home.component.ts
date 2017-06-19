@@ -6,6 +6,7 @@ import { NavController, LoadingController } from 'ionic-angular';
 import { ConnectPageComponent } from '../connect';
 import { SigninPageComponent, SignupPageComponent, AccountService } from '../account';
 import { ToastService } from '../core/service';
+import { InvestigationsPageComponent } from '../investigations';
 
 @Component({
   selector: 'home-page-component',
@@ -14,6 +15,7 @@ import { ToastService } from '../core/service';
 })
 export class HomePageComponent {
   connectPageComponent = ConnectPageComponent;
+  investigationsPageComponent = InvestigationsPageComponent;
   signinPageComponent = SigninPageComponent;
   signupPageComponent = SignupPageComponent;
 
