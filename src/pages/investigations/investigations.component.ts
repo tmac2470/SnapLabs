@@ -3,8 +3,8 @@ import { Component } from '@angular/core';
 // Ionic
 import { NavController, LoadingController } from 'ionic-angular';
 // SnapApp
-import { ConnectPageComponent } from '../connect';
 import { ToastService } from '../core/service';
+import { InvestigationDetailsPageComponent } from '../investigation-details';
 
 @Component({
   selector: 'investigations-page-component',
@@ -12,7 +12,6 @@ import { ToastService } from '../core/service';
   styles: ['./investigations.styles.scss']
 })
 export class InvestigationsPageComponent {
-  connectPageComponent = ConnectPageComponent;
   investigations: any = [{
     key: 'balloon_pressure_investigation',
     name: 'Balloon Pressure Investigation'
@@ -41,8 +40,10 @@ export class InvestigationsPageComponent {
     return loader;
   }
 
-  // Helper to open a given page
-  openPage(page: any) {
-    this._navCtrl.push(page);
+  // Helper to open a given investigation details page
+  openInvestigationDetails(key: string) {
+    this._navCtrl.push(InvestigationDetailsPageComponent, {
+      investigationKey: key
+    });
   }
 }

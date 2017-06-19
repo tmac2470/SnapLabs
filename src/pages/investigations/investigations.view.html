@@ -10,7 +10,7 @@
   <h5 padding>Select an investigation</h5>
 
   <ion-list>
-    <ion-item *ngFor="let investigation of investigations" detail-push>
+    <ion-item *ngFor="let investigation of investigations" detail-push (click)="openInvestigationDetails(investigation.key)">
       {{ investigation.name }}
     </ion-item>
   </ion-list>
