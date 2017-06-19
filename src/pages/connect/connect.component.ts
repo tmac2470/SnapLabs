@@ -46,7 +46,7 @@ export class ConnectPageComponent {
         this.isBluetoothEnabled = false;
         this._toastService.present({
           message: 'Please enable bluetooth!',
-          duration: 10000,
+          duration: 3000
         });
       });
   }
@@ -66,8 +66,8 @@ export class ConnectPageComponent {
         console.log('error enabling bluetooth', error);
 
         this._toastService.present({
-          message: 'Please enable bluetooth!',
-          duration: 10000
+          message: 'Something went wrong! Please enable the bluetooth manually',
+          duration: 3000
         });
       });
   }
