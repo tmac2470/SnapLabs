@@ -34,3 +34,17 @@ Make sure you have the following configuration:
 
 ## Start the app
     npm start
+
+## Build the development versions of the app
+    npm run build:android:dev
+    npm run build:ios:dev
+
+## Build the production versions of the app
+    npm run build:android:prod
+    npm run build:ios:prod
+
+## Generate the app splashscreens and icon
+
+- Add a new splash.png and icon.png under `resources` folder before doing this step.
+
+      npm run resources

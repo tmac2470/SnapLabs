@@ -10,7 +10,12 @@
     "lint": "ionic-app-scripts lint",
     "ionic:build": "ionic-app-scripts build",
     "ionic:serve": "ionic-app-scripts serve",
-    "start": "ionic serve"
+    "start": "ionic serve",
+    "resources": "ionic cordova resources",
+    "build:android:prod": "ionic cordova build --release android",
+    "build:android:dev": "ionic cordova build android",
+    "build:ios:prod": "ionic cordova build --release ios",
+    "build:ios:dev": "ionic cordova build ios"
   },
   "cordovaPlugins": [
     "cordova-plugin-bluetoothle"
