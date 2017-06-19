@@ -14,10 +14,12 @@ import { AccountModule } from '../pages/account/account.module';
 import { CoreModule } from '../pages/core/core.module';
 import { ConnectModule } from '../pages/connect/connect.module';
 import { HomeModule } from '../pages/home/home.module';
+import { AppShellPageComponent } from '../pages/app-shell/app-shell.component';
 
 @NgModule({
   declarations: [
-    SnapLabApp
+    SnapLabApp,
+    AppShellPageComponent
   ],
   imports: [
     BrowserModule,
@@ -35,7 +37,8 @@ import { HomeModule } from '../pages/home/home.module';
   ],
   bootstrap: [IonicApp],
   entryComponents: [
-    SnapLabApp
+    SnapLabApp,
+    AppShellPageComponent
   ],
   providers: [
     BLE,

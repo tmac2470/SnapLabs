@@ -1,16 +1,20 @@
-import { Component } from '@angular/core';
-import { Platform } from 'ionic-angular';
+// Angular
+import { AfterViewInit, Component, ViewChild } from '@angular/core';
+// Ionic
+import { Nav, Platform } from 'ionic-angular';
 import { StatusBar } from '@ionic-native/status-bar';
 import { SplashScreen } from '@ionic-native/splash-screen';
 
 // SnapLabs
 import { HomePageComponent } from '../pages/home';
+import { AppShellPageComponent } from '../pages/app-shell';
 
 @Component({
   templateUrl: 'app.html'
 })
-export class SnapLabApp {
-  rootPage:any = HomePageComponent;
+export class SnapLabApp implements AfterViewInit {
+  rootPage: any = AppShellPageComponent;
+  @ViewChild(Nav) nav: Nav;
 
   constructor(platform: Platform, statusBar: StatusBar, splashScreen: SplashScreen) {
     platform.ready().then(() => {
@@ -19,6 +23,11 @@ export class SnapLabApp {
       statusBar.styleDefault();
       splashScreen.hide();
     });
+  }
+
+  // Component lifecycles
+  ngAfterViewInit(): void {
+    this.nav.setRoot(HomePageComponent);
   }
 }
 
