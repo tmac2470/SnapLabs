@@ -13,8 +13,9 @@ import { ToastService } from '../../core/service';
 })
 export class SigninPageComponent {
   credentials: IUserCredentials = {
-    email: '',
-    password: ''
+    email: ''
+    // ,
+    // password: ''
   };
 
   constructor(

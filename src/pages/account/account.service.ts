@@ -52,7 +52,9 @@ export class AccountService {
     const userPromise = this._storageService.storage.get(StorageKey.USER_KEY);
     return Observable.fromPromise(userPromise)
       .map(user => {
-        if (user && user.email === credentials.email && user.password === credentials.password) {
+        if (user && user.email === credentials.email
+          // && user.password === credentials.password
+        ) {
           return user;
         } else {
           return null;

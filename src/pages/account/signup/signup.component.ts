@@ -21,7 +21,7 @@ export class SignupPageComponent {
   passwordDataType: DataType = DataType.PASSWORD;
   credentials: IUserCredentials = {
     email: '',
-    password: '',
+    // password: '',
     username: ''
   };
 
