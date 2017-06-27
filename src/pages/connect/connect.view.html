@@ -5,7 +5,7 @@
     </ion-title>
 
     <ion-buttons end>
-      <button ion-button outline (click)="startScanning()">Scan</button>
+      <button ion-button outline [disabled]="isScanning" (click)="startScanning()">Scan</button>
     </ion-buttons>
   </ion-navbar>
 </ion-header>
@@ -22,13 +22,29 @@
     </ion-buttons>
   </ion-toolbar>
 
+  <ion-list no-padding no-lines margin-top>
+    <ion-item text-wrap *ngIf="connectedDevice?.id">
+      <h2>Connected to :
+        <span *ngIf="connectedDevice?.name">{{ connectedDevice.name }}</span>
+        <span *ngIf="connectedDevice?.id">{{ connectedDevice.id }}</span>
+      </h2>
+      <ion-icon name="checkmark-circle-outline" color="green" item-right></ion-icon>
+    </ion-item>
+
+    <ion-item text-wrap *ngIf="!connectedDevice?.id">
+      <h2>Status: Not connected</h2>
+    </ion-item>
+  </ion-list>
+
   <ion-list inset>
-    <ion-item-sliding *ngFor="let device of devices" #slidingItem>
-      <button ion-item (click)="connectToDevice(device)">
-        <h2>{{device.name}}</h2>
-        <p>{{device.id}}</p>
-        <p>{{device.rssi}}</p>
-      </button>
-    </ion-item-sliding>
+    <ion-item *ngFor="let device of devices" (click)="connectToDevice(device)">
+      <h2>{{device.name}}</h2>
+      <p>{{device.id}}</p>
+      <p>{{device.rssi}}</p>
+    </ion-item>
+
+    <ion-item *ngIf="isScanning" text-center>
+      Scanning...
+    </ion-item>
   </ion-list>
 </ion-content>

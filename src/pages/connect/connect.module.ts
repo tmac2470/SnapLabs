@@ -4,6 +4,7 @@ import { ModuleWithProviders, NgModule, Optional, SkipSelf } from '@angular/core
 import { IonicModule } from 'ionic-angular';
 // Leezair
 import { ConnectPageComponent } from './connect.component';
+import { ConnectService } from './connect.service';
 
 const pages = [
   ConnectPageComponent
@@ -26,7 +27,10 @@ const pages = [
 export class ConnectModule {
   static forRoot(): ModuleWithProviders {
     return {
-      ngModule: ConnectModule
+      ngModule: ConnectModule,
+      providers: [
+        ConnectService
+      ]
     };
   }
 

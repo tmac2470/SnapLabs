@@ -2,9 +2,9 @@
 import { Component } from '@angular/core';
 // Ionic
 import { NavController, Platform, LoadingController } from 'ionic-angular';
-import { BLE } from '@ionic-native/ble';
 // App
 import { ToastService } from '../core/service';
+import { ConnectService } from './connect.service';
 
 @Component({
   selector: 'connect-page-component',
@@ -15,12 +15,14 @@ export class ConnectPageComponent {
   devices: string[]
   isBluetoothEnabled: boolean = false;
   isAndroidDevice: boolean = false;
+  connectedDevice: any = {};
+  isScanning: boolean = false;
 
   constructor(
+    private _connectService: ConnectService,
     private _navCtrl: NavController,
     private _loadingCtrl: LoadingController,
     private _toastService: ToastService,
-    private ble: BLE,
     private platform: Platform
   ) {
     if (this.platform.is('android')) {
@@ -36,13 +38,11 @@ export class ConnectPageComponent {
   // If yes, scan for devices
   // Else, throw an error
   checkIfBluetoothEnabled() {
-    this.ble.isEnabled()
+    this._connectService.isBluetoothEnabled()
       .then(connected => {
-        console.log('connected in bluetooth', connected);
         this.isBluetoothEnabled = true;
         this.startScanning();
       }).catch(error => {
-        console.log('error in bluetooth', error);
         this.isBluetoothEnabled = false;
         this._toastService.present({
           message: 'Please enable bluetooth!',
@@ -54,17 +54,14 @@ export class ConnectPageComponent {
   // Enable bluetooth directly from the app
   // Only for android apps!
   enableBluetooth() {
-    this.ble.enable()
+    this._connectService.enableBluetooth()
       .then(enabled => {
-        console.log('bluetooth enabled', enabled);
         this._toastService.present({
           message: 'Bluetooth enabled!',
           duration: 1500,
         });
         this.checkIfBluetoothEnabled();
       }).catch(error => {
-        console.log('error enabling bluetooth', error);
-
         this._toastService.present({
           message: 'Something went wrong! Please enable the bluetooth manually',
           duration: 3000
@@ -72,44 +69,62 @@ export class ConnectPageComponent {
       });
   }
 
-  loading() {
+  loading(text: string = 'Scanning...') {
     let loader = this._loadingCtrl.create({
-      content: "Scanning..."
+      content: text
     });
     loader.present();
     return loader;
   }
 
   // Scan for bluetooth devices nearby
+  private scanForDevices() {
+    this.devices = [];
+
+    this.isScanning = true;
+    this._connectService.startScanning([])
+      .subscribe(device => {
+        this.devices.push(device);
+      },
+      error => {
+        this._toastService.present({
+          message: 'Something went wrong while searching for bluetooth devices. Please retry!',
+          duration: 3000
+        });
+      });
+
+    // Scan for 3 seconds and then stop
+    setTimeout(() => {
+      this._connectService.stopScanning()
+        .then(() => {
+          this.isScanning = false;
+        });
+    }, 3000);
+  }
+
   startScanning() {
     if (!this.platform.is('cordova')) {
       return;
     }
 
-    this.devices = [];
-    // Get the loading modal
-    const loading = this.loading();
-
-    this.ble.startScan([]).subscribe(device => {
-      this.devices.push(device);
-    });
-
-    // Scan for 3 seconds and then stop
-    setTimeout(() => {
-      this.ble.stopScan().then(() => {
-        console.log('Scanning has stopped');
-        console.log(JSON.stringify(this.devices))
-        loading.dismiss();
-      });
-    }, 3000);
+    this.scanForDevices();
   }
 
   connectToDevice(device) {
-    console.log('Connect To Device');
-    console.log(JSON.stringify(device))
-    this.ble.connect(device.id).subscribe(data => {
-      console.log('device connected', device);
-    });
-  }
+    const loading = this.loading('Connecting...');
 
+    this._connectService.connectToDeviceId(device.id)
+      .subscribe(data => {
+        console.log(device);
+        console.log('device connected', device);
+        this.connectedDevice = device;
+        loading.dismiss();
+      },
+      error => {
+        this._toastService.present({
+          message: 'Unable to connect to device. Please retry!',
+          duration: 3000
+        });
+      });
+  }
 }
