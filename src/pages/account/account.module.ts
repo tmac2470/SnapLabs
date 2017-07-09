@@ -2,7 +2,7 @@
 import { ModuleWithProviders, NgModule, Optional, SkipSelf } from '@angular/core';
 // Ionic
 import { IonicModule } from 'ionic-angular';
-// Leezair
+// SnapApp
 import { SigninPageComponent } from './signin';
 import { SignupPageComponent } from './signup';
 import { AccountService } from './account.service';

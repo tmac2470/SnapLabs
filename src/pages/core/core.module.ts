@@ -2,7 +2,7 @@
 import { ModuleWithProviders, NgModule, Optional, SkipSelf } from '@angular/core';
 // Ionic
 import { IonicModule } from 'ionic-angular';
-// Leezair
+// SnapApp
 import {
   EmailValidatorDirective,
   HideKeyboardOnGoDirective

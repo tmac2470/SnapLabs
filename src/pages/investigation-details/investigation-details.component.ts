@@ -13,7 +13,7 @@ import { ToastService } from '../core/service';
 })
 export class InvestigationDetailsPageComponent {
   connectPageComponent = ConnectPageComponent;
-  investigationKey: string;
+  investigation: any;
 
   constructor(
     private _loadingCtrl: LoadingController,
@@ -21,7 +21,7 @@ export class InvestigationDetailsPageComponent {
     private _navParams: NavParams,
     private _toastService: ToastService
   ) {
-    this.investigationKey = this._navParams.get('investigationKey');
+    this.investigation = this._navParams.get('investigation');
   }
 
   // LifeCycle methods

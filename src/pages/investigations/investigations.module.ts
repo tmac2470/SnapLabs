@@ -2,8 +2,9 @@
 import { ModuleWithProviders, NgModule, Optional, SkipSelf } from '@angular/core';
 // Ionic
 import { IonicModule } from 'ionic-angular';
-// Leezair
+// Snapapp
 import { InvestigationsPageComponent } from './investigations.component';
+import { InvestigationsService } from './investigations.service';
 
 const pages = [
   InvestigationsPageComponent
@@ -26,7 +27,10 @@ const pages = [
 export class InvestigationsModule {
   static forRoot(): ModuleWithProviders {
     return {
-      ngModule: InvestigationsModule
+      ngModule: InvestigationsModule,
+      providers: [
+        InvestigationsService
+      ]
     };
   }
 

@@ -1,6 +1,7 @@
 // Angular
 import { BrowserModule } from '@angular/platform-browser';
 import { ErrorHandler, NgModule } from '@angular/core';
+import { Http, HttpModule } from '@angular/http';
 // Ionic
 import { IonicApp, IonicErrorHandler, IonicModule } from 'ionic-angular';
 import { SplashScreen } from '@ionic-native/splash-screen';
@@ -25,6 +26,7 @@ import { AppShellPageComponent } from '../pages/app-shell/app-shell.component';
   ],
   imports: [
     BrowserModule,
+    HttpModule,
     // Ionic
     IonicModule.forRoot(SnapLabApp, {
       backButtonText: '',
