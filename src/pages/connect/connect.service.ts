@@ -22,6 +22,10 @@ export class ConnectService {
     this._storageService.storage.set(StorageKey.CONNECTED_DEVICE, device);
   }
 
+  getLastDevice(): Promise<any> {
+    return this._storageService.storage.get(StorageKey.CONNECTED_DEVICE);
+  }
+
   isBluetoothEnabled(): Promise<any> {
     return this.ble.isEnabled();
   }
@@ -41,5 +45,9 @@ export class ConnectService {
   connectToDeviceId(id: string): Observable<any> {
     return this.ble.connect(id)
       .map(device => this.saveConnectedDevice(device));
+  }
+
+  isConnectedToDevice(id: string): Promise<any> {
+    return this.ble.isConnected(id);
   }
 }

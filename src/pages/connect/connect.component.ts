@@ -31,7 +31,18 @@ export class ConnectPageComponent {
   }
 
   ionViewDidEnter() {
+    this.isConnectedToAnyDevice();
     this.checkIfBluetoothEnabled();
+  }
+
+  isConnectedToAnyDevice() {
+    this._connectService.getLastDevice()
+      .then(device => {
+        this._connectService.isConnectedToDevice(device.id)
+          .then(connected => {
+            this.connectedDevice = device;
+          });
+      });
   }
 
   // Checks if the bluetooth is enabled.
