@@ -1,2 +1,2 @@
 export * from './investigation-details.component';
-export * from './investigation.model';
+export * from './investigation-details.model';

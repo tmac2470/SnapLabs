@@ -7,5 +7,24 @@
 </ion-header>
 
 <ion-content>
+  <ion-list inset no-lines>
+    <ion-item>
+      <h2>{{ investigation.data.experimentConfig.labTitle }}</h2>
+    </ion-item>
+    <ion-item>
+      <h5>Maximum Samling Interval (ms): {{ investigation.data.experimentConfig.sampleInterval }}</h5>
+      <h5>
+        Status:
+      </h5>
+    </ion-item>
+  </ion-list>
 
+  <ion-list inset no-lines *ngFor="let sensor of sensors">
+    <ion-item>
+      <h4>{{ sensor.name }}</h4>
+    </ion-item>
+
+    <ion-item *ngif="sensor.config.data.display === 'on' || sensor.config.data.display === '1'">
+    </ion-item>
+  </ion-list>
 </ion-content>
