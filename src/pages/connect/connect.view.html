@@ -39,6 +39,7 @@
   <ion-list inset>
     <ion-item *ngFor="let device of devices" (click)="connectToDevice(device)">
       <h2>{{device.name}}</h2>
+      <ion-icon *ngIf="device.id === connectedDevice?.id" name="checkmark-circle-outline" color="green" item-right></ion-icon>
       <p>{{device.id}}</p>
       <p>{{device.rssi}}</p>
     </ion-item>
