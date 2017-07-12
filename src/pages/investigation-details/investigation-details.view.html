@@ -24,7 +24,13 @@
       <h4>{{ sensor.name }}</h4>
     </ion-item>
 
-    <ion-item *ngif="sensor.config.data.display === 'on' || sensor.config.data.display === '1'">
-    </ion-item>
+    <!--<ion-item *ngif="sensor.config.data.display === 'on' || sensor.config.data.display === '1'">
+    </ion-item>-->
   </ion-list>
 </ion-content>
+
+<ion-footer *ngIf="!connectedDevice?.id">
+  <button ion-button color="secondary" full no-margin (click)="openPage(connectPageComponent)">
+    Connect
+  </button>
+</ion-footer>
