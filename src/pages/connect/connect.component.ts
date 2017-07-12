@@ -1,18 +1,18 @@
 // Angular
-import { Component } from '@angular/core';
+import { Component } from "@angular/core";
 // Ionic
-import { NavController, Platform, LoadingController } from 'ionic-angular';
+import { NavController, Platform, LoadingController } from "ionic-angular";
 // App
-import { ToastService } from '../core/service';
-import { ConnectService } from './connect.service';
+import { ToastService } from "../core/service";
+import { ConnectService } from "./connect.service";
 
 @Component({
-  selector: 'connect-page-component',
-  templateUrl: 'connect.view.html',
-  styles: ['./connect.styles.scss']
+  selector: "connect-page-component",
+  templateUrl: "connect.view.html",
+  styles: ["./connect.styles.scss"]
 })
 export class ConnectPageComponent {
-  devices: string[]
+  devices: string[];
   isBluetoothEnabled: boolean = false;
   isAndroidDevice: boolean = false;
   connectedDevice: any = {};
@@ -25,7 +25,7 @@ export class ConnectPageComponent {
     private _toastService: ToastService,
     private platform: Platform
   ) {
-    if (this.platform.is('android')) {
+    if (this.platform.is("android")) {
       this.isAndroidDevice = true;
     }
   }
@@ -36,27 +36,25 @@ export class ConnectPageComponent {
   }
 
   isConnectedToAnyDevice() {
-    this._connectService.getLastDevice()
-      .then(device => {
-        this._connectService.isConnectedToDevice(device.id)
-          .then(connected => {
-            this.connectedDevice = device;
-          });
-      });
+    this._connectService.getConnectedDevice().then(device => {
+      this.connectedDevice = device;
+    });
   }
 
   // Checks if the bluetooth is enabled.
   // If yes, scan for devices
   // Else, throw an error
   checkIfBluetoothEnabled() {
-    this._connectService.isBluetoothEnabled()
+    this._connectService
+      .isBluetoothEnabled()
       .then(connected => {
         this.isBluetoothEnabled = true;
         this.startScanning();
-      }).catch(error => {
+      })
+      .catch(error => {
         this.isBluetoothEnabled = false;
         this._toastService.present({
-          message: 'Please enable bluetooth!',
+          message: "Please enable bluetooth!",
           duration: 3000
         });
       });
@@ -65,22 +63,24 @@ export class ConnectPageComponent {
   // Enable bluetooth directly from the app
   // Only for android apps!
   enableBluetooth() {
-    this._connectService.enableBluetooth()
+    this._connectService
+      .enableBluetooth()
       .then(enabled => {
         this._toastService.present({
-          message: 'Bluetooth enabled!',
-          duration: 1500,
+          message: "Bluetooth enabled!",
+          duration: 1500
         });
         this.checkIfBluetoothEnabled();
-      }).catch(error => {
+      })
+      .catch(error => {
         this._toastService.present({
-          message: 'Something went wrong! Please enable the bluetooth manually',
+          message: "Something went wrong! Please enable the bluetooth manually",
           duration: 3000
         });
       });
   }
 
-  loading(text: string = 'Scanning...') {
+  loading(text: string = "Scanning...") {
     let loader = this._loadingCtrl.create({
       content: text
     });
@@ -93,28 +93,29 @@ export class ConnectPageComponent {
     this.devices = [];
 
     this.isScanning = true;
-    this._connectService.startScanning([])
-      .subscribe(device => {
+    this._connectService.startScanning([]).subscribe(
+      device => {
         this.devices.push(device);
       },
       error => {
         this._toastService.present({
-          message: 'Something went wrong while searching for bluetooth devices. Please retry!',
+          message:
+            "Something went wrong while searching for bluetooth devices. Please retry!",
           duration: 3000
         });
-      });
+      }
+    );
 
     // Scan for 3 seconds and then stop
     setTimeout(() => {
-      this._connectService.stopScanning()
-        .then(() => {
-          this.isScanning = false;
-        });
+      this._connectService.stopScanning().then(() => {
+        this.isScanning = false;
+      });
     }, 3000);
   }
 
   startScanning() {
-    if (!this.platform.is('cordova')) {
+    if (!this.platform.is("cordova")) {
       return;
     }
 
@@ -122,20 +123,21 @@ export class ConnectPageComponent {
   }
 
   connectToDevice(device) {
-    const loading = this.loading('Connecting...');
+    const loading = this.loading("Connecting...");
 
-    this._connectService.connectToDeviceId(device.id)
-      .subscribe(data => {
+    this._connectService.connectToDeviceId(device.id).subscribe(
+      data => {
         console.log(device);
-        console.log('device connected', device);
+        console.log("device connected", device);
         this.connectedDevice = device;
         loading.dismiss();
       },
       error => {
         this._toastService.present({
-          message: 'Unable to connect to device. Please retry!',
+          message: "Unable to connect to device. Please retry!",
           duration: 3000
         });
-      });
+      }
+    );
   }
 }

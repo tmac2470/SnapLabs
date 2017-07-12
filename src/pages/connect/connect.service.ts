@@ -1,20 +1,15 @@
 // Other libraries
-import { Observable } from 'rxjs/Observable';
+import { Observable } from "rxjs/Observable";
 // Angular
-import { Injectable } from '@angular/core';
+import { Injectable } from "@angular/core";
 // Ionic
-import { BLE } from '@ionic-native/ble';
+import { BLE } from "@ionic-native/ble";
 // App
-import { StorageService, StorageKey } from '../core/service';
+import { StorageService, StorageKey } from "../core/service";
 
 @Injectable()
 export class ConnectService {
-
-  constructor(
-    private ble: BLE,
-    private _storageService: StorageService
-  ) {
-  }
+  constructor(private ble: BLE, private _storageService: StorageService) {}
 
   // Methods
 
@@ -43,11 +38,21 @@ export class ConnectService {
   }
 
   connectToDeviceId(id: string): Observable<any> {
-    return this.ble.connect(id)
-      .map(device => this.saveConnectedDevice(device));
+    return this.ble.connect(id).map(device => this.saveConnectedDevice(device));
   }
 
   isConnectedToDevice(id: string): Promise<any> {
     return this.ble.isConnected(id);
+  }
+
+  getConnectedDevice(): Promise<any> {
+    return this.getLastDevice().then(device => {
+      if (!device) {
+        return new Promise(null);
+      }
+      this.isConnectedToDevice(device.id).then(connected => {
+        return new Promise(connected);
+      });
+    });
   }
 }
