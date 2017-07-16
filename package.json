@@ -15,7 +15,11 @@
         "build:android:prod": "ionic cordova build --release android",
         "build:android:dev": "ionic cordova build android",
         "build:ios:prod": "ionic cordova build --release ios",
-        "build:ios:dev": "ionic cordova build ios"
+        "build:ios:dev": "ionic cordova build ios",
+        "run:android": "ionic cordova run android",
+        "run:ios": "ionic cordova run ios",
+        "run:android:live": "ionic cordova run android -l",
+        "run:ios:live": "ionic cordova run ios -l"
     },
     "cordovaPlugins": [
         "cordova-plugin-bluetoothle"
