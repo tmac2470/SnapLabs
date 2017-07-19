@@ -15,6 +15,7 @@ export class ConnectService {
 
   private saveConnectedDevice(device: any) {
     this._storageService.storage.set(StorageKey.CONNECTED_DEVICE, device);
+    return device;
   }
 
   getLastDevice(): Promise<any> {
@@ -38,7 +39,19 @@ export class ConnectService {
   }
 
   connectToDeviceId(id: string): Observable<any> {
+    this.disconnect(id)
+      .then(disconnected => {
+        // Ok disconnected
+      })
+      .catch(error => {
+        // error disconnecting
+      });
+
     return this.ble.connect(id).map(device => this.saveConnectedDevice(device));
+  }
+
+  disconnect(id: string): Promise<any> {
+    return this.ble.disconnect(id);
   }
 
   isConnectedToDevice(id: string): Promise<any> {
@@ -49,10 +62,27 @@ export class ConnectService {
     return this.getLastDevice().then(device => {
       if (!device) {
         return new Promise(null);
+      } else {
+        return this.isConnectedToDevice(device.id)
+          .then(connected => {
+            return connected ? device : null;
+          })
+          .catch(e => {
+            return e;
+          });
       }
-      this.isConnectedToDevice(device.id).then(connected => {
-        return new Promise(connected);
-      });
     });
+  }
+
+  registerService(deviceId: string, service: any): Promise<any> {
+    return this.ble.read(deviceId, service.UUID, service.DATA);
+  }
+
+  startNotification(deviceId: string, service: any): Observable<any> {
+    return this.ble.startNotification(deviceId, service.UUID, service.DATA);
+  }
+
+  readCharacteristic(deviceId: string, service: any): Promise<any> {
+    return this.ble.read(deviceId, service.UUID, service.DATA);
   }
 }

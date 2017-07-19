@@ -36,9 +36,15 @@ export class ConnectPageComponent {
   }
 
   isConnectedToAnyDevice() {
-    this._connectService.getConnectedDevice().then(device => {
-      this.connectedDevice = device;
-    });
+    this._connectService
+      .getConnectedDevice()
+      .then(device => {
+        this.connectedDevice = device;
+      })
+      .catch(error => {
+        // No device connected
+        this.connectedDevice = {};
+      });
   }
 
   // Checks if the bluetooth is enabled.
@@ -108,9 +114,17 @@ export class ConnectPageComponent {
 
     // Scan for 3 seconds and then stop
     setTimeout(() => {
-      this._connectService.stopScanning().then(() => {
-        this.isScanning = false;
-      });
+      this._connectService
+        .stopScanning()
+        .then(() => {
+          this.isScanning = false;
+        })
+        .catch(e => {
+          this._toastService.present({
+            message: "Unable to scan for devices. Please retry!",
+            duration: 3000
+          });
+        });
     }, 3000);
   }
 
@@ -127,9 +141,7 @@ export class ConnectPageComponent {
 
     this._connectService.connectToDeviceId(device.id).subscribe(
       data => {
-        console.log(device);
-        console.log("device connected", device);
-        this.connectedDevice = device;
+        this.connectedDevice = data;
         loading.dismiss();
       },
       error => {
@@ -137,7 +149,27 @@ export class ConnectPageComponent {
           message: "Unable to connect to device. Please retry!",
           duration: 3000
         });
+        loading.dismiss();
       }
     );
+  }
+
+  disconnect() {
+    const loading = this.loading("Disconnecting...");
+
+    this._connectService
+      .disconnect(this.connectedDevice.id)
+      .then(_ => {
+        this.isConnectedToAnyDevice();
+        this.scanForDevices();
+        loading.dismiss();
+      })
+      .catch(e => {
+        this._toastService.present({
+          message: "Unable to connect to device. Please retry!",
+          duration: 3000
+        });
+        loading.dismiss();
+      });
   }
 }
