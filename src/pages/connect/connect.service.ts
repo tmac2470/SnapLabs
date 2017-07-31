@@ -74,12 +74,12 @@ export class ConnectService {
     });
   }
 
-  registerService(deviceId: string, service: any): Promise<any> {
-    return this.ble.read(deviceId, service.UUID, service.DATA);
-  }
-
   startNotification(deviceId: string, service: any): Observable<any> {
     return this.ble.startNotification(deviceId, service.UUID, service.DATA);
+  }
+
+  stopNotification(deviceId: string, service: any): Promise<any> {
+    return this.ble.stopNotification(deviceId, service.UUID, service.DATA);
   }
 
   readCharacteristic(deviceId: string, service: any): Promise<any> {
