@@ -12,7 +12,7 @@
       <h2>{{ investigation.data.experimentConfig.labTitle }}</h2>
     </ion-item>
     <ion-item>
-      <h5>Maximum Samling Interval (ms): {{ investigation.data.experimentConfig.sampleInterval }}</h5>
+      <h5>Maximum Sampling Interval (ms): {{ investigation.data.experimentConfig.sampleInterval }}</h5>
       <h5>
         Status:
       </h5>
@@ -29,8 +29,8 @@
   </ion-list>
 </ion-content>
 
-<ion-footer *ngIf="!connectedDevice?.id">
+<ion-footer>
   <button ion-button color="secondary" full no-margin (click)="openPage(connectPageComponent)">
-    Connect
+    Sensor tag
   </button>
 </ion-footer>
