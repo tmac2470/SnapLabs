@@ -74,8 +74,8 @@ export class ConnectService {
     });
   }
 
-  readData(deviceId: string, service: any, data: any): Observable<any> {
-    return this.ble.startNotification(deviceId, service, data);
+  readData(deviceId: string, service: any): Observable<any> {
+    return this.ble.startNotification(deviceId, service.UUID, service.DATA);
   }
 
   stopReadingData(deviceId: string, service: any): Promise<any> {
@@ -86,12 +86,7 @@ export class ConnectService {
     return this.ble.read(deviceId, service.UUID, service.DATA);
   }
 
-  writeToDevice(
-    deviceId: string,
-    service: any,
-    data: any,
-    buffer: any
-  ): Promise<any> {
-    return this.ble.write(deviceId, service, data, buffer);
+  writeToDevice(deviceId: string, service: any, buffer: any): Promise<any> {
+    return this.ble.write(deviceId, service.UUID, service.CONFIG, buffer);
   }
 }

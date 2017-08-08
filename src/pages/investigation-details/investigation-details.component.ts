@@ -88,64 +88,30 @@ export class InvestigationDetailsPageComponent {
   }
 
   startNotification(device) {
-    console.log("Starting notifications");
-
     const service = SERVICES.BAROMETER;
 
-    const button = {
-      service: "FFE0",
-      data: "FFE1" // Bit 2: side key, Bit 1- right key, Bit 0 –left key
-    };
-
-    const accelerometer = {
-      service: "F000AA80-0451-4000-B000-000000000000",
-      data: "F000AA81-0451-4000-B000-000000000000", // read/notify 3 bytes X : Y : Z
-      notification: "F0002902-0451-4000-B000-000000000000",
-      configuration: "F000AA82-0451-4000-B000-000000000000", // read/write 1 byte
-      period: "F000AA83-0451-4000-B000-000000000000" // read/write 1 byte Period = [Input*10]ms
-    };
-
-    const barometer = {
-      service: "F000AA40-0451-4000-B000-000000000000",
-      data: "F000AA41-0451-4000-B000-000000000000",
-      notification: "F0002902-0451-4000-B000-000000000000",
-      configuration: "F000AA42-0451-4000-B000-000000000000",
-      period: "F000AA43-0451-4000-B000-000000000000"
-    };
-
-    this._connectService
-      .readData(device.id, barometer.service, barometer.data)
-      .subscribe(
-        data => {
-          console.log("reading data");
-          // const state = new Uint8Array(data);
-          // console.log(state);
-
-          // BAROMETER DATA
-          const state = new Uint8Array(data);
-          console.log(
-            "TEMPERATURE : C",
-            this.barometerConvert(state[0] | (state[1] << 8) | (state[2] << 16))
-          );
-          console.log(
-            "PRESSURE hpa",
-            this.barometerConvert(state[3] | (state[4] << 8) | (state[5] << 16))
-          );
-        },
-        error => {
-          console.log(error);
-        }
-      );
+    this._connectService.readData(device.id, service).subscribe(
+      data => {
+        // BAROMETER DATA
+        const state = new Uint8Array(data);
+        console.log(
+          "TEMPERATURE : C",
+          this.barometerConvert(state[0] | (state[1] << 8) | (state[2] << 16))
+        );
+        console.log(
+          "PRESSURE hpa",
+          this.barometerConvert(state[3] | (state[4] << 8) | (state[5] << 16))
+        );
+      },
+      error => {
+        console.log(error);
+      }
+    );
 
     var barometerConfig = new Uint8Array(1);
     barometerConfig[0] = 0x01;
     this._connectService
-      .writeToDevice(
-        device.id,
-        barometer.service,
-        barometer.configuration,
-        barometerConfig.buffer
-      )
+      .writeToDevice(device.id, service, barometerConfig.buffer)
       .then(e => {
         console.log(e);
       })
