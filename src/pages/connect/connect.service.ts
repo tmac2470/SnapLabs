@@ -74,15 +74,24 @@ export class ConnectService {
     });
   }
 
-  startNotification(deviceId: string, service: any): Observable<any> {
-    return this.ble.startNotification(deviceId, service.UUID, service.DATA);
+  readData(deviceId: string, service: any, data: any): Observable<any> {
+    return this.ble.startNotification(deviceId, service, data);
   }
 
-  stopNotification(deviceId: string, service: any): Promise<any> {
+  stopReadingData(deviceId: string, service: any): Promise<any> {
     return this.ble.stopNotification(deviceId, service.UUID, service.DATA);
   }
 
-  readCharacteristic(deviceId: string, service: any): Promise<any> {
+  readOne(deviceId: string, service: any): Promise<any> {
     return this.ble.read(deviceId, service.UUID, service.DATA);
+  }
+
+  writeToDevice(
+    deviceId: string,
+    service: any,
+    data: any,
+    buffer: any
+  ): Promise<any> {
+    return this.ble.write(deviceId, service, data, buffer);
   }
 }
