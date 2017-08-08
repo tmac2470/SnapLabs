@@ -17,6 +17,18 @@
         Status:
       </h5>
     </ion-item>
+
+    <ion-item>
+      <button ion-button color="secondary" (click)="startNotification(connectedDevice)">
+    Start Notification
+  </button>
+    </ion-item>
+
+    <ion-item>
+      <button ion-button color="primary" (click)="stopNotification(connectedDevice)">
+        Stop Notif
+      </button>
+    </ion-item>
   </ion-list>
 
   <ion-list inset no-lines *ngFor="let sensor of sensors">

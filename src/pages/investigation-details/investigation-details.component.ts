@@ -73,7 +73,6 @@ export class InvestigationDetailsPageComponent {
       .then(device => {
         console.log(device);
         this.connectedDevice = device;
-        this.startNotification(device);
       })
       .catch(e => {
         this._toastService.present({
@@ -88,6 +87,7 @@ export class InvestigationDetailsPageComponent {
   }
 
   startNotification(device) {
+    console.log("start notif");
     const service = SERVICES.BAROMETER;
 
     this._connectService.readData(device.id, service).subscribe(
@@ -109,7 +109,7 @@ export class InvestigationDetailsPageComponent {
     );
 
     var barometerConfig = new Uint8Array(1);
-    barometerConfig[0] = 0x01;
+    barometerConfig[0] = 0x0a;
     this._connectService
       .writeToDevice(device.id, service, barometerConfig.buffer)
       .then(e => {
@@ -119,17 +119,31 @@ export class InvestigationDetailsPageComponent {
         console.log(e);
       });
 
-    var bytesToString = buffer => {
-      return String.fromCharCode.apply(null, new Uint8Array(buffer));
-    };
+    // var bytesToString = buffer => {
+    //   return String.fromCharCode.apply(null, new Uint8Array(buffer));
+    // };
 
-    var stringToBytes = string => {
-      var array = new Uint8Array(string.length);
-      for (var i = 0, l = string.length; i < l; i++) {
-        array[i] = string.charCodeAt(i);
-      }
-      return array.buffer;
-    };
+    // var stringToBytes = string => {
+    //   var array = new Uint8Array(string.length);
+    //   for (var i = 0, l = string.length; i < l; i++) {
+    //     array[i] = string.charCodeAt(i);
+    //   }
+    //   return array.buffer;
+    // };
+  }
+
+  stopNotification(device) {
+    console.log("stop notif");
+    const service = SERVICES.BAROMETER;
+
+    this._connectService
+      .stopReadingData(device, service)
+      .then(e => {
+        console.log(e);
+      })
+      .catch(e => {
+        console.log(e);
+      });
   }
 
   loading() {
