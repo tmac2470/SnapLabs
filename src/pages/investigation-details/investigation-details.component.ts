@@ -25,6 +25,44 @@ export class InvestigationDetailsPageComponent {
   sensors: any[] = [];
   connectedDevice: any = {};
 
+  mapDataSetConfig = {
+    drawTicks: false,
+    fill: false,
+    lineTension: 0.2,
+    data: [],
+    pointBorderWidth: 0.1,
+    backgroundColor: "rgba(255,255,255,1)"
+  };
+
+  mapOptions = {
+    scales: {
+      yAxes: [
+        {
+          ticks: {
+            beginAtZero: true
+          },
+          scaleLabel: {
+            display: true
+          }
+        }
+      ],
+      xAxes: [
+        {
+          display: false
+        }
+      ]
+    },
+    legend: {
+      display: true,
+      position: "bottom"
+    },
+    elements: {
+      line: {
+        tension: 0 // disables bezier curves for high performance
+      }
+    }
+  };
+
   @ViewChild("barCanvas") barCanvas;
   barChart: any;
 
@@ -41,8 +79,20 @@ export class InvestigationDetailsPageComponent {
   // LifeCycle methods
   ionViewWillEnter() {
     const sensorTags = this.investigation.data.experimentConfig.sensorTags;
+    const getSensorTags = async () => {
+      await this.getSensorTags(sensorTags);
+    };
+    getSensorTags();
+    this.isConnectedToAnyDevice();
+  }
 
-    // Fetch all the configs for all different sensor tags
+  ionViewDidEnter() {
+    this.sensors.forEach(sensorTag => {
+      this.initialiseChart(sensorTag.name);
+    });
+  }
+
+  getSensorTags(sensorTags) {
     for (let id in sensorTags) {
       const sensorTag: ISensorTag = sensorTags[id];
 
@@ -67,42 +117,29 @@ export class InvestigationDetailsPageComponent {
         }
       }
     }
-
-    console.log(this.sensors);
-    this.isConnectedToAnyDevice();
-    this.initialiseCharts();
   }
 
-  initialiseCharts() {
-    this.barChart = new Chart(this.barCanvas.nativeElement, {
+  initialiseChart(chartId) {
+    const ctx = document.getElementById(chartId);
+    let mapDataSetConfig = this.mapDataSetConfig;
+
+    this.barChart = new Chart(ctx, {
       type: "line",
       data: {
         datasets: [
           {
-            fill: false,
-            lineTension: 0.2,
-            label: "Ambient Temperature (C)",
-            data: [5, 10, 15, 20, 25, 30, 35, 40],
+            mapDataSetConfig,
             borderColor: "rgba(255,0,0,1)",
-            backgroundColor: "rgba(255,255,255,1)"
+            label: "Ambient Temperature (C)"
           },
           {
-            fill: false,
-            lineTension: 0.2,
+            mapDataSetConfig,
             label: "Target (IR) Temperature (C)",
-            data: [10, 45, 32, 31, 34, 45, 45, 32],
-            borderColor: "rgba(0,0,255,1)",
-            backgroundColor: "rgba(255,255,255,1)"
+            borderColor: "rgba(0,0,255,1)"
           }
         ]
       },
-      options: {
-        elements: {
-          line: {
-            tension: 0 // disables bezier curves for high performance
-          }
-        }
-      }
+      options: this.mapOptions
     });
   }
 
@@ -110,7 +147,6 @@ export class InvestigationDetailsPageComponent {
     this._connectService
       .getConnectedDevice()
       .then(device => {
-        console.log(device);
         this.connectedDevice = device;
       })
       .catch(e => {
@@ -126,7 +162,6 @@ export class InvestigationDetailsPageComponent {
   }
 
   startNotification(device) {
-    console.log("start notif");
     const service = SERVICES.BAROMETER;
 
     this._connectService.readData(device.id, service).subscribe(

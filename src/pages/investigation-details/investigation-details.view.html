@@ -27,15 +27,10 @@
   <ion-list inset no-lines *ngFor="let sensor of sensors">
     <ion-item>
       <h4>{{ sensor.name }}</h4>
+      <canvas id="{{ sensor.name }}" margin-top></canvas>
     </ion-item>
-
-    <!--<ion-item *ngif="sensor.config.data.display === 'on' || sensor.config.data.display === '1'">
-    </ion-item>-->
   </ion-list>
 
-  <ion-item no-lines>
-    <canvas #barCanvas></canvas>
-  </ion-item>
 </ion-content>
 
 <ion-footer>

@@ -1,5 +1,8 @@
 {
   "name": "snaplab_ionic",
   "app_id": "0f936878",
-  "type": "ionic-angular"
+  "type": "ionic-angular",
+  "integrations": {
+    "cordova": {}
+  }
 }
