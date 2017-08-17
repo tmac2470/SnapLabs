@@ -1,6 +1,5 @@
 // http://ionicframework.com/docs/v2/theming/
 
-
 // App Global Sass
 // --------------------------------------------------
 // Put style rules here that you want to apply globally. These
@@ -21,12 +20,17 @@
 }
 
 // Used to align an item in the middle of the screen
-[vertical-middle]{
+[vertical-middle] {
   margin-top: 50% !important;
 }
 
+[no-border-radius] {
+  border-radius: 0 !important;
+}
+
 // Prevent ionic from uppercasing the text in android
-ion-navbar, ion-toolbar {
+ion-navbar,
+ion-toolbar {
   button {
     text-transform: none !important;
   }

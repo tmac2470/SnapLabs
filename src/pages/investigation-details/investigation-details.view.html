@@ -14,19 +14,12 @@
     <ion-item>
       <h5>Maximum Sampling Interval (ms): {{ investigation.data.experimentConfig.sampleInterval }}</h5>
       <h5>
-        Status:
+        Status: <span *ngIf="connectedDevice?.id">Connected</span> <span *ngIf="!connectedDevice?.id">Not connected</span>
       </h5>
-    </ion-item>
 
-    <ion-item>
-      <button ion-button color="secondary" (click)="startNotification(connectedDevice)">
-    Start Notification
-  </button>
-    </ion-item>
-
-    <ion-item>
-      <button ion-button color="primary" (click)="stopNotification(connectedDevice)">
-        Stop Notif
+      <h5 *ngIf="connectedDevice?.id">Sensor tag: {{ connectedDevice.id }}</h5>
+      <button *ngIf="!connectedDevice?.id" margin-top ion-button color="secondary" full no-margin (click)="openPage(connectPageComponent)">
+        Connect to sensor tag
       </button>
     </ion-item>
   </ion-list>
@@ -39,10 +32,21 @@
     <!--<ion-item *ngif="sensor.config.data.display === 'on' || sensor.config.data.display === '1'">
     </ion-item>-->
   </ion-list>
+
+  <ion-item no-lines>
+    <canvas #barCanvas></canvas>
+  </ion-item>
 </ion-content>
 
 <ion-footer>
-  <button ion-button color="secondary" full no-margin (click)="openPage(connectPageComponent)">
-    Sensor tag
+  <button ion-button no-margin no-border-radius color="secondary" (click)="startNotification(connectedDevice)">
+    Start graphs
+  </button>
+  <button ion-button no-margin no-border-radius color="danger" (click)="stopNotification(connectedDevice)">
+    Stop graphs
+  </button>
+
+  <button ion-button no-margin no-border-radius (click)="stopNotification(connectedDevice)">
+    Reset graphs
   </button>
 </ion-footer>

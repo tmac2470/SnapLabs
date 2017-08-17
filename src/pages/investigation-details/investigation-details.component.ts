@@ -1,7 +1,9 @@
 // Angular
-import { Component } from "@angular/core";
+import { Component, ViewChild } from "@angular/core";
 // Ionic
 import { NavParams, NavController, LoadingController } from "ionic-angular";
+// Chart JS
+import { Chart } from "chart.js";
 // SnapApp
 import { ConnectPageComponent, ConnectService } from "../connect";
 import { ToastService } from "../core/service";
@@ -22,6 +24,9 @@ export class InvestigationDetailsPageComponent {
   investigation: Investigation;
   sensors: any[] = [];
   connectedDevice: any = {};
+
+  @ViewChild("barCanvas") barCanvas;
+  barChart: any;
 
   constructor(
     private _connectService: ConnectService,
@@ -65,6 +70,40 @@ export class InvestigationDetailsPageComponent {
 
     console.log(this.sensors);
     this.isConnectedToAnyDevice();
+    this.initialiseCharts();
+  }
+
+  initialiseCharts() {
+    this.barChart = new Chart(this.barCanvas.nativeElement, {
+      type: "line",
+      data: {
+        datasets: [
+          {
+            fill: false,
+            lineTension: 0.2,
+            label: "Ambient Temperature (C)",
+            data: [5, 10, 15, 20, 25, 30, 35, 40],
+            borderColor: "rgba(255,0,0,1)",
+            backgroundColor: "rgba(255,255,255,1)"
+          },
+          {
+            fill: false,
+            lineTension: 0.2,
+            label: "Target (IR) Temperature (C)",
+            data: [10, 45, 32, 31, 34, 45, 45, 32],
+            borderColor: "rgba(0,0,255,1)",
+            backgroundColor: "rgba(255,255,255,1)"
+          }
+        ]
+      },
+      options: {
+        elements: {
+          line: {
+            tension: 0 // disables bezier curves for high performance
+          }
+        }
+      }
+    });
   }
 
   isConnectedToAnyDevice() {
@@ -108,6 +147,13 @@ export class InvestigationDetailsPageComponent {
       }
     );
 
+    /**
+   * We must send some data to write to the device before
+   * we can start receiving any notifications.
+   * Also, it seems like the barometerConfig should hold
+   * some unique value. Currently any value seems to work
+   *
+   */
     var barometerConfig = new Uint8Array(1);
     barometerConfig[0] = 0x0a;
     this._connectService
