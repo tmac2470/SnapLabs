@@ -50,3 +50,11 @@ export interface ISensor {
   grid: SensorGrid;
   parameters: SensorParameters;
 }
+
+export class ColorCode {
+  static RED: string = "rgba(255,0,0,1)";
+  static GREEN: string = "rgba(0,255,0,1)";
+  static BLUE: string = "rgba(0,0,255,1)";
+  static BLACK: string = "rgba(0,0,0,1)";
+  static WHITE: string = "rgba(255,255,255,1)";
+}

@@ -11,7 +11,8 @@ import { ToastService } from "../core/service";
 import {
   Investigation,
   ISensor,
-  ISensorTag
+  ISensorTag,
+  ColorCode
 } from "./investigation-details.model";
 import * as SERVICES from "../connect/connect.config";
 
@@ -33,7 +34,7 @@ export class InvestigationDetailsPageComponent {
     lineTension: 0.2,
     data: [],
     pointBorderWidth: 0.1,
-    backgroundColor: "rgba(255,255,255,1)"
+    backgroundColor: ColorCode.WHITE
   };
 
   mapOptions = {
@@ -66,7 +67,7 @@ export class InvestigationDetailsPageComponent {
   };
 
   @ViewChild("barCanvas") barCanvas;
-  barCharts: any = {};
+  charts: any = {};
 
   constructor(
     private _connectService: ConnectService,
@@ -101,7 +102,7 @@ export class InvestigationDetailsPageComponent {
       .then(device => {
         this.connectedDevice = device;
         // Automatically start notifications
-        this.startNotification();
+        this.startNotifications();
       })
       .catch(e => {
         this._toastService.present({
@@ -138,28 +139,173 @@ export class InvestigationDetailsPageComponent {
     }
   }
 
-  initialiseChart(chartId) {
-    const ctx = document.getElementById(chartId);
-    let mapDataSetConfig = this.mapDataSetConfig;
+  /**
+   * HOW IT WORKS
+   *
+   * Upon entering this page, check if any device is connected.
+   * Get all the services/sensors for the experiment.
+   * Initialise the charts object with all the graphs to be used for each service.
+   *
+   * If a device is connected start the notifications for all the services requested.
+   * If no device is connected ask the user to connect a device
+   * Once a device is connected just start the notifications (that'd happen automatically once user comes back to this page)
+   *
+   * Starting notifications would mean that the data from sensor tags has started coming in.
+   * Stopping notifications would stop the notification for all services
+   *
+   * Upon starting graphs turn the graphsStarted flag on.
+   * Upon stop graphs turn the graphsStarted flag off.
+   * Upon reset graphs turn the graphsStarted flag off and also clear off the graphs.
+   *
+   */
 
-    this.barCharts[chartId] = new Chart(ctx, {
-      type: "line",
-      data: {
-        datasets: [
+  getChartDatasets(chart: string): Array<any> {
+    const mapDataSetConfig = this.mapDataSetConfig;
+
+    switch (chart.toLowerCase()) {
+      case "temperature":
+        return [
           {
             mapDataSetConfig,
-            borderColor: "rgba(255,0,0,1)",
+            borderColor: ColorCode.RED,
             label: "Ambient Temperature (C)"
           },
           {
             mapDataSetConfig,
-            label: "Target (IR) Temperature (C)",
-            borderColor: "rgba(0,0,255,1)"
+            borderColor: ColorCode.GREEN,
+            label: "Target (IR) Temperature (C)"
           }
-        ]
-      },
-      options: this.mapOptions
-    });
+        ];
+
+      case "barometer":
+        return [
+          {
+            mapDataSetConfig,
+            borderColor: ColorCode.RED,
+            label: "Pressure (hPa)"
+          }
+        ];
+
+      case "luxometer":
+        return [
+          {
+            mapDataSetConfig,
+            borderColor: ColorCode.RED,
+            label: "lux"
+          }
+        ];
+
+      case "magnetometer":
+        return [
+          {
+            mapDataSetConfig,
+            borderColor: ColorCode.RED,
+            label: "X"
+          },
+          {
+            mapDataSetConfig,
+            borderColor: ColorCode.BLUE,
+            label: "Y"
+          },
+          {
+            mapDataSetConfig,
+            borderColor: ColorCode.GREEN,
+            label: "Z"
+          },
+          {
+            mapDataSetConfig,
+            borderColor: ColorCode.BLACK,
+            label: "Scalar Value"
+          }
+        ];
+
+      case "gyroscope":
+        return [
+          {
+            mapDataSetConfig,
+            borderColor: ColorCode.RED,
+            label: "X"
+          },
+          {
+            mapDataSetConfig,
+            borderColor: ColorCode.BLUE,
+            label: "Y"
+          },
+          {
+            mapDataSetConfig,
+            borderColor: ColorCode.GREEN,
+            label: "Z"
+          }
+        ];
+
+      case "accelerometer":
+        return [
+          {
+            mapDataSetConfig,
+            borderColor: ColorCode.RED,
+            label: "X"
+          },
+          {
+            mapDataSetConfig,
+            borderColor: ColorCode.BLUE,
+            label: "Y"
+          },
+          {
+            mapDataSetConfig,
+            borderColor: ColorCode.GREEN,
+            label: "Z"
+          },
+          {
+            mapDataSetConfig,
+            borderColor: ColorCode.BLACK,
+            label: "Scalar Value"
+          }
+        ];
+
+      case "humidity":
+        return [
+          {
+            mapDataSetConfig,
+            borderColor: ColorCode.RED,
+            label: "X"
+          },
+          {
+            mapDataSetConfig,
+            borderColor: ColorCode.BLUE,
+            label: "Y"
+          },
+          {
+            mapDataSetConfig,
+            borderColor: ColorCode.GREEN,
+            label: "Z"
+          }
+        ];
+    }
+  }
+
+  getChart(chart: string, ctx: any) {
+    switch (chart.toLowerCase()) {
+      case "accelerometer":
+      case "barometer":
+      case "gyroscope":
+      case "humidity":
+      case "luxometer":
+      case "magnetometer":
+      case "temperature":
+        // These all above use the same graph
+        return new Chart(ctx, {
+          type: "line",
+          data: {
+            datasets: this.getChartDatasets(chart)
+          },
+          options: this.mapOptions
+        });
+    }
+  }
+
+  initialiseChart(chartId) {
+    const ctx = document.getElementById(chartId);
+    this.charts[chartId] = this.getChart(chartId, ctx);
   }
 
   stopGraphs() {
@@ -173,16 +319,19 @@ export class InvestigationDetailsPageComponent {
   resetGraphs() {
     this.stopGraphs();
 
-    _.keys(this.barCharts, chartId => {
-      this.barCharts[chartId].clear();
+    _.keys(this.charts, chartId => {
+      this.charts[chartId].clear();
     });
   }
+
+  // Draw graphs
+  drawGraphs() {}
 
   private barometerConvert(data) {
     return data / 100;
   }
 
-  startNotification() {
+  startNotifications() {
     const device = this.connectedDevice;
 
     const service = SERVICES.BAROMETER;
@@ -200,7 +349,7 @@ export class InvestigationDetailsPageComponent {
           this.barometerConvert(state[3] | (state[4] << 8) | (state[5] << 16))
         );
         if (this.graphsStarted) {
-          // Draw graphs
+          this.drawGraphs();
         }
       },
       error => {
