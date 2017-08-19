@@ -2,7 +2,8 @@
 import { Component, ViewChild } from "@angular/core";
 // Ionic
 import { NavParams, NavController, LoadingController } from "ionic-angular";
-// Chart JS
+// Others
+import * as _ from "lodash";
 import { Chart } from "chart.js";
 // SnapApp
 import { ConnectPageComponent, ConnectService } from "../connect";
@@ -24,6 +25,7 @@ export class InvestigationDetailsPageComponent {
   investigation: Investigation;
   sensors: any[] = [];
   connectedDevice: any = {};
+  graphsStarted: boolean = false;
 
   mapDataSetConfig = {
     drawTicks: false,
@@ -64,7 +66,7 @@ export class InvestigationDetailsPageComponent {
   };
 
   @ViewChild("barCanvas") barCanvas;
-  barChart: any;
+  barCharts: any = {};
 
   constructor(
     private _connectService: ConnectService,
@@ -90,6 +92,23 @@ export class InvestigationDetailsPageComponent {
     this.sensors.forEach(sensorTag => {
       this.initialiseChart(sensorTag.name);
     });
+  }
+
+  // Other methods
+  isConnectedToAnyDevice() {
+    this._connectService
+      .getConnectedDevice()
+      .then(device => {
+        this.connectedDevice = device;
+        // Automatically start notifications
+        this.startNotification();
+      })
+      .catch(e => {
+        this._toastService.present({
+          message: "No sensor tag connected!",
+          duration: 3000
+        });
+      });
   }
 
   getSensorTags(sensorTags) {
@@ -123,7 +142,7 @@ export class InvestigationDetailsPageComponent {
     const ctx = document.getElementById(chartId);
     let mapDataSetConfig = this.mapDataSetConfig;
 
-    this.barChart = new Chart(ctx, {
+    this.barCharts[chartId] = new Chart(ctx, {
       type: "line",
       data: {
         datasets: [
@@ -143,25 +162,29 @@ export class InvestigationDetailsPageComponent {
     });
   }
 
-  isConnectedToAnyDevice() {
-    this._connectService
-      .getConnectedDevice()
-      .then(device => {
-        this.connectedDevice = device;
-      })
-      .catch(e => {
-        this._toastService.present({
-          message: "No sensor tag connected!",
-          duration: 3000
-        });
-      });
+  stopGraphs() {
+    this.graphsStarted = false;
+  }
+
+  startGraphs() {
+    this.graphsStarted = true;
+  }
+
+  resetGraphs() {
+    this.stopGraphs();
+
+    _.keys(this.barCharts, chartId => {
+      this.barCharts[chartId].clear();
+    });
   }
 
   private barometerConvert(data) {
     return data / 100;
   }
 
-  startNotification(device) {
+  startNotification() {
+    const device = this.connectedDevice;
+
     const service = SERVICES.BAROMETER;
 
     this._connectService.readData(device.id, service).subscribe(
@@ -176,6 +199,9 @@ export class InvestigationDetailsPageComponent {
           "PRESSURE hpa",
           this.barometerConvert(state[3] | (state[4] << 8) | (state[5] << 16))
         );
+        if (this.graphsStarted) {
+          // Draw graphs
+        }
       },
       error => {
         console.log(error);
@@ -213,8 +239,10 @@ export class InvestigationDetailsPageComponent {
     // };
   }
 
-  stopNotification(device) {
-    console.log("stop notif");
+  stopNotification() {
+    const device = this.connectedDevice;
+
+    this.graphsStarted = false;
     const service = SERVICES.BAROMETER;
 
     this._connectService

@@ -28,6 +28,16 @@
   border-radius: 0 !important;
 }
 
+[half] {
+  display: block;
+  width: 50%;
+  contain: strict;
+}
+
+[flex] {
+  display: flex;
+}
+
 // Prevent ionic from uppercasing the text in android
 ion-navbar,
 ion-toolbar {

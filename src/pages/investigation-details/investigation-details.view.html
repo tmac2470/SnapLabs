@@ -33,15 +33,15 @@
 
 </ion-content>
 
-<ion-footer>
-  <button ion-button no-margin no-border-radius color="secondary" (click)="startNotification(connectedDevice)">
+<ion-footer flex>
+  <button ion-button no-margin full no-border-radius *ngIf="!graphsStarted" (click)="startGraphs()">
     Start graphs
   </button>
-  <button ion-button no-margin no-border-radius color="danger" (click)="stopNotification(connectedDevice)">
+  <button ion-button no-margin half no-border-radius *ngIf="graphsStarted" color="danger" (click)="stopGraphs()">
     Stop graphs
   </button>
 
-  <button ion-button no-margin no-border-radius (click)="stopNotification(connectedDevice)">
+  <button ion-button no-margin half no-border-radius *ngIf="graphsStarted" color="dark" (click)="resetGraphs()">
     Reset graphs
   </button>
 </ion-footer>
