@@ -23,12 +23,12 @@
   </ion-toolbar>
 
   <ion-list no-padding no-lines margin-top>
-    <ion-item text-wrap *ngIf="connectedDevice?.id">
+    <ion-item text-wrap *ngIf="connectedDevice?.id" [color]="connectedDeviceKeyPressed ? 'primary' : null">
       <h2>Connected to :
         <span *ngIf="connectedDevice?.name">{{ connectedDevice.name }}</span>
         <span *ngIf="connectedDevice?.id">{{ connectedDevice.id }}</span>
       </h2>
-      <ion-icon name="checkmark-circle-outline" color="green" item-right></ion-icon>
+      <p>Press any button on the device to highlight this space</p>
     </ion-item>
 
     <ion-item text-wrap *ngIf="!connectedDevice?.id">
@@ -51,7 +51,7 @@
 </ion-content>
 
 <ion-footer>
-  <button ion-button color="secondary" full no-margin (click)="disconnect()" *ngIf="connectedDevice?.id">
+  <button ion-button color="danger" full no-margin (click)="disconnect()" *ngIf="connectedDevice?.id">
     Disconnect
   </button>
 </ion-footer>

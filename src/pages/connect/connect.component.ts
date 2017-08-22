@@ -1,10 +1,11 @@
 // Angular
-import { Component } from "@angular/core";
+import { Component, ChangeDetectorRef } from "@angular/core";
 // Ionic
 import { NavController, Platform, LoadingController } from "ionic-angular";
 // App
 import { ToastService } from "../core/service";
 import { ConnectService } from "./connect.service";
+import * as SERVICES from "./connect.config";
 
 @Component({
   selector: "connect-page-component",
@@ -16,6 +17,7 @@ export class ConnectPageComponent {
   isBluetoothEnabled: boolean = false;
   isAndroidDevice: boolean = false;
   connectedDevice: any = {};
+  connectedDeviceKeyPressed: boolean;
   isScanning: boolean = false;
 
   constructor(
@@ -23,6 +25,7 @@ export class ConnectPageComponent {
     private _navCtrl: NavController,
     private _loadingCtrl: LoadingController,
     private _toastService: ToastService,
+    private cdRef: ChangeDetectorRef,
     private platform: Platform
   ) {
     if (this.platform.is("android")) {
@@ -40,11 +43,44 @@ export class ConnectPageComponent {
       .getConnectedDevice()
       .then(device => {
         this.connectedDevice = device;
+        this.pingDevice();
       })
       .catch(error => {
         // No device connected
         this.connectedDevice = {};
       });
+  }
+
+  highlightConnectedDevice(state: Uint8Array) {
+    if (state.length > 0 && !!state[0]) {
+      if (state[0] > 0) {
+        this.connectedDeviceKeyPressed = true;
+      } else {
+        this.connectedDeviceKeyPressed = false;
+      }
+    } else {
+      this.connectedDeviceKeyPressed = false;
+    }
+    this.cdRef.detectChanges();
+  }
+
+  pingDevice() {
+    const device = this.connectedDevice;
+    const service = SERVICES.IOButton;
+
+    this._connectService.readData(device.id, service).subscribe(
+      data => {
+        const state = new Uint8Array(data);
+        this.highlightConnectedDevice(state);
+      },
+      error => {
+        this._toastService.present({
+          message:
+            "Unable to detect device! Please retry bluetooth connection.",
+          duration: 3000
+        });
+      }
+    );
   }
 
   // Checks if the bluetooth is enabled.

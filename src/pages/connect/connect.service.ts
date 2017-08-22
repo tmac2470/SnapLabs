@@ -89,4 +89,8 @@ export class ConnectService {
   writeToDevice(deviceId: string, service: any, buffer: any): Promise<any> {
     return this.ble.write(deviceId, service.UUID, service.CONFIG, buffer);
   }
+
+  bytesToString(buffer) {
+    return String.fromCharCode.apply(null, new Uint8Array(buffer));
+  }
 }

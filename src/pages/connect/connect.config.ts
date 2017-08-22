@@ -55,3 +55,16 @@ export const KEYPRESS = {
   UUID: "0000ffe0-0000-1000-8000-00805f9b34fb",
   DATA: "0000ffe1-0000-1000-8000-00805f9b34fb"
 };
+
+// To buzz the device
+export const BUZZER = {
+  UUID: "f000aa64-0451-4000-b000-000000000000",
+  CONFIG: "f000aa66-0451-4000-b000-000000000000",
+  DATA: "f000aa65-0451-4000-b000-000000000000"
+};
+
+export const IOButton = {
+  UUID: "ffe0",
+  CONFIG: "ffe1",
+  DATA: "ffe1"
+};
