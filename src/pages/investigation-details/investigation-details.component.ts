@@ -283,7 +283,7 @@ export class InvestigationDetailsPageComponent {
     }
   }
 
-  getChart(chart: string, ctx: any) {
+  getChartType(chart: string, ctx: any) {
     switch (chart.toLowerCase()) {
       case "accelerometer":
       case "barometer":
@@ -305,7 +305,7 @@ export class InvestigationDetailsPageComponent {
 
   initialiseChart(chartId) {
     const ctx = document.getElementById(chartId);
-    this.charts[chartId] = this.getChart(chartId, ctx);
+    this.charts[chartId] = this.getChartType(chartId, ctx);
   }
 
   stopGraphs() {
