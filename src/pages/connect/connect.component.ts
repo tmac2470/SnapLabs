@@ -1,5 +1,6 @@
 // Angular
-import { Component, ChangeDetectorRef } from "@angular/core";
+import { Component, ChangeDetectorRef, OnDestroy } from "@angular/core";
+import { Subscription } from "rxjs/Subscription";
 // Ionic
 import { NavController, Platform, LoadingController } from "ionic-angular";
 // App
@@ -12,13 +13,14 @@ import * as SERVICES from "./connect.config";
   templateUrl: "connect.view.html",
   styles: ["./connect.styles.scss"]
 })
-export class ConnectPageComponent {
+export class ConnectPageComponent implements OnDestroy {
   devices: string[];
   isBluetoothEnabled: boolean = false;
   isAndroidDevice: boolean = false;
   connectedDevice: any = {};
   connectedDeviceKeyPressed: boolean;
   isScanning: boolean = false;
+  devicePingSubscription: Subscription;
 
   constructor(
     private _connectService: ConnectService,
@@ -36,6 +38,13 @@ export class ConnectPageComponent {
   ionViewDidEnter() {
     this.isConnectedToAnyDevice();
     this.checkIfBluetoothEnabled();
+  }
+
+  ngOnDestroy() {
+    if (this.devicePingSubscription) {
+      this.devicePingSubscription.unsubscribe();
+    }
+    this.cdRef.detach();
   }
 
   isConnectedToAnyDevice() {
@@ -68,19 +77,21 @@ export class ConnectPageComponent {
     const device = this.connectedDevice;
     const service = SERVICES.IOButton;
 
-    this._connectService.readData(device.id, service).subscribe(
-      data => {
-        const state = new Uint8Array(data);
-        this.highlightConnectedDevice(state);
-      },
-      error => {
-        this._toastService.present({
-          message:
-            "Unable to detect device! Please retry bluetooth connection.",
-          duration: 3000
-        });
-      }
-    );
+    this.devicePingSubscription = this._connectService
+      .readData(device.id, service)
+      .subscribe(
+        data => {
+          const state = new Uint8Array(data);
+          this.highlightConnectedDevice(state);
+        },
+        error => {
+          this._toastService.present({
+            message:
+              "Unable to detect device! Please retry bluetooth connection.",
+            duration: 3000
+          });
+        }
+      );
   }
 
   // Checks if the bluetooth is enabled.
