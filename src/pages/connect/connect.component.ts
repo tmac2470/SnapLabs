@@ -52,7 +52,9 @@ export class ConnectPageComponent implements OnDestroy {
       .getConnectedDevice()
       .then(device => {
         this.connectedDevice = device;
-        this.pingDevice();
+        if (device && device.id) {
+          this.pingDevice();
+        }
       })
       .catch(error => {
         // No device connected
@@ -189,6 +191,7 @@ export class ConnectPageComponent implements OnDestroy {
     this._connectService.connectToDeviceId(device.id).subscribe(
       data => {
         this.connectedDevice = data;
+        this.pingDevice();
         loading.dismiss();
       },
       error => {
