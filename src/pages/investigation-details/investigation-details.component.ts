@@ -1,5 +1,5 @@
 // Angular
-import { Component, ViewChild } from "@angular/core";
+import { Component } from "@angular/core";
 // Ionic
 import { NavParams, NavController, LoadingController } from "ionic-angular";
 // Others
@@ -66,7 +66,6 @@ export class InvestigationDetailsPageComponent {
     }
   };
 
-  @ViewChild("barCanvas") barCanvas;
   charts: any = {};
 
   constructor(
@@ -96,6 +95,11 @@ export class InvestigationDetailsPageComponent {
   }
 
   // Other methods
+  initialiseChart(chartId) {
+    const ctx = document.getElementById(chartId);
+    this.charts[chartId] = this.getChartType(chartId, ctx);
+  }
+
   isConnectedToAnyDevice() {
     this._connectService
       .getConnectedDevice()
@@ -113,6 +117,7 @@ export class InvestigationDetailsPageComponent {
   }
 
   getSensorTags(sensorTags) {
+    this.sensors = [];
     for (let id in sensorTags) {
       const sensorTag: ISensorTag = sensorTags[id];
 
@@ -301,11 +306,6 @@ export class InvestigationDetailsPageComponent {
           options: this.mapOptions
         });
     }
-  }
-
-  initialiseChart(chartId) {
-    const ctx = document.getElementById(chartId);
-    this.charts[chartId] = this.getChartType(chartId, ctx);
   }
 
   stopGraphs() {
