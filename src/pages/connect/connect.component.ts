@@ -54,6 +54,7 @@ export class ConnectPageComponent implements OnDestroy {
         this.connectedDevice = device;
         if (device && device.id) {
           this.pingDevice();
+          this.getDeviceBatteryInfo();
         }
       })
       .catch(error => {
@@ -77,7 +78,7 @@ export class ConnectPageComponent implements OnDestroy {
 
   pingDevice() {
     const device = this.connectedDevice;
-    const service = SERVICES.IOButton;
+    const service = SERVICES.IOBUTTON;
 
     this.devicePingSubscription = this._connectService
       .readData(device.id, service)
@@ -94,6 +95,27 @@ export class ConnectPageComponent implements OnDestroy {
           });
         }
       );
+  }
+
+  getDeviceBatteryInfo() {
+    const device = this.connectedDevice;
+    const service = SERVICES.BATTERY;
+
+    this._connectService
+      .readOne(device.id, service)
+      .then(data => {
+        const state = new Uint8Array(data);
+
+        if (state.length > 0 && !!state[0]) {
+          this.connectedDevice.battery = state[0];
+        }
+      })
+      .catch(err => {
+        this._toastService.present({
+          message: "Unable to get device's battery status!",
+          duration: 3000
+        });
+      });
   }
 
   // Checks if the bluetooth is enabled.
@@ -192,6 +214,7 @@ export class ConnectPageComponent implements OnDestroy {
       data => {
         this.connectedDevice = data;
         this.pingDevice();
+        this.getDeviceBatteryInfo();
         loading.dismiss();
       },
       error => {

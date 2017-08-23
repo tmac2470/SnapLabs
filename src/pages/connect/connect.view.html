@@ -28,6 +28,7 @@
         <span *ngIf="connectedDevice?.name">{{ connectedDevice.name }}</span>
         <span *ngIf="connectedDevice?.id">{{ connectedDevice.id }}</span>
       </h2>
+      <p *ngIf="connectedDevice.battery">Battery status: {{ connectedDevice.battery }}%</p>
       <p>Press any button on the device to highlight this space</p>
     </ion-item>
 

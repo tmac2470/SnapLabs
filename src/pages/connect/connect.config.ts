@@ -63,8 +63,16 @@ export const BUZZER = {
   DATA: "f000aa65-0451-4000-b000-000000000000"
 };
 
-export const IOButton = {
+// To read button press
+export const IOBUTTON = {
   UUID: "ffe0",
   CONFIG: "ffe1",
   DATA: "ffe1"
+};
+
+// To read battery information
+export const BATTERY = {
+  UUID: "180f",
+  CONFIG: "2a19",
+  DATA: "2a19"
 };
