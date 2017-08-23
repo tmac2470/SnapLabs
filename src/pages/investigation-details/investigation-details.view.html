@@ -26,7 +26,7 @@
 
   <ion-list inset no-lines *ngFor="let sensor of sensors">
     <ion-item>
-      <h4>{{ sensor.name }}</h4>
+      <h4>{{ sensor.name }} <span pull-right *ngIf="charts[sensor.name]?.value">{{ charts[sensor.name].value }}</span></h4>
       <canvas id="{{ sensor.name }}" margin-top></canvas>
     </ion-item>
   </ion-list>

@@ -319,13 +319,25 @@ export class InvestigationDetailsPageComponent {
   resetGraphs() {
     this.stopGraphs();
 
-    _.keys(this.charts, chartId => {
-      this.charts[chartId].clear();
+    _.keys(this.charts).map(chartId => {
+      this.charts[chartId].reset();
     });
   }
 
+  addData(chart, label, data) {
+    chart.data.labels.push(label);
+    chart.data.datasets.forEach(dataset => {
+      dataset.data.push(data);
+    });
+    chart.update();
+  }
+
   // Draw graphs
-  drawGraphs() {}
+  drawGraphs(chart: any, value: number) {
+    if (this.graphsStarted) {
+      this.addData(chart, "null", value);
+    }
+  }
 
   private barometerConvert(data) {
     return data / 100;
@@ -334,23 +346,45 @@ export class InvestigationDetailsPageComponent {
   startNotifications() {
     const device = this.connectedDevice;
 
-    const service = SERVICES.BAROMETER;
+    this.sensors.forEach(sensorTag => {
+      switch (sensorTag.name.toLowerCase()) {
+        case "temperature":
+        case "barometer":
+          this.barometerTempNotifications(device, "Barometer", "Temperature");
+          break;
+        case "accelerometer":
+        case "gyroscope":
+        case "humidity":
+        case "luxometer":
+        case "magnetometer":
+          break;
 
+        default:
+          break;
+      }
+    });
+  }
+
+  barometerTempNotifications(
+    device: any,
+    barometerChartId: string,
+    temperatureChartId: string
+  ) {
+    const service = SERVICES.BAROMETER;
     this._connectService.readData(device.id, service).subscribe(
       data => {
         // BAROMETER DATA
         const state = new Uint8Array(data);
-        console.log(
-          "TEMPERATURE : C",
-          this.barometerConvert(state[0] | (state[1] << 8) | (state[2] << 16))
+
+        const tempValue = this.barometerConvert(
+          state[0] | (state[1] << 8) | (state[2] << 16)
         );
-        console.log(
-          "PRESSURE hpa",
-          this.barometerConvert(state[3] | (state[4] << 8) | (state[5] << 16))
+        const pressureValue = this.barometerConvert(
+          state[3] | (state[4] << 8) | (state[5] << 16)
         );
-        if (this.graphsStarted) {
-          this.drawGraphs();
-        }
+
+        this.drawGraphs(this.charts[barometerChartId], pressureValue);
+        this.drawGraphs(this.charts[temperatureChartId], tempValue);
       },
       error => {
         console.log(error);
@@ -358,14 +392,14 @@ export class InvestigationDetailsPageComponent {
     );
 
     /**
-   * We must send some data to write to the device before
-   * we can start receiving any notifications.
-   * Also, it seems like the barometerConfig should hold
-   * some unique value. Currently any value seems to work
-   *
-   */
+       * We must send some data to write to the device before
+       * we can start receiving any notifications.
+       * Also, it seems like the barometerConfig should hold
+       * some unique value. Currently any value seems to work
+       *
+       */
     var barometerConfig = new Uint8Array(1);
-    barometerConfig[0] = 0x0a;
+    barometerConfig[0] = 0x01;
     this._connectService
       .writeToDevice(device.id, service, barometerConfig.buffer)
       .then(e => {
@@ -374,18 +408,6 @@ export class InvestigationDetailsPageComponent {
       .catch(e => {
         console.log(e);
       });
-
-    // var bytesToString = buffer => {
-    //   return String.fromCharCode.apply(null, new Uint8Array(buffer));
-    // };
-
-    // var stringToBytes = string => {
-    //   var array = new Uint8Array(string.length);
-    //   for (var i = 0, l = string.length; i < l; i++) {
-    //     array[i] = string.charCodeAt(i);
-    //   }
-    //   return array.buffer;
-    // };
   }
 
   stopNotification() {
