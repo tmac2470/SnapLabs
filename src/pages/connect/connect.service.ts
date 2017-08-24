@@ -79,7 +79,7 @@ export class ConnectService {
   }
 
   stopReadingData(deviceId: string, service: any): Promise<any> {
-    return this.ble.stopNotification(deviceId, service.UUID, service.CONFIG);
+    return this.ble.stopNotification(deviceId, service.UUID, service.DATA);
   }
 
   readOne(deviceId: string, service: any): Promise<any> {

@@ -368,6 +368,8 @@ export class InvestigationDetailsPageComponent implements OnDestroy {
           this.barometerTempNotifications(device, "Barometer", "Temperature");
           break;
         case "accelerometer":
+          this.accelerometerTempNotifications(device, "Accelerometer");
+          break;
         case "gyroscope":
         case "humidity":
         case "luxometer":
@@ -387,6 +389,84 @@ export class InvestigationDetailsPageComponent implements OnDestroy {
         this.cdRef.detectChanges();
       }
     });
+  }
+
+  accelerometerTempNotifications(device: any, accelerometerChartId: string) {
+    const service = SERVICES.Accelerometer;
+
+    const sensorMpu9250GyroConvert = data => {
+      // return data / (65536 / 500);
+      return data / (32768 / 2);
+    };
+
+    const subscription: Subscription = this._connectService
+      .readData(device.id, service)
+      .subscribe(
+        data => {
+          // BAROMETER DATA
+          const state = new Int16Array(data);
+
+          //0 gyro x
+          //1 gyro y
+          //2 gyro z
+          //3 accel x
+          //4 accel y
+          //5 accel z
+          //6 mag x
+          //7 mag y
+          //8 mag z
+
+          console.log(
+            "Gyro",
+            sensorMpu9250GyroConvert(state[0]),
+            sensorMpu9250GyroConvert(state[1]),
+            sensorMpu9250GyroConvert(state[2])
+          );
+          console.log(
+            "Acc",
+            sensorMpu9250GyroConvert(state[3]),
+            sensorMpu9250GyroConvert(state[4]),
+            sensorMpu9250GyroConvert(state[5])
+          );
+          console.log("Mag", state[6], state[7], state[8]);
+        },
+        error => {
+          console.log(error);
+        }
+      );
+
+    // turn accelerometer on
+    const configData = new Uint16Array(1);
+    //Turn on gyro, accel, and mag, 2G range, Disable wake on motion
+    configData[0] = 0x007f;
+    this._connectService
+      .writeToDevice(device.id, service, configData.buffer)
+      .then(e => {
+        // Success
+      })
+      .catch(e => {
+        this._toastService.present({
+          message: "Unable to write to device! Please reconnect device.",
+          duration: 3000
+        });
+      });
+
+    // turn accelerometer period on
+    const periodData = new Uint8Array(1);
+    periodData[0] = 0x0a;
+    this._connectService
+      .writeToDevice(device.id, service, configData.buffer)
+      .then(e => {
+        // Success
+      })
+      .catch(e => {
+        this._toastService.present({
+          message: "Unable to write to device! Please reconnect device.",
+          duration: 3000
+        });
+      });
+
+    this.subscriptions.push(subscription);
   }
 
   barometerConvert(data) {
@@ -432,7 +512,7 @@ export class InvestigationDetailsPageComponent implements OnDestroy {
        * some unique value. Currently any value seems to work
        *
        */
-    var barometerConfig = new Uint8Array(1);
+    const barometerConfig = new Uint8Array(1);
     barometerConfig[0] = 0x01;
     this._connectService
       .writeToDevice(device.id, service, barometerConfig.buffer)
