@@ -12,7 +12,6 @@
       <h2>{{ investigation.data.experimentConfig.labTitle }}</h2>
     </ion-item>
     <ion-item>
-      <h5>Maximum Sampling Interval (ms): {{ investigation.data.experimentConfig.sampleInterval }}</h5>
       <h5>
         Status: <span *ngIf="connectedDevice?.id">Connected</span> <span *ngIf="!connectedDevice?.id">Not connected</span>
       </h5>
@@ -26,7 +25,7 @@
 
   <ion-list inset no-lines *ngFor="let sensor of sensors">
     <ion-item>
-      <h4>{{ sensor.name }} <span pull-right *ngIf="charts[sensor.name]?.value">{{ charts[sensor.name].value }}</span></h4>
+      <h4>{{ sensor.name }} <span pull-right *ngIf="sensor?.value">- {{ sensor.value }}</span></h4>
       <canvas id="{{ sensor.name }}" margin-top></canvas>
     </ion-item>
   </ion-list>

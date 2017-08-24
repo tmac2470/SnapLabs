@@ -1,5 +1,6 @@
 // Angular
-import { Component } from "@angular/core";
+import { Component, ChangeDetectorRef, OnDestroy } from "@angular/core";
+import { Subscription } from "rxjs/Subscription";
 // Ionic
 import { NavParams, NavController, LoadingController } from "ionic-angular";
 // Others
@@ -21,12 +22,13 @@ import * as SERVICES from "../connect/connect.config";
   templateUrl: "investigation-details.view.html",
   styles: ["./investigation-details.styles.scss"]
 })
-export class InvestigationDetailsPageComponent {
+export class InvestigationDetailsPageComponent implements OnDestroy {
   connectPageComponent = ConnectPageComponent;
   investigation: Investigation;
   sensors: any[] = [];
   connectedDevice: any = {};
   graphsStarted: boolean = false;
+  subscriptions: Subscription[] = [];
 
   mapDataSetConfig = {
     drawTicks: false,
@@ -42,7 +44,7 @@ export class InvestigationDetailsPageComponent {
       yAxes: [
         {
           ticks: {
-            beginAtZero: true
+            beginAtZero: false
           },
           scaleLabel: {
             display: true
@@ -71,11 +73,24 @@ export class InvestigationDetailsPageComponent {
   constructor(
     private _connectService: ConnectService,
     private _loadingCtrl: LoadingController,
+    private cdRef: ChangeDetectorRef,
     private _navCtrl: NavController,
     private _navParams: NavParams,
     private _toastService: ToastService
   ) {
     this.investigation = this._navParams.get("investigation");
+  }
+
+  ngOnDestroy() {
+    this.stopNotifications();
+
+    this.subscriptions.map(subs => {
+      if (subs) {
+        subs.unsubscribe();
+      }
+    });
+
+    this.cdRef.detach();
   }
 
   // LifeCycle methods
@@ -321,6 +336,10 @@ export class InvestigationDetailsPageComponent {
 
     _.keys(this.charts).map(chartId => {
       this.charts[chartId].reset();
+      this.charts[chartId].clear();
+      this.charts[chartId].data.datasets.forEach(dataset => {
+        dataset.data = [];
+      });
     });
   }
 
@@ -337,10 +356,6 @@ export class InvestigationDetailsPageComponent {
     if (this.graphsStarted) {
       this.addData(chart, "null", value);
     }
-  }
-
-  private barometerConvert(data) {
-    return data / 100;
   }
 
   startNotifications() {
@@ -365,31 +380,50 @@ export class InvestigationDetailsPageComponent {
     });
   }
 
+  updateSensorValue(name: string, value: string) {
+    this.sensors.map(sensor => {
+      if (sensor.name === name) {
+        sensor.value = value;
+        this.cdRef.detectChanges();
+      }
+    });
+  }
+
+  barometerConvert(data) {
+    return data / 100;
+  }
+
   barometerTempNotifications(
     device: any,
     barometerChartId: string,
     temperatureChartId: string
   ) {
-    const service = SERVICES.BAROMETER;
-    this._connectService.readData(device.id, service).subscribe(
-      data => {
-        // BAROMETER DATA
-        const state = new Uint8Array(data);
+    const service = SERVICES.Barometer;
+    const subscription: Subscription = this._connectService
+      .readData(device.id, service)
+      .subscribe(
+        data => {
+          // BAROMETER DATA
+          const state = new Uint8Array(data);
 
-        const tempValue = this.barometerConvert(
-          state[0] | (state[1] << 8) | (state[2] << 16)
-        );
-        const pressureValue = this.barometerConvert(
-          state[3] | (state[4] << 8) | (state[5] << 16)
-        );
+          const tempValue = this.barometerConvert(
+            state[0] | (state[1] << 8) | (state[2] << 16)
+          );
 
-        this.drawGraphs(this.charts[barometerChartId], pressureValue);
-        this.drawGraphs(this.charts[temperatureChartId], tempValue);
-      },
-      error => {
-        console.log(error);
-      }
-    );
+          const pressureValue = this.barometerConvert(
+            state[3] | (state[4] << 8) | (state[5] << 16)
+          );
+
+          this.updateSensorValue(barometerChartId, `${pressureValue} hPa`);
+          this.updateSensorValue(temperatureChartId, `${tempValue} °C`);
+
+          this.drawGraphs(this.charts[barometerChartId], pressureValue);
+          this.drawGraphs(this.charts[temperatureChartId], tempValue);
+        },
+        error => {
+          console.log(error);
+        }
+      );
 
     /**
        * We must send some data to write to the device before
@@ -403,27 +437,34 @@ export class InvestigationDetailsPageComponent {
     this._connectService
       .writeToDevice(device.id, service, barometerConfig.buffer)
       .then(e => {
-        console.log(e);
+        // Success
       })
       .catch(e => {
-        console.log(e);
+        this._toastService.present({
+          message: "Unable to write to device! Please reconnect device.",
+          duration: 3000
+        });
       });
+
+    this.subscriptions.push(subscription);
   }
 
-  stopNotification() {
+  stopNotifications() {
     const device = this.connectedDevice;
-
     this.graphsStarted = false;
-    const service = SERVICES.BAROMETER;
 
-    this._connectService
-      .stopReadingData(device, service)
-      .then(e => {
-        console.log(e);
-      })
-      .catch(e => {
-        console.log(e);
-      });
+    this.sensors.map(sensor => {
+      const service = SERVICES[sensor.name];
+
+      this._connectService
+        .stopReadingData(device, service)
+        .then(e => {
+          // console.log(e);
+        })
+        .catch(e => {
+          // console.log(e);
+        });
+    });
   }
 
   loading() {
