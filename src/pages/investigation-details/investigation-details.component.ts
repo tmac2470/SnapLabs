@@ -120,8 +120,10 @@ export class InvestigationDetailsPageComponent implements OnDestroy {
       .getConnectedDevice()
       .then(device => {
         this.connectedDevice = device;
-        // Automatically start notifications
-        this.startNotifications();
+        if (device && device.id) {
+          // Automatically start notifications
+          this.startNotifications();
+        }
       })
       .catch(e => {
         this._toastService.present({
@@ -343,17 +345,29 @@ export class InvestigationDetailsPageComponent implements OnDestroy {
     });
   }
 
-  addData(chart, label, data) {
+  addData(chart: any, label: string, data: any) {
     chart.data.labels.push(label);
-    chart.data.datasets.forEach(dataset => {
-      dataset.data.push(data);
-    });
+
+    if (typeof data === "string" || typeof data === "number") {
+      chart.data.datasets.forEach(dataset => {
+        dataset.data.push(data);
+      });
+    } else {
+      chart.data.datasets.forEach(dataset => {
+        _.keys(data).map(key => {
+          if (key == dataset.label) {
+            dataset.data.push(data[key]);
+          }
+        });
+      });
+    }
+
     chart.update();
   }
 
   // Draw graphs
-  drawGraphs(chart: any, value: number) {
-    if (this.graphsStarted) {
+  drawGraphs(chart: any, value: any) {
+    if (this.graphsStarted && chart) {
       this.addData(chart, "null", value);
     }
   }
@@ -368,12 +382,17 @@ export class InvestigationDetailsPageComponent implements OnDestroy {
           this.barometerTempNotifications(device, "Barometer", "Temperature");
           break;
         case "accelerometer":
-          this.accelerometerTempNotifications(device, "Accelerometer");
-          break;
         case "gyroscope":
+        case "magnetometer":
+          this.accGyroMagNotifications(
+            device,
+            "Accelerometer",
+            "Gyroscope",
+            "Magnetometer"
+          );
+          break;
         case "humidity":
         case "luxometer":
-        case "magnetometer":
           break;
 
         default:
@@ -391,7 +410,12 @@ export class InvestigationDetailsPageComponent implements OnDestroy {
     });
   }
 
-  accelerometerTempNotifications(device: any, accelerometerChartId: string) {
+  accGyroMagNotifications(
+    device: any,
+    accelerometerChartId: string,
+    gyroscopeChartId: string,
+    magnetometerChartId: string
+  ) {
     const service = SERVICES.Accelerometer;
 
     const sensorMpu9250GyroConvert = data => {
@@ -416,19 +440,57 @@ export class InvestigationDetailsPageComponent implements OnDestroy {
           //7 mag y
           //8 mag z
 
-          console.log(
-            "Gyro",
-            sensorMpu9250GyroConvert(state[0]),
-            sensorMpu9250GyroConvert(state[1]),
-            sensorMpu9250GyroConvert(state[2])
+          const gyroscopeValues = {
+            X: sensorMpu9250GyroConvert(state[0]),
+            Y: sensorMpu9250GyroConvert(state[1]),
+            Z: sensorMpu9250GyroConvert(state[2])
+          };
+
+          const accelerometerValues = {
+            X: sensorMpu9250GyroConvert(state[3]),
+            Y: sensorMpu9250GyroConvert(state[4]),
+            Z: sensorMpu9250GyroConvert(state[5])
+          };
+
+          const magnetometerValues = {
+            X: state[6],
+            Y: state[7],
+            Z: state[8]
+          };
+
+          const accelerometerChart = this.charts[accelerometerChartId];
+          const gyroscopeChart = this.charts[gyroscopeChartId];
+          const magnetometerChart = this.charts[magnetometerChartId];
+
+          this.drawGraphs(accelerometerChart, accelerometerValues);
+          this.drawGraphs(gyroscopeChart, gyroscopeValues);
+          this.drawGraphs(magnetometerChart, magnetometerValues);
+
+
+          this.updateSensorValue(
+            gyroscopeChartId,
+            `X : ${gyroscopeValues.X.toFixed(
+              3
+            )} Y : ${gyroscopeValues.Y.toFixed(
+              3
+            )} Z : ${gyroscopeValues.Z.toFixed(3)}`
           );
-          console.log(
-            "Acc",
-            sensorMpu9250GyroConvert(state[3]),
-            sensorMpu9250GyroConvert(state[4]),
-            sensorMpu9250GyroConvert(state[5])
+          this.updateSensorValue(
+            accelerometerChartId,
+            `X : ${accelerometerValues.X.toFixed(
+              3
+            )} Y : ${accelerometerValues.Y.toFixed(
+              3
+            )} Z : ${accelerometerValues.Z.toFixed(3)}`
           );
-          console.log("Mag", state[6], state[7], state[8]);
+          this.updateSensorValue(
+            magnetometerChartId,
+            `X : ${magnetometerValues.X.toFixed(
+              3
+            )} Y : ${magnetometerValues.Y.toFixed(
+              3
+            )} Z : ${magnetometerValues.Z.toFixed(3)}`
+          );
         },
         error => {
           console.log(error);
@@ -497,8 +559,11 @@ export class InvestigationDetailsPageComponent implements OnDestroy {
           this.updateSensorValue(barometerChartId, `${pressureValue} hPa`);
           this.updateSensorValue(temperatureChartId, `${tempValue} °C`);
 
-          this.drawGraphs(this.charts[barometerChartId], pressureValue);
-          this.drawGraphs(this.charts[temperatureChartId], tempValue);
+          const barometerChart = this.charts[barometerChartId];
+          const temperatureChart = this.charts[temperatureChartId];
+
+          this.drawGraphs(barometerChart, pressureValue);
+          this.drawGraphs(temperatureChart, tempValue);
         },
         error => {
           console.log(error);
@@ -536,14 +601,16 @@ export class InvestigationDetailsPageComponent implements OnDestroy {
     this.sensors.map(sensor => {
       const service = SERVICES[sensor.name];
 
-      this._connectService
-        .stopReadingData(device, service)
-        .then(e => {
-          // console.log(e);
-        })
-        .catch(e => {
-          // console.log(e);
-        });
+      if (service && service.UUID) {
+        this._connectService
+          .stopReadingData(device, service)
+          .then(e => {
+            // console.log(e);
+          })
+          .catch(e => {
+            // console.log(e);
+          });
+      }
     });
   }
 
