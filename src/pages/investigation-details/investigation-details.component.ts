@@ -395,6 +395,7 @@ export class InvestigationDetailsPageComponent implements OnDestroy {
           this.humidityNotifications(device, "Humidity");
           break;
         case "luxometer":
+          this.luxometerNotifications(device, "Luxometer");
           break;
 
         default:
@@ -410,6 +411,47 @@ export class InvestigationDetailsPageComponent implements OnDestroy {
         this.cdRef.detectChanges();
       }
     });
+  }
+
+  luxometerNotifications(device: any, luxometerChartId: string) {
+    const service = SERVICES.Luxometer;
+    const subscription: Subscription = this._connectService
+      .readData(device.id, service)
+      .subscribe(
+        data => {
+          // BAROMETER DATA
+          const state = new Uint8Array(data);
+
+          const tempValue = this.barometerConvert(
+            state[0] | (state[1] << 8) | (state[2] << 16)
+          );
+
+          this.updateSensorValue(luxometerChartId, `${tempValue} lux`);
+
+          const luxometerChart = this.charts[luxometerChartId];
+
+          this.drawGraphs(luxometerChart, tempValue);
+        },
+        error => {
+          console.log(error);
+        }
+      );
+
+    const luxometerConfig = new Uint8Array(1);
+    luxometerConfig[0] = 0x01;
+    this._connectService
+      .writeToDevice(device.id, service, luxometerConfig.buffer)
+      .then(e => {
+        // Success
+      })
+      .catch(e => {
+        this._toastService.present({
+          message: "Unable to write to device! Please reconnect device.",
+          duration: 3000
+        });
+      });
+
+    this.subscriptions.push(subscription);
   }
 
   humidityNotifications(device: any, humidityChartId: string) {
