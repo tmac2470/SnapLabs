@@ -1,25 +1,27 @@
 // Angular
-import { Component } from '@angular/core';
+import { Component } from "@angular/core";
 // Ionic
-import { NavController, LoadingController } from 'ionic-angular';
+import { NavController, LoadingController } from "ionic-angular";
+// Other
+import * as _ from "lodash";
 // SnapApp
-import { ToastService } from '../core/service';
-import { InvestigationDetailsPageComponent } from '../investigation-details';
-import { InvestigationsService } from './investigations.service';
-import { Investigation } from '../investigation-details';
+import { ToastService } from "../core/service";
+import { InvestigationDetailsPageComponent } from "../investigation-details";
+import { InvestigationsService } from "./investigations.service";
+import { Investigation } from "../investigation-details";
 
 @Component({
-  selector: 'investigations-page-component',
-  templateUrl: 'investigations.view.html',
-  styles: ['./investigations.styles.scss']
+  selector: "investigations-page-component",
+  templateUrl: "investigations.view.html",
+  styles: ["./investigations.styles.scss"]
 })
 export class InvestigationsPageComponent {
   localInvestigationFiles = [
-    'Balloon_Pressure_Investigation.json',
-    'Classroom_Heat_and_Light_Investigation.json',
-    'Investigating_the_SensorTags.json',
-    'Magnetic_Mining_Investigation.json',
-    'Rocket_Acceleration_Investigation.json'
+    "Balloon_Pressure_Investigation.json",
+    "Classroom_Heat_and_Light_Investigation.json",
+    "Investigating_the_SensorTags.json",
+    "Magnetic_Mining_Investigation.json",
+    "Rocket_Acceleration_Investigation.json"
   ];
 
   investigations: Investigation[] = [];
@@ -29,21 +31,26 @@ export class InvestigationsPageComponent {
     private _loadingCtrl: LoadingController,
     private _navCtrl: NavController,
     private _toastService: ToastService
-  ) { }
+  ) {}
 
   // LifeCycle methods
   ionViewDidLoad() {
     this.investigations = [];
     this.loadLocalInvestigationData(this.localInvestigationFiles);
+
+    this.investigations = _.sortBy(this.investigations, investigation => {
+      return investigation.name;
+    });
   }
 
   replaceEscapesWithSpace(fileName: String): String {
-    return fileName.replace(/_/g, ' ');
+    return fileName.replace(/_/g, " ");
   }
 
   loadLocalInvestigationData(files: String[]) {
     files.map(file => {
-      this._investigationsService.getLocalInvestigationFile(file)
+      this._investigationsService
+        .getLocalInvestigationFile(file)
         .subscribe(fileData => {
           this.investigations.push({
             file: file,
