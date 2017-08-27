@@ -392,6 +392,8 @@ export class InvestigationDetailsPageComponent implements OnDestroy {
           );
           break;
         case "humidity":
+          this.humidityNotifications(device, "Humidity");
+          break;
         case "luxometer":
           break;
 
@@ -408,6 +410,60 @@ export class InvestigationDetailsPageComponent implements OnDestroy {
         this.cdRef.detectChanges();
       }
     });
+  }
+
+  humidityNotifications(device: any, humidityChartId: string) {
+    const service = SERVICES.Humidity;
+
+    const subscription: Subscription = this._connectService
+      .readData(device.id, service)
+      .subscribe(
+        data => {
+          // BAROMETER DATA
+          const state = new Uint8Array(data);
+
+          const sensorMpu9250GyroConvert = data => {
+            return data / (32768 / 2);
+          };
+
+          const humidityValues = {
+            X: sensorMpu9250GyroConvert(state[0]),
+            Y: sensorMpu9250GyroConvert(state[1]),
+            Z: sensorMpu9250GyroConvert(state[2])
+          };
+
+          this.updateSensorValue(
+            humidityChartId,
+            `X : ${humidityValues.X.toFixed(3)} Y : ${humidityValues.Y.toFixed(
+              3
+            )} Z : ${humidityValues.Z.toFixed(3)}`
+          );
+
+          const humidityChart = this.charts[humidityChartId];
+
+          this.drawGraphs(humidityChart, humidityValues);
+        },
+        error => {
+          console.log(error);
+        }
+      );
+
+    const humidityConfig = new Uint8Array(1);
+    humidityConfig[0] = 0x01;
+    // Switch on sensor
+    this._connectService
+      .writeToDevice(device.id, service, humidityConfig.buffer)
+      .then(e => {
+        // Success
+      })
+      .catch(e => {
+        this._toastService.present({
+          message: "Unable to write to device! Please reconnect device.",
+          duration: 3000
+        });
+      });
+
+    this.subscriptions.push(subscription);
   }
 
   accGyroMagNotifications(
@@ -465,7 +521,6 @@ export class InvestigationDetailsPageComponent implements OnDestroy {
           this.drawGraphs(accelerometerChart, accelerometerValues);
           this.drawGraphs(gyroscopeChart, gyroscopeValues);
           this.drawGraphs(magnetometerChart, magnetometerValues);
-
 
           this.updateSensorValue(
             gyroscopeChartId,
