@@ -433,7 +433,11 @@ export class InvestigationDetailsPageComponent implements OnDestroy {
           this.drawGraphs(luxometerChart, tempValue);
         },
         error => {
-          console.log(error);
+          this._toastService.present({
+            message:
+              "Unable to read luxometer values! Please reconnect device.",
+            duration: 3000
+          });
         }
       );
 
@@ -486,7 +490,10 @@ export class InvestigationDetailsPageComponent implements OnDestroy {
           this.drawGraphs(humidityChart, humidityValues);
         },
         error => {
-          console.log(error);
+          this._toastService.present({
+            message: "Unable to read humidity values! Please reconnect device.",
+            duration: 3000
+          });
         }
       );
 
@@ -500,7 +507,8 @@ export class InvestigationDetailsPageComponent implements OnDestroy {
       })
       .catch(e => {
         this._toastService.present({
-          message: "Unable to write to device! Please reconnect device.",
+          message:
+            "Problem with bluetooth connection! Please reconnect device.",
           duration: 3000
         });
       });
@@ -590,7 +598,11 @@ export class InvestigationDetailsPageComponent implements OnDestroy {
           );
         },
         error => {
-          console.log(error);
+          this._toastService.present({
+            message:
+              "Unable to read accelerometer values! Please reconnect device.",
+            duration: 3000
+          });
         }
       );
 
@@ -663,7 +675,11 @@ export class InvestigationDetailsPageComponent implements OnDestroy {
           this.drawGraphs(temperatureChart, tempValue);
         },
         error => {
-          console.log(error);
+          this._toastService.present({
+            message:
+              "Unable to read barometer values! Please reconnect device.",
+            duration: 3000
+          });
         }
       );
 
@@ -702,10 +718,10 @@ export class InvestigationDetailsPageComponent implements OnDestroy {
         this._connectService
           .stopReadingData(device, service)
           .then(e => {
-            // console.log(e);
+            // Success
           })
           .catch(e => {
-            // console.log(e);
+            // Throws some weird error but still stops the notifications.
           });
       }
     });
