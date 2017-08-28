@@ -5,6 +5,7 @@ import { IonicModule } from 'ionic-angular';
 // Snapapp
 import { InvestigationsPageComponent } from './investigations.component';
 import { InvestigationsService } from './investigations.service';
+import { CoreModule } from '../core/core.module';
 
 const pages = [
   InvestigationsPageComponent
@@ -12,7 +13,8 @@ const pages = [
 
 @NgModule({
   imports: [
-    IonicModule
+    IonicModule,
+    CoreModule
   ],
   declarations: [
     ...pages

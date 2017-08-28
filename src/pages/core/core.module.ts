@@ -11,10 +11,17 @@ import {
   StorageService,
   ToastService
 } from './service';
+import {
+  OrderByPipe
+} from './pipe';
 
 const directives = [
   EmailValidatorDirective,
   HideKeyboardOnGoDirective
+];
+
+const pipes = [
+  OrderByPipe
 ];
 
 @NgModule({
@@ -22,12 +29,14 @@ const directives = [
     IonicModule
   ],
   declarations: [
-    ...directives
+    ...directives,
+    ...pipes
   ],
   entryComponents: [
   ],
   exports: [
-    ...directives
+    ...directives,
+    ...pipes
   ]
 })
 export class CoreModule {

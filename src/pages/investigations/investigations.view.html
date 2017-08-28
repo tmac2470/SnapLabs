@@ -9,8 +9,8 @@
 <ion-content>
   <h5 padding>Select an investigation</h5>
 
-  <ion-list>
-    <ion-item *ngFor="let investigation of investigations" detail-push (click)="openInvestigationDetails(investigation)">
+  <ion-list *ngIf="investigations?.length>0">
+    <ion-item *ngFor="let investigation of investigations | snOrderBy: sortOrderInvestigations" detail-push (click)="openInvestigationDetails(investigation)">
       {{ investigation.name }}
     </ion-item>
   </ion-list>

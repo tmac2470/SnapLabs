@@ -2,13 +2,15 @@
 import { Component } from "@angular/core";
 // Ionic
 import { NavController, LoadingController } from "ionic-angular";
-// Other
-import * as _ from "lodash";
 // SnapApp
 import { ToastService } from "../core/service";
 import { InvestigationDetailsPageComponent } from "../investigation-details";
 import { InvestigationsService } from "./investigations.service";
 import { Investigation } from "../investigation-details";
+
+class SortInvestigations {
+  static NAME = "id";
+}
 
 @Component({
   selector: "investigations-page-component",
@@ -16,6 +18,7 @@ import { Investigation } from "../investigation-details";
   styles: ["./investigations.styles.scss"]
 })
 export class InvestigationsPageComponent {
+  sortOrderInvestigations: string = SortInvestigations.NAME;
   localInvestigationFiles = [
     "Balloon_Pressure_Investigation.json",
     "Classroom_Heat_and_Light_Investigation.json",
@@ -37,10 +40,6 @@ export class InvestigationsPageComponent {
   ionViewDidLoad() {
     this.investigations = [];
     this.loadLocalInvestigationData(this.localInvestigationFiles);
-
-    this.investigations = _.sortBy(this.investigations, investigation => {
-      return investigation.name;
-    });
   }
 
   replaceEscapesWithSpace(fileName: String): String {
@@ -48,14 +47,16 @@ export class InvestigationsPageComponent {
   }
 
   loadLocalInvestigationData(files: String[]) {
-    files.map(file => {
+    files.map((file, i) => {
       this._investigationsService
         .getLocalInvestigationFile(file)
         .subscribe(fileData => {
+
           this.investigations.push({
             file: file,
             name: this.replaceEscapesWithSpace(file).slice(0, -5),
-            data: fileData
+            data: fileData,
+            id: i + 1
           });
         });
     });
