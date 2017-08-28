@@ -411,18 +411,26 @@ export class InvestigationDetailsPageComponent implements OnDestroy {
       .readData(device.id, service)
       .subscribe(
         data => {
-          // BAROMETER DATA
-          const state = new Uint8Array(data);
+          // Luxometer DATA
 
-          const tempValue = this.barometerConvert(
-            state[0] | (state[1] << 8) | (state[2] << 16)
-          );
+          // Get 16 bit value from data buffer in little endian format.
+          const value = new DataView(data).getUint16(0, true);
 
-          this.updateSensorValue(luxometerChartId, `${tempValue} lux`);
+          // Extraction of luxometer value, based on sfloatExp2ToDouble
+          // from BLEUtility.m in Texas Instruments TI BLE SensorTag
+          // iOS app source code.
+          const mantissa = value & 0x0fff;
+          const exponent = value >> 12;
+          const magnitude = Math.pow(2, exponent);
+          const output = mantissa * magnitude;
+
+          const luxValue = output / 100.0;
+
+          this.updateSensorValue(luxometerChartId, `${luxValue} lux`);
 
           const luxometerChart = this.charts[luxometerChartId];
 
-          this.drawGraphs(luxometerChart, tempValue);
+          this.drawGraphs(luxometerChart, luxValue);
         },
         error => {
           this._toastService.present({
@@ -526,7 +534,6 @@ export class InvestigationDetailsPageComponent implements OnDestroy {
       .readData(device.id, service)
       .subscribe(
         data => {
-          // BAROMETER DATA
           const state = new Int16Array(data);
 
           //0 gyro x
@@ -633,10 +640,6 @@ export class InvestigationDetailsPageComponent implements OnDestroy {
     this.subscriptions.push(subscription);
   }
 
-  barometerConvert(data) {
-    return data / 100;
-  }
-
   temperatureNotifications(device: any, temperatureChartId: string) {
     const service = SERVICES.Temperature;
 
@@ -657,9 +660,9 @@ export class InvestigationDetailsPageComponent implements OnDestroy {
 
           this.updateSensorValue(
             temperatureChartId,
-            `${temperatureValues[
-              "Ambient Temperature (C)"
-            ].toFixed(3)} °C [Amb], ${temperatureValues[
+            `${temperatureValues["Ambient Temperature (C)"].toFixed(
+              3
+            )} °C [Amb], ${temperatureValues[
               "Target (IR) Temperature (C)"
             ].toFixed(3)} °C [IR] `
           );
