@@ -368,8 +368,10 @@ export class InvestigationDetailsPageComponent implements OnDestroy {
     this.sensors.forEach(sensorTag => {
       switch (sensorTag.name.toLowerCase()) {
         case "temperature":
+          this.temperatureNotifications(device, "Temperature");
+          break;
         case "barometer":
-          this.barometerTempNotifications(device, "Barometer", "Temperature");
+          this.barometerNotifications(device, "Barometer");
           break;
         case "accelerometer":
         case "gyroscope":
@@ -473,7 +475,7 @@ export class InvestigationDetailsPageComponent implements OnDestroy {
             humidityChartId,
             `${humidityValues.RH.toFixed(
               3
-            )} RH at ${humidityValues.TEMP.toFixed(3)} °C`
+            )}% RH at ${humidityValues.TEMP.toFixed(3)} °C`
           );
 
           const humidityChart = this.charts[humidityChartId];
@@ -575,17 +577,17 @@ export class InvestigationDetailsPageComponent implements OnDestroy {
             accelerometerChartId,
             `X : ${accelerometerValues.X.toFixed(
               3
-            )} Y : ${accelerometerValues.Y.toFixed(
+            )}G Y : ${accelerometerValues.Y.toFixed(
               3
-            )} Z : ${accelerometerValues.Z.toFixed(3)}`
+            )}G Z : ${accelerometerValues.Z.toFixed(3)}G`
           );
           this.updateSensorValue(
             magnetometerChartId,
             `X : ${magnetometerValues.X.toFixed(
               3
-            )} Y : ${magnetometerValues.Y.toFixed(
+            )}μ  Y : ${magnetometerValues.Y.toFixed(
               3
-            )} Z : ${magnetometerValues.Z.toFixed(3)}`
+            )}μ Z : ${magnetometerValues.Z.toFixed(3)}μ`
           );
         },
         error => {
@@ -635,11 +637,75 @@ export class InvestigationDetailsPageComponent implements OnDestroy {
     return data / 100;
   }
 
-  barometerTempNotifications(
-    device: any,
-    barometerChartId: string,
-    temperatureChartId: string
-  ) {
+  temperatureNotifications(device: any, temperatureChartId: string) {
+    const service = SERVICES.Temperature;
+
+    console.log("Starting temp");
+
+    const subscription: Subscription = this._connectService
+      .readData(device.id, service)
+      .subscribe(
+        data => {
+          // Calculate target temperature (Celsius).
+          const temp = new DataView(data).getUint16(0, true);
+          const targetTemp = (temp >> 2) * 0.03125;
+          // Calculate ambient temp
+          const ambientTemp = new DataView(data).getUint16(2, true) / 128.0;
+
+          const temperatureValues = {
+            "Ambient Temperature (C)": ambientTemp,
+            "Target (IR) Temperature (C)": targetTemp
+          };
+
+          console.log(targetTemp, ambientTemp);
+
+          this.updateSensorValue(
+            temperatureChartId,
+            `${temperatureValues[
+              "Ambient Temperature (C)"
+            ].toFixed(3)} °C [Ambient], ${temperatureValues[
+              "Target (IR) Temperature (C)"
+            ].toFixed(3)} °C [IR] `
+          );
+
+          const temperatureChart = this.charts[temperatureChartId];
+
+          this.drawGraphs(temperatureChart, temperatureValues);
+        },
+        error => {
+          this._toastService.present({
+            message:
+              "Unable to read temperature values! Please reconnect device.",
+            duration: 3000
+          });
+        }
+      );
+
+    /**
+       * We must send some data to write to the device before
+       * we can start receiving any notifications.
+       * Also, it seems like the barometerConfig should hold
+       * some unique value. Currently any value seems to work
+       *
+       */
+    const tempConfig = new Uint8Array(1);
+    tempConfig[0] = 0x01;
+    this._connectService
+      .writeToDevice(device.id, service, tempConfig.buffer)
+      .then(e => {
+        // Success
+      })
+      .catch(e => {
+        this._toastService.present({
+          message: "Unable to write to device! Please reconnect device.",
+          duration: 3000
+        });
+      });
+
+    this.subscriptions.push(subscription);
+  }
+
+  barometerNotifications(device: any, barometerChartId: string) {
     const service = SERVICES.Barometer;
     const subscription: Subscription = this._connectService
       .readData(device.id, service)
@@ -652,19 +718,19 @@ export class InvestigationDetailsPageComponent implements OnDestroy {
           const tempValue = (flTempData & 0x00ffffff) / 100.0;
           const pressureValue = ((flPressureData >> 8) & 0x00ffffff) / 100.0;
 
-          this.updateSensorValue(barometerChartId, `${pressureValue} hPa`);
-          this.updateSensorValue(temperatureChartId, `${tempValue} °C`);
+          this.updateSensorValue(
+            barometerChartId,
+            `${pressureValue} hPa at ${tempValue} °C`
+          );
 
           const barometerChart = this.charts[barometerChartId];
-          const temperatureChart = this.charts[temperatureChartId];
 
           this.drawGraphs(barometerChart, pressureValue);
-          this.drawGraphs(temperatureChart, tempValue);
         },
         error => {
           this._toastService.present({
             message:
-              "Unable to read barometer values! Please reconnect device.",
+              "Unable to read barometer values! Pleas ve reconnect device.",
             duration: 3000
           });
         }
