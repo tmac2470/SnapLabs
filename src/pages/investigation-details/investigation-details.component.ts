@@ -289,17 +289,7 @@ export class InvestigationDetailsPageComponent implements OnDestroy {
           {
             mapDataSetConfig,
             borderColor: ColorCode.RED,
-            label: "X"
-          },
-          {
-            mapDataSetConfig,
-            borderColor: ColorCode.BLUE,
-            label: "Y"
-          },
-          {
-            mapDataSetConfig,
-            borderColor: ColorCode.GREEN,
-            label: "Z"
+            label: "RH"
           }
         ];
     }
@@ -465,29 +455,28 @@ export class InvestigationDetailsPageComponent implements OnDestroy {
       .readData(device.id, service)
       .subscribe(
         data => {
-          // BAROMETER DATA
-          const state = new Uint8Array(data);
+          // HUMIDITY DATA
+          const state = new DataView(data).getUint16(0, true);
+          const roomTemp = -46.85 + 175.72 / 65536.0 * state;
 
-          const sensorMpu9250GyroConvert = data => {
-            return data / (32768 / 2);
-          };
+          // Calculate the relative humidity.
+          const temp = new DataView(data).getUint16(0, true);
+          const hData = temp & ~0x03;
+          const RHValue = -6.0 + 125.0 / 65536.0 * hData;
 
           const humidityValues = {
-            X: sensorMpu9250GyroConvert(state[0]),
-            Y: sensorMpu9250GyroConvert(state[1]),
-            Z: sensorMpu9250GyroConvert(state[2])
+            RH: RHValue,
+            TEMP: roomTemp
           };
 
           this.updateSensorValue(
             humidityChartId,
-            `X : ${humidityValues.X.toFixed(3)} Y : ${humidityValues.Y.toFixed(
-              3
-            )} Z : ${humidityValues.Z.toFixed(3)}`
+            `${humidityValues.RH.toFixed(3)} RH at ${humidityValues.TEMP.toFixed(3)} °C`
           );
 
           const humidityChart = this.charts[humidityChartId];
 
-          this.drawGraphs(humidityChart, humidityValues);
+          this.drawGraphs(humidityChart, humidityValues.RH);
         },
         error => {
           this._toastService.present({
