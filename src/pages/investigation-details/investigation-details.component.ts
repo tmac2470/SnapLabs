@@ -640,8 +640,6 @@ export class InvestigationDetailsPageComponent implements OnDestroy {
   temperatureNotifications(device: any, temperatureChartId: string) {
     const service = SERVICES.Temperature;
 
-    console.log("Starting temp");
-
     const subscription: Subscription = this._connectService
       .readData(device.id, service)
       .subscribe(
@@ -656,8 +654,6 @@ export class InvestigationDetailsPageComponent implements OnDestroy {
             "Ambient Temperature (C)": ambientTemp,
             "Target (IR) Temperature (C)": targetTemp
           };
-
-          console.log(targetTemp, ambientTemp);
 
           this.updateSensorValue(
             temperatureChartId,
