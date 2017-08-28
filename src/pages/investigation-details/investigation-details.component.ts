@@ -569,25 +569,25 @@ export class InvestigationDetailsPageComponent implements OnDestroy {
             gyroscopeChartId,
             `X : ${gyroscopeValues.X.toFixed(
               3
-            )} Y : ${gyroscopeValues.Y.toFixed(
+            )}, Y : ${gyroscopeValues.Y.toFixed(
               3
-            )} Z : ${gyroscopeValues.Z.toFixed(3)}`
+            )}, Z : ${gyroscopeValues.Z.toFixed(3)}`
           );
           this.updateSensorValue(
             accelerometerChartId,
             `X : ${accelerometerValues.X.toFixed(
               3
-            )}G Y : ${accelerometerValues.Y.toFixed(
+            )}G, Y : ${accelerometerValues.Y.toFixed(
               3
-            )}G Z : ${accelerometerValues.Z.toFixed(3)}G`
+            )}G, Z : ${accelerometerValues.Z.toFixed(3)}G`
           );
           this.updateSensorValue(
             magnetometerChartId,
             `X : ${magnetometerValues.X.toFixed(
               3
-            )}μ  Y : ${magnetometerValues.Y.toFixed(
+            )}μ,  Y : ${magnetometerValues.Y.toFixed(
               3
-            )}μ Z : ${magnetometerValues.Z.toFixed(3)}μ`
+            )}μ, Z : ${magnetometerValues.Z.toFixed(3)}μ`
           );
         },
         error => {
@@ -659,7 +659,7 @@ export class InvestigationDetailsPageComponent implements OnDestroy {
             temperatureChartId,
             `${temperatureValues[
               "Ambient Temperature (C)"
-            ].toFixed(3)} °C [Ambient], ${temperatureValues[
+            ].toFixed(3)} °C [Amb], ${temperatureValues[
               "Target (IR) Temperature (C)"
             ].toFixed(3)} °C [IR] `
           );
