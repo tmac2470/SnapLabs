@@ -471,7 +471,9 @@ export class InvestigationDetailsPageComponent implements OnDestroy {
 
           this.updateSensorValue(
             humidityChartId,
-            `${humidityValues.RH.toFixed(3)} RH at ${humidityValues.TEMP.toFixed(3)} °C`
+            `${humidityValues.RH.toFixed(
+              3
+            )} RH at ${humidityValues.TEMP.toFixed(3)} °C`
           );
 
           const humidityChart = this.charts[humidityChartId];
@@ -644,15 +646,11 @@ export class InvestigationDetailsPageComponent implements OnDestroy {
       .subscribe(
         data => {
           // BAROMETER DATA
-          const state = new Uint8Array(data);
+          const flTempData = new DataView(data).getUint32(0, true);
+          const flPressureData = new DataView(data).getUint32(2, true);
 
-          const tempValue = this.barometerConvert(
-            state[0] | (state[1] << 8) | (state[2] << 16)
-          );
-
-          const pressureValue = this.barometerConvert(
-            state[3] | (state[4] << 8) | (state[5] << 16)
-          );
+          const tempValue = (flTempData & 0x00ffffff) / 100.0;
+          const pressureValue = ((flPressureData >> 8) & 0x00ffffff) / 100.0;
 
           this.updateSensorValue(barometerChartId, `${pressureValue} hPa`);
           this.updateSensorValue(temperatureChartId, `${tempValue} °C`);
