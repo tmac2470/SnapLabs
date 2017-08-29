@@ -1,23 +1,29 @@
 // Angular
-import { Component } from '@angular/core';
+import { Component } from "@angular/core";
 // Ionic
-import { NavController, LoadingController } from 'ionic-angular';
+import { NavController, LoadingController } from "ionic-angular";
 // SnapApp
-import { ConnectPageComponent } from '../connect';
-import { SigninPageComponent, SignupPageComponent, AccountService } from '../account';
-import { ToastService } from '../core/service';
-import { InvestigationsPageComponent } from '../investigations';
+import { ConnectPageComponent } from "../connect";
+import {
+  SigninPageComponent,
+  SignupPageComponent,
+  AccountService
+} from "../account";
+import { ToastService } from "../core/service";
+import { InvestigationsPageComponent } from "../investigations";
+import { DownloadInvestigationsPageComponent } from "../download-investigations";
 
 @Component({
-  selector: 'home-page-component',
-  templateUrl: 'home.view.html',
-  styles: ['./home.styles.scss']
+  selector: "home-page-component",
+  templateUrl: "home.view.html",
+  styles: ["./home.styles.scss"]
 })
 export class HomePageComponent {
   connectPageComponent = ConnectPageComponent;
   investigationsPageComponent = InvestigationsPageComponent;
   signinPageComponent = SigninPageComponent;
   signupPageComponent = SignupPageComponent;
+  downloadInvestigationsPageComponent = DownloadInvestigationsPageComponent;
 
   isLoggedIn: boolean = false;
 
@@ -26,17 +32,16 @@ export class HomePageComponent {
     private _loadingCtrl: LoadingController,
     private _navCtrl: NavController,
     private _toastService: ToastService
-  ) { }
+  ) {}
 
   // LifeCycle methods
   ionViewWillEnter() {
     const loading = this.loading();
 
-    this._accountService.getUser()
-      .subscribe(user => {
-        loading.dismiss();
-        this.isLoggedIn = !!user && !!user.email;
-      });
+    this._accountService.getUser().subscribe(user => {
+      loading.dismiss();
+      this.isLoggedIn = !!user && !!user.email;
+    });
   }
 
   loading() {
@@ -57,13 +62,12 @@ export class HomePageComponent {
   logout() {
     const loading = this.loading();
 
-    this._accountService.logout()
-      .subscribe(_ => {
-        this.isLoggedIn = false;
-        loading.dismiss();
-        this._toastService.present({
-          message: `Successfully logged out!`
-        });
+    this._accountService.logout().subscribe(_ => {
+      this.isLoggedIn = false;
+      loading.dismiss();
+      this._toastService.present({
+        message: `Successfully logged out!`
       });
+    });
   }
 }

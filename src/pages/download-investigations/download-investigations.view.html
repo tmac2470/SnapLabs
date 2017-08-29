@@ -1,0 +1,17 @@
+<ion-header>
+  <ion-navbar>
+    <ion-title>
+      Investigations
+    </ion-title>
+  </ion-navbar>
+</ion-header>
+
+<ion-content>
+  <h5 padding>Select an investigation to download</h5>
+
+  <ion-list *ngIf="investigations?.length>0">
+    <ion-item *ngFor="let investigation of investigations" (click)="openInvestigationDetails(investigation)">
+      {{ investigation.labTitle }}
+    </ion-item>
+  </ion-list>
+</ion-content>

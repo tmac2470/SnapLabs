@@ -80,7 +80,6 @@ export class HttpService {
   }
 
   private mapResult(data: Response): Response {
-    let response = data.json();
     return data;
   }
 

@@ -51,7 +51,6 @@ export class InvestigationsPageComponent {
       this._investigationsService
         .getLocalInvestigationFile(file)
         .subscribe(fileData => {
-
           this.investigations.push({
             file: file,
             name: this.replaceEscapesWithSpace(file).slice(0, -5),
