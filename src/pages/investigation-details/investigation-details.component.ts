@@ -525,18 +525,11 @@ export class InvestigationDetailsPageComponent implements OnDestroy {
   ) {
     const service = SERVICES.Accelerometer;
 
-    const sensorMpu9250GyroConvert = data => {
-      // return data / (65536 / 500);
-      return data / (32768 / 2);
-    };
-
     const subscription: Subscription = this._connectService
       .readData(device.id, service)
       .subscribe(
         data => {
-          const state = new Int16Array(data);
-
-          //0 gyro x
+                    //0 gyro x
           //1 gyro y
           //2 gyro z
           //3 accel x
@@ -546,22 +539,52 @@ export class InvestigationDetailsPageComponent implements OnDestroy {
           //7 mag y
           //8 mag z
 
+          // val depends on range: 2G = (32768/2), 4G = (32768/4), 8G = (32768/8) = 4096, 16G (32768/16)
+          // To correspond with bit set in snaplabs.devices.enableMovementSensor
+          // NOTE - MUST BE SIGNED INT (Not getUint16)
+          const accVal = 32768 / 2;
+          const accDivisors = { x: -1 * accVal, y: accVal, z: -1 * accVal };
+          const ax_temp = new DataView(data).getInt16(6, true);
+          const ay_temp = new DataView(data).getInt16(8, true);
+          const az_temp = new DataView(data).getInt16(10, true);
+          //console.log("DEBUG - accelerometer values read are :" + ax_temp + ", " + ay_temp + ", " +az_temp  )
+          // Calculate accelerometer values.
+          // Leave as 6,8,10  http://processors.wiki.ti.com/index.php/CC2650_SensorTag_User's_Guide#Movement_Sensor
+          const accX = ax_temp / accDivisors.x;
+          const accY = ay_temp / accDivisors.y;
+          const accZ = az_temp / accDivisors.z;
+          const accScalar = Math.sqrt(accX * accX + accY * accY + accZ * accZ);
+
+          // Gyrometer calculations
+          var gyroVal = 500 / 65536.0;
+          var gyroX = new DataView(data).getInt16(0, true) * gyroVal;
+          var gyroY = new DataView(data).getInt16(2, true) * gyroVal;
+          var gyroZ = new DataView(data).getInt16(4, true) * gyroVal;
+
+          // Magnetometer calculations
+          var magX = new DataView(data).getInt16(12, true);
+          var magY = new DataView(data).getInt16(14, true);
+          var magZ = new DataView(data).getInt16(16, true);
+          var magScalar = Math.sqrt(magX * magX + magY * magY + magZ * magZ);
+
           const gyroscopeValues = {
-            X: sensorMpu9250GyroConvert(state[0]),
-            Y: sensorMpu9250GyroConvert(state[1]),
-            Z: sensorMpu9250GyroConvert(state[2])
+            X: gyroX,
+            Y: gyroY,
+            Z: gyroZ
           };
 
           const accelerometerValues = {
-            X: sensorMpu9250GyroConvert(state[3]),
-            Y: sensorMpu9250GyroConvert(state[4]),
-            Z: sensorMpu9250GyroConvert(state[5])
+            X: accX,
+            Y: accY,
+            Z: accZ,
+            "Scalar Value": accScalar
           };
 
           const magnetometerValues = {
-            X: state[6],
-            Y: state[7],
-            Z: state[8]
+            X: magX,
+            Y: magY,
+            Z: magZ,
+            "Scalar Value": magScalar
           };
 
           const accelerometerChart = this.charts[accelerometerChartId];
@@ -586,15 +609,23 @@ export class InvestigationDetailsPageComponent implements OnDestroy {
               3
             )}G, Y : ${accelerometerValues.Y.toFixed(
               3
-            )}G, Z : ${accelerometerValues.Z.toFixed(3)}G`
+            )}G, Z : ${accelerometerValues.Z.toFixed(
+              3
+            )}G, Scalar Value : ${accelerometerValues["Scalar Value"].toFixed(
+              3
+            )}G`
           );
           this.updateSensorValue(
             magnetometerChartId,
             `X : ${magnetometerValues.X.toFixed(
               3
-            )}μ,  Y : ${magnetometerValues.Y.toFixed(
+            )}μT,  Y : ${magnetometerValues.Y.toFixed(
               3
-            )}μ, Z : ${magnetometerValues.Z.toFixed(3)}μ`
+            )}μT, Z : ${magnetometerValues.Z.toFixed(
+              3
+            )}μT, Scalar Value : ${accelerometerValues["Scalar Value"].toFixed(
+              3
+            )}μT`
           );
         },
         error => {
