@@ -9,6 +9,7 @@ import { StatusBar } from "@ionic-native/status-bar";
 import { IonicStorageModule } from "@ionic/storage";
 import { BLE } from "@ionic-native/ble";
 import { Keyboard } from "@ionic-native/keyboard";
+import { Network } from "@ionic-native/network";
 // SnapLabApp
 import { SnapLabApp } from "./app.component";
 import { AccountModule } from "../pages/account/account.module";
@@ -18,6 +19,7 @@ import { HomeModule } from "../pages/home/home.module";
 import { InvestigationsModule } from "../pages/investigations/investigations.module";
 import { InvestigationDetailsModule } from "../pages/investigation-details/investigation-details.module";
 import { AppShellPageComponent } from "../pages/app-shell/app-shell.component";
+import { DownloadInvestigationsModule } from "../pages/download-investigations/download-investigations.module";
 
 @NgModule({
   declarations: [SnapLabApp, AppShellPageComponent],
@@ -34,6 +36,7 @@ import { AppShellPageComponent } from "../pages/app-shell/app-shell.component";
     AccountModule.forRoot(),
     ConnectModule.forRoot(),
     CoreModule.forRoot(),
+    DownloadInvestigationsModule.forRoot(),
     HomeModule.forRoot(),
     InvestigationDetailsModule.forRoot(),
     InvestigationsModule.forRoot()
@@ -45,6 +48,7 @@ import { AppShellPageComponent } from "../pages/app-shell/app-shell.component";
     Keyboard,
     SplashScreen,
     StatusBar,
+    Network,
     { provide: ErrorHandler, useClass: IonicErrorHandler }
   ]
 })
