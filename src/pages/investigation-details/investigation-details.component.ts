@@ -24,7 +24,7 @@ import * as SERVICES from "../connect/connect.config";
 })
 export class InvestigationDetailsPageComponent implements OnDestroy {
   connectPageComponent = ConnectPageComponent;
-  investigation: any;
+  investigation: Investigation;
   sensors: any[] = [];
   connectedDevice: any = {};
   graphsStarted: boolean = false;
@@ -139,7 +139,7 @@ export class InvestigationDetailsPageComponent implements OnDestroy {
       const sensorTag: ISensorTag = sensorTags[id];
 
       // Fetch the sensor tags which have been switched "on"
-      if (sensorTag.connect === "on" || sensorTag.connect === "1") {
+      if (!!sensorTag.connect) {
         const sensors: any = sensorTag.sensors;
 
         // Fetch each sensor from the sensor tags config
@@ -147,9 +147,9 @@ export class InvestigationDetailsPageComponent implements OnDestroy {
           const sensor: ISensor = sensors[iSensor];
           // Fetch only the sensors which have been switched "on"
           if (
-            sensor.data.display === "on" ||
-            sensor.graph.graphdisplay === "on" ||
-            sensor.grid.griddisplay === "on"
+            sensor.data.display ||
+            sensor.graph.graphdisplay ||
+            sensor.grid.griddisplay
           ) {
             this.sensors.push({
               name: iSensor,

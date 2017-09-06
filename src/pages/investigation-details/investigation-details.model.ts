@@ -1,17 +1,15 @@
 export interface Investigation {
-  file: String;
-  name: String;
-  data: InvestigationData;
   _id: string;
-}
-
-export interface InvestigationData {
-  experimentConfig: InvestigationDataConfig;
-}
-
-export interface InvestigationDataConfig {
-  labTitle: String;
-  sampleInterval: String;
+  serialNumber: number;
+  lastUpdatedAt: Date;
+  videoPrefix: string;
+  dataStorageAllowed: boolean;
+  dataStoragePrefix: string;
+  graphAutoStart: boolean;
+  labTitle: string;
+  sampleInterval: string;
+  description: string;
+  isPublished: boolean;
   sensorTags: any;
 }
 
