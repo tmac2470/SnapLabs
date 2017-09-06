@@ -9,7 +9,7 @@ import { InvestigationsService } from "./investigations.service";
 import { Investigation } from "../investigation-details";
 
 class SortInvestigations {
-  static NAME = "id";
+  static NAME = "_id";
 }
 
 @Component({
@@ -55,7 +55,7 @@ export class InvestigationsPageComponent {
             file: file,
             name: this.replaceEscapesWithSpace(file).slice(0, -5),
             data: fileData,
-            id: i + 1
+            _id: fileData.experimentConfig._id
           });
         });
     });

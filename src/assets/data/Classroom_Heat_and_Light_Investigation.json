@@ -1,5 +1,6 @@
 {
 	"experimentConfig" : {
+    "_id": "2",
 		"labTitle" : "Heat and Light Investigation",
 		"sampleInterval" : "1000",
 		"captureOnClick" : "off",

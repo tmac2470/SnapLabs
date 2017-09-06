@@ -1,5 +1,6 @@
 {
 	"experimentConfig" : {
+    "_id": "4",
 		"labTitle" : "Magnetism Investigation",
 		"sampleInterval" : "1000",
 		"sensorTags" : {
@@ -122,7 +123,7 @@
 							"xyz" : "off",
 							"scalar" : "on"
 						}
-					}, 
+					},
 					"Luxometer" : {
 						"data" : {
 							"display" : "off",

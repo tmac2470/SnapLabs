@@ -1,5 +1,6 @@
 {
 	"experimentConfig" : {
+    "_id": "1",
 		"labTitle" : "Pressure Investigation",
 		"sampleInterval" : "300",
 		"sensorTags" : {

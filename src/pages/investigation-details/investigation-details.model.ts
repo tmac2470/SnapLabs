@@ -2,7 +2,7 @@ export interface Investigation {
   file: String;
   name: String;
   data: InvestigationData;
-  id: number;
+  _id: string;
 }
 
 export interface InvestigationData {

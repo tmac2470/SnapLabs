@@ -1,5 +1,6 @@
 {
 	"experimentConfig" : {
+    "_id": "3",
 		"labTitle" : "All Sensor Investigation",
 		"sampleInterval" : "500",
 		"captureOnClick" : "of",

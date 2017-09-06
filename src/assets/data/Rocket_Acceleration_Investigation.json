@@ -1,5 +1,6 @@
 {
 	"experimentConfig" : {
+    "_id": "5",
 		"labTitle" : "Acceleration Investigation",
 		"sampleInterval" : "100",
 		"captureOnClick" : "off",
@@ -29,7 +30,7 @@
 							"rows" : "4"
 						},
 						"parameters" : {
-							"xyz" : "off", 
+							"xyz" : "off",
 							"scalar" : "on"
 						}
 					},
