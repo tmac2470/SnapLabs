@@ -9,7 +9,7 @@ import { InvestigationsService } from "./investigations.service";
 import { Investigation } from "../investigation-details";
 
 class SortInvestigations {
-  static NAME = "_id";
+  static NAME = "labTitle";
 }
 
 @Component({
@@ -42,21 +42,12 @@ export class InvestigationsPageComponent {
     this.loadLocalInvestigationData(this.localInvestigationFiles);
   }
 
-  replaceEscapesWithSpace(fileName: String): String {
-    return fileName.replace(/_/g, " ");
-  }
-
   loadLocalInvestigationData(files: String[]) {
     files.map((file, i) => {
       this._investigationsService
         .getLocalInvestigationFile(file)
         .subscribe(fileData => {
-          this.investigations.push({
-            file: file,
-            name: this.replaceEscapesWithSpace(file).slice(0, -5),
-            data: fileData,
-            _id: fileData.experimentConfig._id
-          });
+          this.investigations.push(fileData);
         });
     });
   }

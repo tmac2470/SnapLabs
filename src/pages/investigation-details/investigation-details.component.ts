@@ -24,7 +24,7 @@ import * as SERVICES from "../connect/connect.config";
 })
 export class InvestigationDetailsPageComponent implements OnDestroy {
   connectPageComponent = ConnectPageComponent;
-  investigation: Investigation;
+  investigation: any;
   sensors: any[] = [];
   connectedDevice: any = {};
   graphsStarted: boolean = false;
@@ -79,7 +79,6 @@ export class InvestigationDetailsPageComponent implements OnDestroy {
     private _toastService: ToastService
   ) {
     this.investigation = this._navParams.get("investigation");
-    console.log(this.investigation);
   }
 
   ngOnDestroy() {
@@ -96,7 +95,7 @@ export class InvestigationDetailsPageComponent implements OnDestroy {
 
   // LifeCycle methods
   ionViewWillEnter() {
-    const sensorTags = this.investigation.data.experimentConfig.sensorTags;
+    const sensorTags = this.investigation.sensorTags;
     const getSensorTags = async () => {
       await this.getSensorTags(sensorTags);
     };

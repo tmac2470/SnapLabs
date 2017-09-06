@@ -64,8 +64,6 @@ export class DownloadInvestigationsPageComponent {
         this.investigations = data;
         loading.dismiss();
       });
-
-    console.log("Experiments", this.investigations);
   }
 
   // Helper to open a given page
@@ -79,11 +77,7 @@ export class DownloadInvestigationsPageComponent {
       .getExperiment(investigation._id)
       .subscribe(investigationDetails => {
         this._navCtrl.push(InvestigationDetailsPageComponent, {
-          investigation: {
-            data: {
-              experimentConfig: investigationDetails
-            }
-          }
+          investigation: investigationDetails
         });
       });
   }

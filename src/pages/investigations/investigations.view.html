@@ -11,7 +11,7 @@
 
   <ion-list *ngIf="investigations?.length>0">
     <ion-item *ngFor="let investigation of investigations | snOrderBy: sortOrderInvestigations" detail-push (click)="openInvestigationDetails(investigation)">
-      {{ investigation.name }}
+      {{ investigation.labTitle }}
     </ion-item>
   </ion-list>
 </ion-content>
