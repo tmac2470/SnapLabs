@@ -80,7 +80,11 @@ export class HttpService {
   }
 
   private mapResult(data: Response): Response {
-    return data;
+    let response = data.json();
+    if (!response.success) {
+      throw new Error(response.message);
+    }
+    return response.data;
   }
 
   private _checkConnectivity(): Observable<any> {

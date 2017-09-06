@@ -8,11 +8,11 @@ import { NavController, LoadingController } from "ionic-angular";
 // SnapApp
 import { DownloadInvestigationsService } from "./download-investigations.service";
 import { Investigation } from "../investigation-details";
-// import { InvestigationDetailsPageComponent } from "../investigation-details";
+import { InvestigationDetailsPageComponent } from "../investigation-details";
 
 export interface ISearchParams {
-  before: Date;
-  after: Date;
+  before?: Date;
+  after?: Date;
   content?: string;
   field?: string;
   sort?: string;
@@ -27,15 +27,15 @@ export class DownloadInvestigationsPageComponent {
   investigations: Investigation[] = [];
   urlSearchParams: URLSearchParams = new URLSearchParams();
   searchParams: ISearchParams = {
-    page: "1",
-    before: new Date(),
-    after: new Date("24 Jan 2017")
+    page: "1"
+    // before: new Date(),
+    // after: new Date("24 Jan 2017")
   };
 
   constructor(
     private _navCtrl: NavController,
     private _loadingCtrl: LoadingController,
-    private _downloadInvestigations: DownloadInvestigationsService
+    private _downloadInvestigationsService: DownloadInvestigationsService
   ) {}
 
   // LifeCycle methods
@@ -58,7 +58,7 @@ export class DownloadInvestigationsPageComponent {
   getExperiments() {
     const loading = this.loading();
 
-    this._downloadInvestigations
+    this._downloadInvestigationsService
       .getExperiments(this.processParams(this.searchParams))
       .subscribe(data => {
         this.investigations = data;
@@ -75,9 +75,17 @@ export class DownloadInvestigationsPageComponent {
 
   // Helper to open a given investigation details page
   openInvestigationDetails(investigation: Investigation) {
-    // this._navCtrl.push(InvestigationDetailsPageComponent, {
-    //   investigation: investigation
-    // });
+    this._downloadInvestigationsService
+      .getExperiment(investigation._id)
+      .subscribe(investigationDetails => {
+        this._navCtrl.push(InvestigationDetailsPageComponent, {
+          investigation: {
+            data: {
+              experimentConfig: investigationDetails
+            }
+          }
+        });
+      });
   }
 
   loading() {

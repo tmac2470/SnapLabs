@@ -79,6 +79,7 @@ export class InvestigationDetailsPageComponent implements OnDestroy {
     private _toastService: ToastService
   ) {
     this.investigation = this._navParams.get("investigation");
+    console.log(this.investigation);
   }
 
   ngOnDestroy() {
@@ -529,7 +530,7 @@ export class InvestigationDetailsPageComponent implements OnDestroy {
       .readData(device.id, service)
       .subscribe(
         data => {
-                    //0 gyro x
+          //0 gyro x
           //1 gyro y
           //2 gyro z
           //3 accel x
