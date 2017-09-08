@@ -1,7 +1,7 @@
 <ion-header>
   <ion-navbar>
     <ion-title>
-      Investigations
+      Download Investigations
     </ion-title>
   </ion-navbar>
 </ion-header>
@@ -20,8 +20,8 @@
         <h5>Updated at: {{ investigation.lastUpdatedAt }}</h5>
         <h5>Description: {{ investigation.description }}</h5>
         <br>
-        <button ion-button color="primary" full (click)="downloadInvestigation(investigation)" *ngIf="!isInvestigationLocal(investigation)">Download</button>
-        <button ion-button color="primary" full disabled (click)="downloadInvestigation(investigation)" *ngIf="isInvestigationLocal(investigation)">Downloaded</button>
+        <button ion-button color="secondary" full (click)="downloadInvestigation(investigation)" *ngIf="!isInvestigationLocal(investigation)">Download</button>
+        <button ion-button color="primary" full (click)="openInvestigationDetails(investigation)" *ngIf="isInvestigationLocal(investigation)">Open</button>
       </div>
     </ion-item>
   </ion-list>
