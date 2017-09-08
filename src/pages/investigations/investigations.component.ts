@@ -7,6 +7,7 @@ import { ToastService } from "../core/service";
 import { InvestigationDetailsPageComponent } from "../investigation-details";
 import { InvestigationsService } from "./investigations.service";
 import { Investigation } from "../investigation-details";
+import { DownloadInvestigationsService } from "../download-investigations";
 
 class SortInvestigations {
   static NAME = "labTitle";
@@ -30,6 +31,7 @@ export class InvestigationsPageComponent {
   investigations: Investigation[] = [];
 
   constructor(
+    private _downloadInvestigationsService: DownloadInvestigationsService,
     private _investigationsService: InvestigationsService,
     private _loadingCtrl: LoadingController,
     private _navCtrl: NavController,
@@ -40,6 +42,7 @@ export class InvestigationsPageComponent {
   ionViewDidLoad() {
     this.investigations = [];
     this.loadLocalInvestigationData(this.localInvestigationFiles);
+    this.getLocalInvestigations();
   }
 
   loadLocalInvestigationData(files: String[]) {
@@ -50,6 +53,14 @@ export class InvestigationsPageComponent {
           this.investigations.push(fileData);
         });
     });
+  }
+
+  getLocalInvestigations() {
+    this._downloadInvestigationsService
+      .getLocalInvestigations()
+      .subscribe(investigations => {
+        this.investigations = this.investigations.concat(investigations);
+      });
   }
 
   loading() {
