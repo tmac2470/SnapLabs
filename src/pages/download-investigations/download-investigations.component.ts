@@ -25,7 +25,9 @@ export interface ISearchParams {
 })
 export class DownloadInvestigationsPageComponent {
   investigations: Investigation[] = [];
+  localInvestigations: Investigation[] = [];
   urlSearchParams: URLSearchParams = new URLSearchParams();
+  visibleDetailsPanelId: string = "";
   searchParams: ISearchParams = {
     page: "1"
     // before: new Date(),
@@ -41,7 +43,10 @@ export class DownloadInvestigationsPageComponent {
   // LifeCycle methods
   ionViewDidLoad() {
     this.investigations = [];
-    this.getExperiments();
+    this.localInvestigations = [];
+
+    this.getLocalInvestigations();
+    this.getApiInvestigations();
   }
 
   processParams(searchParams: ISearchParams): URLSearchParams {
@@ -55,11 +60,19 @@ export class DownloadInvestigationsPageComponent {
     return this.urlSearchParams;
   }
 
-  getExperiments() {
+  getLocalInvestigations() {
+    this._downloadInvestigationsService
+      .getLocalInvestigations()
+      .subscribe(investigations => {
+        this.localInvestigations = investigations;
+      });
+  }
+
+  getApiInvestigations() {
     const loading = this.loading();
 
     this._downloadInvestigationsService
-      .getExperiments(this.processParams(this.searchParams))
+      .getInvestigations(this.processParams(this.searchParams))
       .subscribe(data => {
         this.investigations = data;
         loading.dismiss();
@@ -71,10 +84,39 @@ export class DownloadInvestigationsPageComponent {
     this._navCtrl.push(page);
   }
 
+  openDetailsPanel(id: string) {
+    if (this.visibleDetailsPanelId === id) {
+      this.visibleDetailsPanelId = null;
+    } else {
+      this.visibleDetailsPanelId = id;
+    }
+  }
+
+  isInvestigationLocal(investigation: Investigation) {
+    const exists = this.localInvestigations.some(i => {
+      return i._id === investigation._id;
+    });
+    return exists;
+  }
+
+  // Download and add it to local
+  downloadInvestigation(investigation: Investigation) {
+    const loading = this.loading();
+
+    // To keep the panel open
+    this.openDetailsPanel(investigation._id);
+    this._downloadInvestigationsService
+      .saveInvestigation(investigation)
+      .subscribe(localInvestigations => {
+        this.localInvestigations = localInvestigations;
+        loading.dismiss();
+      });
+  }
+
   // Helper to open a given investigation details page
   openInvestigationDetails(investigation: Investigation) {
     this._downloadInvestigationsService
-      .getExperiment(investigation._id)
+      .getInvestigation(investigation._id)
       .subscribe(investigationDetails => {
         this._navCtrl.push(InvestigationDetailsPageComponent, {
           investigation: investigationDetails

@@ -10,8 +10,19 @@
   <h5 padding>Select an investigation to download</h5>
 
   <ion-list *ngIf="investigations?.length>0">
-    <ion-item *ngFor="let investigation of investigations" (click)="openInvestigationDetails(investigation)">
-      {{ investigation.labTitle }}
+    <ion-item *ngFor="let investigation of investigations" (click)="openDetailsPanel(investigation._id)" text-wrap>
+      <h2 text-bold>{{ investigation.labTitle }}</h2>
+      <h5>Created by: {{ investigation.createdBy?.name }}</h5>
+
+      <div *ngIf="visibleDetailsPanelId === investigation._id">
+        <br>
+        <h5>Creator's email: {{ investigation.createdBy?.email }}</h5>
+        <h5>Updated at: {{ investigation.lastUpdatedAt }}</h5>
+        <h5>Description: {{ investigation.description }}</h5>
+        <br>
+        <button ion-button color="primary" full (click)="downloadInvestigation(investigation)" *ngIf="!isInvestigationLocal(investigation)">Download</button>
+        <button ion-button color="primary" full disabled (click)="downloadInvestigation(investigation)" *ngIf="isInvestigationLocal(investigation)">Downloaded</button>
+      </div>
     </ion-item>
   </ion-list>
 </ion-content>

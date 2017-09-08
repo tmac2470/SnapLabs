@@ -11,6 +11,7 @@ export interface Investigation {
   description: string;
   isPublished: boolean;
   sensorTags: any;
+  downloaded?: boolean;
 }
 
 export interface ISensorTag {

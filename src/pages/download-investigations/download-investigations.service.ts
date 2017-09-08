@@ -5,7 +5,8 @@ import "rxjs/add/operator/map";
 import { URLSearchParams } from "@angular/http";
 import { Injectable } from "@angular/core";
 // App
-import { HttpService, StorageService } from "../core/service";
+import { HttpService, StorageService, StorageKey } from "../core/service";
+import { Investigation } from "../investigation-details";
 
 @Injectable()
 export class DownloadInvestigationsService {
@@ -16,13 +17,35 @@ export class DownloadInvestigationsService {
     private _storageService: StorageService
   ) {}
 
-  getExperiments(searchParams?: URLSearchParams): Observable<any> {
-    return this._http
-      .get(`${this.API_PATH_EXPERIMENTS}`, { search: searchParams });
+  getInvestigations(searchParams?: URLSearchParams): Observable<any> {
+    return this._http.get(`${this.API_PATH_EXPERIMENTS}`, {
+      search: searchParams
+    });
   }
 
-  getExperiment(id: string): Observable<any> {
-    return this._http
-      .get(`${this.API_PATH_EXPERIMENTS}/${id}`);
+  getInvestigation(id: string): Observable<any> {
+    return this._http.get(`${this.API_PATH_EXPERIMENTS}/${id}`);
+  }
+
+  getLocalInvestigations(): Observable<any> {
+    const promise = this._storageService.storage.get(
+      StorageKey.INVESTIGATIONS_STORE
+    );
+    return Observable.fromPromise(promise);
+  }
+
+  saveInvestigation(investigation: Investigation): Observable<any> {
+    return this.getLocalInvestigations().mergeMap(investigations => {
+      if (!investigations) {
+        investigations = [];
+      }
+      investigations.push(investigation);
+
+      const promise = this._storageService.storage.set(
+        StorageKey.INVESTIGATIONS_STORE,
+        investigations
+      );
+      return Observable.fromPromise(promise);
+    });
   }
 }
