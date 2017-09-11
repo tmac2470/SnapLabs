@@ -7,12 +7,14 @@ import { URLSearchParams } from "@angular/http";
 import {
   ModalController,
   NavController,
+  PopoverController,
   LoadingController
 } from "ionic-angular";
 // SnapApp
 import { DownloadInvestigationsService } from "./download-investigations.service";
 import { Investigation } from "../investigation-details";
 import { InvestigationDetailsPageComponent } from "../investigation-details";
+import { SearchSortPageComponent } from "./search-sort";
 
 export interface ISearchParams {
   afterDate?: Date;
@@ -45,6 +47,7 @@ export class DownloadInvestigationsPageComponent {
     private _modalCtrl: ModalController,
     private _navCtrl: NavController,
     private _loadingCtrl: LoadingController,
+    private _popoverCtrl: PopoverController,
     private _downloadInvestigationsService: DownloadInvestigationsService
   ) {}
 
@@ -93,7 +96,7 @@ export class DownloadInvestigationsPageComponent {
   }
 
   openSortOptions() {
-    console.log("sort");
+    this.openPopover(SearchSortPageComponent);
   }
 
   openFilterOptions() {
@@ -101,8 +104,17 @@ export class DownloadInvestigationsPageComponent {
   }
 
   openModal(page: any) {
-    let modal = this._modalCtrl.create(page);
+    const modal = this._modalCtrl.create(page);
     modal.present();
+  }
+
+  openPopover(page: any) {
+    const popover = this._popoverCtrl.create(page);
+    popover.present();
+
+    popover.onDidDismiss(data => {
+      console.log(data);
+    });
   }
 
   openDetailsPanel(id: string) {

@@ -1,0 +1,34 @@
+<ion-content>
+  <ion-list radio-group [(ngModel)]="sort">
+    <ion-toolbar>
+      <ion-title>
+        SORT
+      </ion-title>
+      <ion-buttons start>
+        <button ion-button (click)="close()">
+          <ion-icon name="close"></ion-icon>
+        </button>
+      </ion-buttons>
+    </ion-toolbar>
+
+    <ion-item>
+      <ion-label>Created by</ion-label>
+      <ion-radio [value]="searchSortOptions.CREATOR"></ion-radio>
+    </ion-item>
+
+    <ion-item>
+      <ion-label>Date created</ion-label>
+      <ion-radio [value]="searchSortOptions.CREATED"></ion-radio>
+    </ion-item>
+
+    <ion-item>
+      <ion-label>Last updated</ion-label>
+      <ion-radio [value]="searchSortOptions.UPDATED"></ion-radio>
+    </ion-item>
+  </ion-list>
+
+  <button ion-button color="secondary" full no-margin (click)="apply()">
+      Apply
+  </button>
+
+</ion-content>
