@@ -4,24 +4,30 @@ import * as _ from "lodash";
 import { Component } from "@angular/core";
 import { URLSearchParams } from "@angular/http";
 // Ionic
-import { NavController, LoadingController } from "ionic-angular";
+import {
+  ModalController,
+  NavController,
+  LoadingController
+} from "ionic-angular";
 // SnapApp
 import { DownloadInvestigationsService } from "./download-investigations.service";
 import { Investigation } from "../investigation-details";
 import { InvestigationDetailsPageComponent } from "../investigation-details";
 
 export interface ISearchParams {
-  before?: Date;
-  after?: Date;
-  content?: string;
-  field?: string;
-  sort?: string;
+  afterDate?: Date;
+  beforeDate?: Date;
+  fields?: string;
   page: string;
+  perPage: number;
+  query?: string;
+  sort?: string;
 }
 
 @Component({
   selector: "download-investigations-page-component",
-  templateUrl: "download-investigations.view.html"
+  templateUrl: "download-investigations.view.html",
+  styles: ["./download-investigations.styles.scss"]
 })
 export class DownloadInvestigationsPageComponent {
   investigations: Investigation[] = [];
@@ -29,12 +35,14 @@ export class DownloadInvestigationsPageComponent {
   urlSearchParams: URLSearchParams = new URLSearchParams();
   visibleDetailsPanelId: string = "";
   searchParams: ISearchParams = {
-    page: "1"
+    page: "1",
+    perPage: 10
     // before: new Date(),
     // after: new Date("24 Jan 2017")
   };
 
   constructor(
+    private _modalCtrl: ModalController,
     private _navCtrl: NavController,
     private _loadingCtrl: LoadingController,
     private _downloadInvestigationsService: DownloadInvestigationsService
@@ -82,6 +90,19 @@ export class DownloadInvestigationsPageComponent {
   // Helper to open a given page
   openPage(page: any) {
     this._navCtrl.push(page);
+  }
+
+  openSortOptions() {
+    console.log("sort");
+  }
+
+  openFilterOptions() {
+    console.log("filter");
+  }
+
+  openModal(page: any) {
+    let modal = this._modalCtrl.create(page);
+    modal.present();
   }
 
   openDetailsPanel(id: string) {

@@ -1,0 +1,18 @@
+@import "../../theme/variables";
+
+ion-segment-button {
+  border-top: 1px solid ;
+
+  &:first-of-type {
+    border: none !important;
+    border-right: 1px solid $light-grey !important;
+  }
+
+  &:last-of-type {
+    border: none !important;
+    border-left: 1px solid $light-grey !important;
+  }
+
+  // color : map-get($colors, primary);
+  opacity: 1 !important;
+}

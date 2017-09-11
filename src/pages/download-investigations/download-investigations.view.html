@@ -4,6 +4,17 @@
       Download Investigations
     </ion-title>
   </ion-navbar>
+
+  <ion-toolbar>
+    <ion-segment>
+      <ion-segment-button value="1" (click)="openSortOptions()">
+        Sort
+      </ion-segment-button>
+      <ion-segment-button value="2" (click)="openFilterOptions()">
+        Filter
+      </ion-segment-button>
+    </ion-segment>
+  </ion-toolbar>
 </ion-header>
 
 <ion-content>
