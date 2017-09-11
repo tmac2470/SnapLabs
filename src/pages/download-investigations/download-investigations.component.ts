@@ -15,16 +15,8 @@ import { DownloadInvestigationsService } from "./download-investigations.service
 import { Investigation } from "../investigation-details";
 import { InvestigationDetailsPageComponent } from "../investigation-details";
 import { SearchSortPageComponent } from "./search-sort";
-
-export interface ISearchParams {
-  afterDate?: Date;
-  beforeDate?: Date;
-  fields?: string;
-  page: string;
-  perPage: number;
-  query?: string;
-  sort?: string;
-}
+import { SearchFilterPageComponent } from "./search-filter";
+import { ISearchParams } from "./download-investigations.model";
 
 @Component({
   selector: "download-investigations-page-component",
@@ -100,12 +92,16 @@ export class DownloadInvestigationsPageComponent {
   }
 
   openFilterOptions() {
-    console.log("filter");
+    this.openModal(SearchFilterPageComponent);
   }
 
   openModal(page: any) {
     const modal = this._modalCtrl.create(page);
     modal.present();
+
+    modal.onDidDismiss(data => {
+      console.log(data);
+    });
   }
 
   openPopover(page: any) {

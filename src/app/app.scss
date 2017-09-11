@@ -45,3 +45,23 @@ ion-toolbar {
     text-transform: none !important;
   }
 }
+
+// Increase background opacity
+ion-backdrop {
+  opacity: 0.5 !important;
+}
+
+// Make popover come in from bottom
+.popover-content {
+  top: auto !important;
+  left: 0 !important;
+  bottom: 0 !important;
+  border-radius: 0 !important;
+  width: 100% !important;
+}
+
+// Fix segment button
+.segment-button {
+  width: 100% !important;
+  max-width: 100% !important;
+}

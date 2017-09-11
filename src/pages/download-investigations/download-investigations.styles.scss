@@ -1,7 +1,7 @@
 @import "../../theme/variables";
 
 ion-segment-button {
-  border-top: 1px solid ;
+  border-top: 1px solid;
 
   &:first-of-type {
     border: none !important;
@@ -15,4 +15,9 @@ ion-segment-button {
 
   // color : map-get($colors, primary);
   opacity: 1 !important;
+}
+
+.segment-activated {
+  background: transparent !important;
+  color: map-get($colors, primary) !important;
 }
