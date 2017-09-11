@@ -12,18 +12,34 @@
     </ion-toolbar>
 
     <ion-item>
-      <ion-label>Created by</ion-label>
+      <ion-label><ion-icon name="arrow-round-up"></ion-icon> Created by</ion-label>
       <ion-radio [value]="searchSortOptions.CREATOR"></ion-radio>
     </ion-item>
 
     <ion-item>
-      <ion-label>Date created</ion-label>
+      <ion-label><ion-icon name="arrow-round-down"></ion-icon> Created by</ion-label>
+      <ion-radio [value]="searchSortOptions.CREATORDESC"></ion-radio>
+    </ion-item>
+
+    <ion-item>
+      <ion-label><ion-icon name="arrow-round-up"></ion-icon> Date created</ion-label>
       <ion-radio [value]="searchSortOptions.CREATED"></ion-radio>
     </ion-item>
 
     <ion-item>
-      <ion-label>Last updated</ion-label>
+      <ion-label><ion-icon name="arrow-round-down"></ion-icon> Date created</ion-label>
+      <ion-radio [value]="searchSortOptions.CREATEDDESC"></ion-radio>
+    </ion-item>
+
+
+    <ion-item>
+      <ion-label><ion-icon name="arrow-round-up"></ion-icon> Last updated</ion-label>
       <ion-radio [value]="searchSortOptions.UPDATED"></ion-radio>
+    </ion-item>
+
+    <ion-item>
+      <ion-label><ion-icon name="arrow-round-down"></ion-icon> Last updated</ion-label>
+      <ion-radio [value]="searchSortOptions.UPDATEDDESC"></ion-radio>
     </ion-item>
   </ion-list>
 
