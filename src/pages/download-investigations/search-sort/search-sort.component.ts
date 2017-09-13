@@ -1,9 +1,12 @@
 // Angular
 import { Component } from "@angular/core";
 // Ionic
-import { ViewController } from "ionic-angular";
+import { ViewController, NavParams } from "ionic-angular";
 // SnapApp
-import { SearchSortOptions } from "./../download-investigations.model";
+import {
+  ISearchParams,
+  SearchSortOptions
+} from "./../download-investigations.model";
 
 @Component({
   selector: "search-sort-page-component",
@@ -12,13 +15,22 @@ import { SearchSortOptions } from "./../download-investigations.model";
 export class SearchSortPageComponent {
   searchSortOptions = SearchSortOptions;
   sort: string;
-  constructor(private _viewCtrl: ViewController) {}
+  searchParams: ISearchParams = {
+    page: "1",
+    perPage: 50
+  };
+
+  constructor(private _viewCtrl: ViewController, navParams: NavParams) {
+    this.searchParams = navParams.get("searchParams");
+    this.sort = this.searchParams.sort;
+  }
 
   // LifeCycle methods
 
   apply() {
+    this.searchParams.sort = this.sort;
     this.close({
-      sort: this.sort
+      searchParams: this.searchParams
     });
   }
 
