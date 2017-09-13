@@ -1,3 +1,5 @@
+// Other
+import * as moment from "moment";
 // Angular
 import { Component } from "@angular/core";
 // Ionic
@@ -18,7 +20,6 @@ export class SearchFilterPageComponent {
     page: "1",
     perPage: 50
   };
-
   constructor(private _viewCtrl: ViewController, navParams: NavParams) {
     this.searchParams = navParams.get("searchParams");
   }
@@ -32,9 +33,9 @@ export class SearchFilterPageComponent {
   }
 
   reset() {
-    this.searchParams.afterDate = undefined;
-    this.searchParams.beforeDate = undefined;
-    this.searchParams.query = undefined;
+    this.searchParams.afterDate = null;
+    this.searchParams.beforeDate = null;
+    this.searchParams.query = null;
   }
 
   close(payload: any) {

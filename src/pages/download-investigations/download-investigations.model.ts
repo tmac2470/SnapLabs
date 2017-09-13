@@ -1,3 +1,5 @@
+import * as moment from "moment";
+
 export class SearchSortOptions {
   static CREATED = "createdAt";
   static UPDATED = "lastupdated";
@@ -19,10 +21,14 @@ export interface ISearchParams {
 }
 
 export class DateFormat {
-  static API = "YYYY-MM-DD"
+  static API = "YYYY-MM-DD";
 }
 
 export class DatePickerOptions {
   static DisplayFormat = DateFormat.API;
   static PickerFormat = "DD MMM YYYY";
+  static MaxDate = moment().format(DateFormat.API);
+  static MinDate = moment()
+    .subtract(1, "year")
+    .format(DateFormat.API);
 }

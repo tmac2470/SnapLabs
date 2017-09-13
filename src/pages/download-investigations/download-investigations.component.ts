@@ -81,7 +81,6 @@ export class DownloadInvestigationsPageComponent {
   }
 
   getApiInvestigations(searchParams) {
-    console.log(searchParams);
     const loading = this.loading();
 
     this._downloadInvestigationsService

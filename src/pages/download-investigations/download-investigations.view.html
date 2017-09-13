@@ -18,7 +18,9 @@
 </ion-header>
 
 <ion-content>
-  <h5 padding>Select an investigation to download</h5>
+  <h5 padding *ngIf="investigations?.length>0">Select an investigation to download</h5>
+
+  <h5 padding *ngIf="investigations?.length==0" text-center>No results found!</h5>
 
   <ion-list *ngIf="investigations?.length>0">
     <ion-item *ngFor="let investigation of investigations" (click)="openDetailsPanel(investigation._id)" text-wrap>

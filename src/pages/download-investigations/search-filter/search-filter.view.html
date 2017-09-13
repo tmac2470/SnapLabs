@@ -22,13 +22,15 @@
 
   <ion-list margin-top inset>
     <ion-item>
-      <ion-label>Created before</ion-label>
-      <ion-datetime [displayFormat]="datePickerOptions.DisplayFormat" [pickerFormat]="datePickerOptions.PickerFormat" [(ngModel)]="searchParams.beforeDate"></ion-datetime>
+      <ion-label>From date</ion-label>
+      <ion-datetime [displayFormat]="datePickerOptions.DisplayFormat" [pickerFormat]="datePickerOptions.PickerFormat" [(ngModel)]="searchParams.afterDate"
+        min="{{ datePickerOptions.MinDate }}" max="{{ datePickerOptions.MaxDate }}"></ion-datetime>
     </ion-item>
 
     <ion-item>
-      <ion-label>Created after</ion-label>
-      <ion-datetime [displayFormat]="datePickerOptions.DisplayFormat" [pickerFormat]="datePickerOptions.PickerFormat" [(ngModel)]="searchParams.afterDate"></ion-datetime>
+      <ion-label>To Date</ion-label>
+      <ion-datetime [displayFormat]="datePickerOptions.DisplayFormat" [pickerFormat]="datePickerOptions.PickerFormat" [(ngModel)]="searchParams.beforeDate"
+        max="{{ datePickerOptions.MaxDate }}" [min]="searchParams.afterDate?searchParams.afterDate: datePickerOptions.MaxDate"></ion-datetime>
     </ion-item>
   </ion-list>
 
