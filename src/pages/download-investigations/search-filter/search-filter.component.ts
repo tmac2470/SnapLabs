@@ -1,14 +1,12 @@
 // Angular
 import { Component } from "@angular/core";
 // Ionic
-import { ViewController } from "ionic-angular";
+import { ViewController, NavParams } from "ionic-angular";
 // SnapApp
-import { ISearchParams } from "./../download-investigations.model";
-
-class DatePickerOptions {
-  static DisplayFormat = "YYYY-MM-DD";
-  static PickerFormat = "DD MMM YYYY";
-}
+import {
+  ISearchParams,
+  DatePickerOptions
+} from "./../download-investigations.model";
 
 @Component({
   selector: "search-filter-page-component",
@@ -21,12 +19,22 @@ export class SearchFilterPageComponent {
     perPage: 50
   };
 
-  constructor(private _viewCtrl: ViewController) {}
+  constructor(private _viewCtrl: ViewController, navParams: NavParams) {
+    this.searchParams = navParams.get("searchParams");
+  }
 
   // LifeCycle methods
 
   apply() {
-    this.close(this.searchParams);
+    this.close({
+      searchParams: this.searchParams
+    });
+  }
+
+  reset() {
+    this.searchParams.afterDate = undefined;
+    this.searchParams.beforeDate = undefined;
+    this.searchParams.query = undefined;
   }
 
   close(payload: any) {

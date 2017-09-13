@@ -1,5 +1,6 @@
 // Others
 import * as _ from "lodash";
+import * as moment from "moment";
 // Angular
 import { Component } from "@angular/core";
 import { URLSearchParams } from "@angular/http";
@@ -16,7 +17,11 @@ import { Investigation } from "../investigation-details";
 import { InvestigationDetailsPageComponent } from "../investigation-details";
 import { SearchSortPageComponent } from "./search-sort";
 import { SearchFilterPageComponent } from "./search-filter";
-import { ISearchParams } from "./download-investigations.model";
+import {
+  ISearchParams,
+  DateFormat,
+  SearchSortOptions
+} from "./download-investigations.model";
 
 @Component({
   selector: "download-investigations-page-component",
@@ -30,9 +35,13 @@ export class DownloadInvestigationsPageComponent {
   visibleDetailsPanelId: string = "";
   searchParams: ISearchParams = {
     page: "1",
-    perPage: 10
-    // before: new Date(),
-    // after: new Date("24 Jan 2017")
+    perPage: 10,
+    fields: "all",
+    afterDate: moment()
+      .add("-20", "days")
+      .format(DateFormat.API),
+    beforeDate: moment().format(DateFormat.API),
+    sort: SearchSortOptions.UPDATEDDESC
   };
 
   constructor(
@@ -49,7 +58,7 @@ export class DownloadInvestigationsPageComponent {
     this.localInvestigations = [];
 
     this.getLocalInvestigations();
-    this.getApiInvestigations();
+    this.getApiInvestigations(this.searchParams);
   }
 
   processParams(searchParams: ISearchParams): URLSearchParams {
@@ -71,11 +80,12 @@ export class DownloadInvestigationsPageComponent {
       });
   }
 
-  getApiInvestigations() {
+  getApiInvestigations(searchParams) {
+    console.log(searchParams);
     const loading = this.loading();
 
     this._downloadInvestigationsService
-      .getInvestigations(this.processParams(this.searchParams))
+      .getInvestigations(this.processParams(searchParams))
       .subscribe(data => {
         this.investigations = data;
         loading.dismiss();
@@ -96,20 +106,30 @@ export class DownloadInvestigationsPageComponent {
   }
 
   openModal(page: any) {
-    const modal = this._modalCtrl.create(page);
+    const modal = this._modalCtrl.create(page, {
+      searchParams: this.searchParams
+    });
     modal.present();
 
     modal.onDidDismiss(data => {
-      console.log(data);
+      if (data && data.searchParams) {
+        this.searchParams = data.searchParams;
+        this.getApiInvestigations(this.searchParams);
+      }
     });
   }
 
   openPopover(page: any) {
-    const popover = this._popoverCtrl.create(page);
+    const popover = this._popoverCtrl.create(page, {
+      searchParams: this.searchParams
+    });
     popover.present();
 
     popover.onDidDismiss(data => {
-      console.log(data);
+      if (data && data.searchParams) {
+        this.searchParams = data.searchParams;
+        this.getApiInvestigations(this.searchParams);
+      }
     });
   }
 

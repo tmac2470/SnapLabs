@@ -14,7 +14,6 @@ import {
 })
 export class SearchSortPageComponent {
   searchSortOptions = SearchSortOptions;
-  sort: string;
   searchParams: ISearchParams = {
     page: "1",
     perPage: 50
@@ -22,13 +21,11 @@ export class SearchSortPageComponent {
 
   constructor(private _viewCtrl: ViewController, navParams: NavParams) {
     this.searchParams = navParams.get("searchParams");
-    this.sort = this.searchParams.sort;
   }
 
   // LifeCycle methods
 
   apply() {
-    this.searchParams.sort = this.sort;
     this.close({
       searchParams: this.searchParams
     });

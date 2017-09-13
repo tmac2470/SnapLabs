@@ -8,13 +8,19 @@
           <ion-icon name="close"></ion-icon>
         </button>
     </ion-buttons>
+
+    <ion-buttons end>
+      <button ion-button (click)="reset()">
+          Reset
+        </button>
+    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
 <ion-content>
-  <ion-searchbar [(ngModel)]="searchParams.query"></ion-searchbar>
+  <ion-searchbar [(ngModel)]="searchParams.query" placeholder="Enter your search query"></ion-searchbar>
 
-  <ion-list>
+  <ion-list margin-top inset>
     <ion-item>
       <ion-label>Created before</ion-label>
       <ion-datetime [displayFormat]="datePickerOptions.DisplayFormat" [pickerFormat]="datePickerOptions.PickerFormat" [(ngModel)]="searchParams.beforeDate"></ion-datetime>

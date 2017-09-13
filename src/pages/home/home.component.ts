@@ -44,12 +44,6 @@ export class HomePageComponent {
     });
   }
 
-  ionViewDidLoad() {
-    setTimeout(() => {
-      this.openPage(this.downloadInvestigationsPageComponent);
-    }, 1000);
-  }
-
   loading() {
     let loader = this._loadingCtrl.create({
       content: "Please wait...",
