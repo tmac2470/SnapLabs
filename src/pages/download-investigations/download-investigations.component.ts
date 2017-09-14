@@ -155,11 +155,16 @@ export class DownloadInvestigationsPageComponent {
 
     // To keep the panel open
     this.openDetailsPanel(investigation._id);
+
     this._downloadInvestigationsService
-      .saveInvestigation(investigation)
-      .subscribe(localInvestigations => {
-        this.localInvestigations = localInvestigations;
-        loading.dismiss();
+      .getInvestigation(investigation._id)
+      .subscribe(investigationDetails => {
+        this._downloadInvestigationsService
+          .saveInvestigation(investigationDetails)
+          .subscribe(localInvestigations => {
+            this.localInvestigations = localInvestigations;
+            loading.dismiss();
+          });
       });
   }
 
