@@ -5,6 +5,7 @@ import { Component } from "@angular/core";
 // Ionic
 import { ViewController, NavParams } from "ionic-angular";
 // SnapApp
+import { ToastService } from "../../core/service";
 import {
   ISearchParams,
   DatePickerOptions
@@ -20,7 +21,11 @@ export class SearchFilterPageComponent {
     page: "1",
     perPage: 50
   };
-  constructor(private _viewCtrl: ViewController, navParams: NavParams) {
+  constructor(
+    private _viewCtrl: ViewController,
+    navParams: NavParams,
+    private _toastService: ToastService
+  ) {
     this.searchParams = navParams.get("searchParams");
   }
 
@@ -30,6 +35,20 @@ export class SearchFilterPageComponent {
     this.close({
       searchParams: this.searchParams
     });
+  }
+
+  checkDates() {
+    const condition = moment(this.searchParams.afterDate).isAfter(
+      this.searchParams.beforeDate
+    );
+
+    if (condition) {
+      this._toastService.present({
+        message: "From date must be before To date",
+        duration: 3000
+      });
+      this.searchParams.beforeDate = null;
+    }
   }
 
   reset() {

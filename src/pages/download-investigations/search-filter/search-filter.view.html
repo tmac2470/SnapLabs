@@ -24,13 +24,13 @@
     <ion-item>
       <ion-label>From date</ion-label>
       <ion-datetime [displayFormat]="datePickerOptions.DisplayFormat" [pickerFormat]="datePickerOptions.PickerFormat" [(ngModel)]="searchParams.afterDate"
-        min="{{ datePickerOptions.MinDate }}" max="{{ datePickerOptions.MaxDate }}"></ion-datetime>
+        min="{{ datePickerOptions.MinDate }}" max="{{ datePickerOptions.MaxDate }}" (ngModelChange)="checkDates()"></ion-datetime>
     </ion-item>
 
     <ion-item>
       <ion-label>To Date</ion-label>
       <ion-datetime [displayFormat]="datePickerOptions.DisplayFormat" [pickerFormat]="datePickerOptions.PickerFormat" [(ngModel)]="searchParams.beforeDate"
-        max="{{ datePickerOptions.MaxDate }}" [min]="searchParams.afterDate?searchParams.afterDate: datePickerOptions.MaxDate"></ion-datetime>
+        max="{{ datePickerOptions.MaxDate }}" [min]="searchParams.afterDate?searchParams.afterDate: datePickerOptions.MaxDate" (ngModelChange)="checkDates()"></ion-datetime>
     </ion-item>
   </ion-list>
 
