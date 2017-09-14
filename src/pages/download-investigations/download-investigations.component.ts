@@ -76,7 +76,9 @@ export class DownloadInvestigationsPageComponent {
     this._downloadInvestigationsService
       .getLocalInvestigations()
       .subscribe(investigations => {
-        this.localInvestigations = investigations;
+        if (!!investigations && investigations.length) {
+          this.localInvestigations = investigations;
+        }
       });
   }
 

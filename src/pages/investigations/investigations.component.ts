@@ -59,7 +59,9 @@ export class InvestigationsPageComponent {
     this._downloadInvestigationsService
       .getLocalInvestigations()
       .subscribe(investigations => {
-        this.investigations = this.investigations.concat(investigations);
+        if (!!investigations && investigations.length) {
+          this.investigations = this.investigations.concat(investigations);
+        }
       });
   }
 
