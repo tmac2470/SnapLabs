@@ -1,11 +1,11 @@
 import * as moment from "moment";
 
 export class SearchSortOptions {
-  static CREATED = "createdAt";
+  static CREATED = "createdat";
   static UPDATED = "lastupdated";
   static CREATOR = "author";
 
-  static CREATEDDESC = "-createdAt";
+  static CREATEDDESC = "-createdat";
   static UPDATEDDESC = "-lastupdated";
   static CREATORDESC = "-author";
 }

@@ -1,6 +1,7 @@
 // Others
 import * as _ from "lodash";
 import * as moment from "moment";
+import { Subscription } from "rxjs/Subscription";
 // Angular
 import { Component } from "@angular/core";
 import { URLSearchParams } from "@angular/http";
@@ -9,9 +10,11 @@ import {
   ModalController,
   NavController,
   PopoverController,
-  LoadingController
+  LoadingController,
+  Toast
 } from "ionic-angular";
 // SnapApp
+import { NetworkService, ToastService } from "../core/service";
 import { DownloadInvestigationsService } from "./download-investigations.service";
 import { Investigation } from "../investigation-details";
 import { InvestigationDetailsPageComponent } from "../investigation-details";
@@ -43,22 +46,61 @@ export class DownloadInvestigationsPageComponent {
     beforeDate: moment().format(DateFormat.API),
     sort: SearchSortOptions.UPDATEDDESC
   };
+  private _networkSubscription: Subscription;
+  private _networkToast: Toast;
 
   constructor(
     private _modalCtrl: ModalController,
     private _navCtrl: NavController,
+    private _networkService: NetworkService,
     private _loadingCtrl: LoadingController,
     private _popoverCtrl: PopoverController,
+    private _toastService: ToastService,
     private _downloadInvestigationsService: DownloadInvestigationsService
   ) {}
 
   // LifeCycle methods
+  ionViewWillEnter() {
+    this.initNetwork();
+  }
+
   ionViewDidLoad() {
     this.investigations = [];
     this.localInvestigations = [];
 
     this.getLocalInvestigations();
     this.getApiInvestigations(this.searchParams);
+  }
+
+  private initNetwork() {
+    this._networkSubscription = this._networkService.connectivity.subscribe(
+      connected => {
+        const dismissPromise = this._networkToast
+          ? this._networkToast.dismiss()
+          : Promise.resolve(true);
+        dismissPromise.then(_ => {
+          let promise;
+          if (connected) {
+            promise = this._toastService.present({
+              message: "App is online!",
+              duration: 3000
+            });
+          } else {
+            promise = this._toastService.present({
+              message: "App is offline!",
+              showCloseButton: true,
+              closeButtonText: "Close"
+            });
+          }
+          promise.then(toast => {
+            this._networkToast = toast;
+            this._networkToast.onDidDismiss(
+              () => (this._networkToast = undefined)
+            );
+          });
+        });
+      }
+    );
   }
 
   processParams(searchParams: ISearchParams): URLSearchParams {

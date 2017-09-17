@@ -43,6 +43,7 @@
         "@ionic/storage": "2.0.1",
         "chart.js": "^2.6.0",
         "cordova-android": "^6.2.3",
+        "cordova-ios": "^4.4.0",
         "cordova-plugin-ble-central": "^1.1.4",
         "cordova-plugin-compat": "^1.1.0",
         "cordova-plugin-console": "^1.0.5",
@@ -78,7 +79,8 @@
             "cordova-plugin-network-information": {}
         },
         "platforms": [
-            "android"
+            "android",
+            "ios"
         ]
     }
 }
