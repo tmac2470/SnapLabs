@@ -38,12 +38,12 @@ export class DownloadInvestigationsPageComponent {
   visibleDetailsPanelId: string = "";
   searchParams: ISearchParams = {
     page: "1",
-    perPage: 10,
+    perPage: 50,
     fields: "all",
-    afterDate: moment()
-      .add("-20", "days")
-      .format(DateFormat.API),
-    beforeDate: moment().format(DateFormat.API),
+    // afterDate: moment()
+    //   .add("-20", "days")
+    //   .format(DateFormat.API),
+    // beforeDate: moment().format(DateFormat.API),
     sort: SearchSortOptions.UPDATEDDESC
   };
   private _networkSubscription: Subscription;
