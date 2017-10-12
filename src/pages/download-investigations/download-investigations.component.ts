@@ -40,9 +40,9 @@ export class DownloadInvestigationsPageComponent {
     page: "1",
     perPage: 50,
     fields: "all",
-    // afterDate: moment()
-    //   .add("-20", "days")
-    //   .format(DateFormat.API),
+    afterDate: moment()
+      .add("-80", "days")
+      .format(DateFormat.API),
     // beforeDate: moment().format(DateFormat.API),
     sort: SearchSortOptions.UPDATEDDESC
   };
