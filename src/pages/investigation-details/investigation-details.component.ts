@@ -142,11 +142,54 @@ export class InvestigationDetailsPageComponent implements OnDestroy {
 
     sensor.config.grids = grids;
 
+    this.captureOnClick();
     return;
   }
 
+  // Capture data for grid
   captureData(grid, value) {
     grid.value = value;
+  }
+
+  // Capture data for grid on click on device
+  captureOnClick() {
+    const device = this.connectedDevice;
+    const service = SERVICES.IOBUTTON;
+
+    const subscription: Subscription = this._connectService
+      .readData(device.id, service)
+      .subscribe(
+        data => {
+          const state = new Uint8Array(data);
+
+          if (state.length > 0 && !!state[0]) {
+            if (state[0] > 0) {
+              this.sensors.map(sensor => {
+                if (sensor.value) {
+                  let grids = [];
+                  grids = sensor.config.grids;
+                  grids = grids.filter(grid => {
+                    return !grid.value;
+                  });
+
+                  if (grids.length > 0) {
+                    this.captureData(grids[0], sensor.value);
+                  }
+                }
+              });
+            }
+          }
+        },
+        error => {
+          this._toastService.present({
+            message:
+              "Unable to detect device! Please retry bluetooth connection.",
+            duration: 3000
+          });
+        }
+      );
+
+    this.subscriptions.push(subscription);
   }
 
   isConnectedToAnyDevice() {
