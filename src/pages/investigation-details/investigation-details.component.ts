@@ -104,8 +104,13 @@ export class InvestigationDetailsPageComponent implements OnDestroy {
   }
 
   ionViewDidEnter() {
+    // console.log(this.sensors);
     this.sensors.forEach(sensorTag => {
       this.initialiseChart(sensorTag.name);
+      this.initialiseGrid(sensorTag, {
+        separation: 50,
+        color: "#000"
+      });
     });
   }
 
@@ -113,6 +118,35 @@ export class InvestigationDetailsPageComponent implements OnDestroy {
   initialiseChart(chartId) {
     const ctx = document.getElementById(chartId);
     this.charts[chartId] = this.getChartType(chartId, ctx);
+  }
+
+  initialiseGrid(sensor, lineOptions) {
+    if (!sensor.config.grid.griddisplay) {
+      return;
+    }
+    const chartId = `${sensor.name}-grid`;
+
+    const countX = sensor.config.grid.columns || 1;
+    const countY = sensor.config.grid.rows || 1;
+
+    const numOfGrids = parseInt(countX) * parseInt(countY);
+
+    let grids = [];
+
+    _.times(numOfGrids, count => {
+      grids.push({
+        id: `${chartId}-${count + 1}`,
+        number: count + 1
+      });
+    });
+
+    sensor.config.grids = grids;
+
+    return;
+  }
+
+  captureData(grid, value) {
+    grid.value = value;
   }
 
   isConnectedToAnyDevice() {

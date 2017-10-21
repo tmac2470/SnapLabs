@@ -18,7 +18,9 @@
 
     <ion-item>
       <h5>
-        Status: <span *ngIf="connectedDevice?.id">Connected</span> <span *ngIf="!connectedDevice?.id">Not connected</span>
+        Status:
+        <span *ngIf="connectedDevice?.id">Connected</span>
+        <span *ngIf="!connectedDevice?.id">Not connected</span>
       </h5>
 
       <h5 *ngIf="connectedDevice?.id">Sensor tag: {{ connectedDevice.id }}</h5>
@@ -33,6 +35,17 @@
       <h2>{{ sensor.name }}</h2>
       <h5 *ngIf="sensor?.value">{{ sensor.value }}</h5>
       <canvas id="{{ sensor.name }}" margin-top></canvas>
+
+      <ion-grid class="grid-container" *ngIf="!!sensor.config.grid.griddisplay">
+        <ion-row>
+          <ion-col col-1 class="grid" *ngFor="let grid of sensor.config.grids">
+            <div class="grid-data" [id]="grid.id" (click)="captureData(grid, sensor.value)">
+              <h4 *ngIf="!grid.value">{{ grid.number }}</h4>
+              <h4 *ngIf="grid.value">{{ grid.value }}</h4>
+            </div>
+          </ion-col>
+        </ion-row>
+      </ion-grid>
     </ion-item>
   </ion-list>
 

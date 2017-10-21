@@ -1,0 +1,28 @@
+.grid-container {
+  padding-top: 20px;
+
+  ion-row {
+    justify-content: center;
+  }
+
+  .grid {
+    min-height: 100px;
+    min-width: 100px;
+
+    .grid-data {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+
+      height: 100%;
+      width: 100%;
+
+      color: #000;
+      background: #32db64;
+
+      font-weight: 600;
+
+      padding: 2px;
+    }
+  }
+}
