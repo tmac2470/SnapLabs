@@ -6,7 +6,7 @@ import { Storage } from "@ionic/storage";
 export class StorageKey {
   static USER_KEY: string = "user";
   static ALL_USERS_KEY: string = "all_users";
-  static CONNECTED_DEVICE: string = "connected_device";
+  static CONNECTED_DEVICES: string = "connected_devices";
   static INVESTIGATIONS_STORE: string = "investigations_store";
 }
 

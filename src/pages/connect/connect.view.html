@@ -1,7 +1,7 @@
 <ion-header>
   <ion-navbar>
     <ion-title>
-      Connect to device
+      Connect to devices
     </ion-title>
 
     <ion-buttons end>
@@ -23,16 +23,23 @@
   </ion-toolbar>
 
   <ion-list no-padding no-lines margin-top>
-    <ion-item text-wrap *ngIf="connectedDevice?.id" [color]="connectedDeviceKeyPressed ? 'primary' : null">
-      <h2>Connected to :
-        <span *ngIf="connectedDevice?.name">{{ connectedDevice.name }}</span>
-        <span *ngIf="connectedDevice?.id">{{ connectedDevice.id }}</span>
-      </h2>
-      <p *ngIf="connectedDevice.battery">Battery status: {{ connectedDevice.battery }}%</p>
-      <p>Press any button on the device to highlight this space</p>
+    <ion-item text-wrap *ngIf="connectedDevices?.length>0">
+      <h2>Connected to :</h2>
     </ion-item>
+    <div *ngFor="let device of connectedDevices">
+      <ion-item text-wrap [color]="connectedDeviceKeyPressed[device.id] ? 'primary' : null">
+        <h2>
+          <span *ngIf="device?.name">{{ device.name }}</span>
+          <span *ngIf="device?.id">{{ device.id }}</span>
+        </h2>
+        <p *ngIf="device.battery">Battery status: {{ device.battery }}%</p>
+        <p>Press any button on the device to highlight this space</p>
 
-    <ion-item text-wrap *ngIf="!connectedDevice?.id">
+        <button ion-button color="danger" (click)="disconnectOne(device)">Disconnect</button>
+      </ion-item>
+    </div>
+
+    <ion-item text-wrap *ngIf="connectedDevices?.length<=0">
       <h2>Status: Not connected</h2>
     </ion-item>
   </ion-list>
@@ -50,9 +57,3 @@
     </ion-item>
   </ion-list>
 </ion-content>
-
-<ion-footer>
-  <button ion-button color="danger" full no-margin (click)="disconnect()" *ngIf="connectedDevice?.id">
-    Disconnect
-  </button>
-</ion-footer>

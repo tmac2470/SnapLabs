@@ -14,13 +14,13 @@ import * as SERVICES from "./connect.config";
   styles: ["./connect.styles.scss"]
 })
 export class ConnectPageComponent implements OnDestroy {
-  devices: string[];
+  devices: string[] = [];
+  connectedDevices: any[] = [];
   isBluetoothEnabled: boolean = false;
   isAndroidDevice: boolean = false;
-  connectedDevice: any = {};
-  connectedDeviceKeyPressed: boolean;
+  connectedDeviceKeyPressed: any = {};
   isScanning: boolean = false;
-  devicePingSubscription: Subscription;
+  subscriptions: Subscription[] = [];
 
   constructor(
     private _connectService: ConnectService,
@@ -36,86 +36,39 @@ export class ConnectPageComponent implements OnDestroy {
   }
 
   ionViewDidEnter() {
-    this.isConnectedToAnyDevice();
+    // this.isConnectedToAnyDevice();
     this.checkIfBluetoothEnabled();
+    this._connectService.updateLocalDevices();
   }
 
   ngOnDestroy() {
-    if (this.devicePingSubscription) {
-      this.devicePingSubscription.unsubscribe();
-    }
+    this.subscriptions.map(subs => {
+      if (subs) {
+        subs.unsubscribe();
+      }
+    });
+
     this.cdRef.detach();
   }
 
-  isConnectedToAnyDevice() {
-    this._connectService
-      .getConnectedDevice()
-      .then(device => {
-        this.connectedDevice = device;
-        if (device && device.id) {
-          this.pingDevice();
-          this.getDeviceBatteryInfo();
-        }
-      })
-      .catch(error => {
-        // No device connected
-        this.connectedDevice = {};
-      });
-  }
+  /**
+   * How it works
+   *
+   * 1. Upon entering this page check if bluetooth is enabled. If yes start scanning,
+   * if no throw error and ask user to enable bluetooth
+   * 1. Scan for devices
+   * 2. Once a device is connected, push it into the list of connected devices and rescan for devices.
+   * 3. Show the list of connected devices and allow user to disconnect from them individually. Scan for devices upon disconnection.
+   * 4. Also allow user to disconnect from all of them at once. Scan for devices upon disconnection.
+   * 4. Upon entering this page, load the list of connected devices.
+   */
 
-  highlightConnectedDevice(state: Uint8Array) {
-    if (state.length > 0 && !!state[0]) {
-      if (state[0] > 0) {
-        this.connectedDeviceKeyPressed = true;
-      } else {
-        this.connectedDeviceKeyPressed = false;
-      }
-    } else {
-      this.connectedDeviceKeyPressed = false;
-    }
-    this.cdRef.detectChanges();
-  }
-
-  pingDevice() {
-    const device = this.connectedDevice;
-    const service = SERVICES.IOBUTTON;
-
-    this.devicePingSubscription = this._connectService
-      .readData(device.id, service)
-      .subscribe(
-        data => {
-          const state = new Uint8Array(data);
-          this.highlightConnectedDevice(state);
-        },
-        error => {
-          this._toastService.present({
-            message:
-              "Unable to detect device! Please retry bluetooth connection.",
-            duration: 3000
-          });
-        }
-      );
-  }
-
-  getDeviceBatteryInfo() {
-    const device = this.connectedDevice;
-    const service = SERVICES.BATTERY;
-
-    this._connectService
-      .readOne(device.id, service)
-      .then(data => {
-        const state = new Uint8Array(data);
-
-        if (state.length > 0 && !!state[0]) {
-          this.connectedDevice.battery = state[0];
-        }
-      })
-      .catch(err => {
-        this._toastService.present({
-          message: "Unable to get device's battery status!",
-          duration: 3000
-        });
-      });
+  loading(text: string = "Scanning...") {
+    let loader = this._loadingCtrl.create({
+      content: text
+    });
+    loader.present();
+    return loader;
   }
 
   // Checks if the bluetooth is enabled.
@@ -135,34 +88,6 @@ export class ConnectPageComponent implements OnDestroy {
           duration: 3000
         });
       });
-  }
-
-  // Enable bluetooth directly from the app
-  // Only for android apps!
-  enableBluetooth() {
-    this._connectService
-      .enableBluetooth()
-      .then(enabled => {
-        this._toastService.present({
-          message: "Bluetooth enabled!",
-          duration: 1500
-        });
-        this.checkIfBluetoothEnabled();
-      })
-      .catch(error => {
-        this._toastService.present({
-          message: "Something went wrong! Please enable the bluetooth manually",
-          duration: 3000
-        });
-      });
-  }
-
-  loading(text: string = "Scanning...") {
-    let loader = this._loadingCtrl.create({
-      content: text
-    });
-    loader.present();
-    return loader;
   }
 
   // Scan for bluetooth devices nearby
@@ -200,6 +125,7 @@ export class ConnectPageComponent implements OnDestroy {
   }
 
   startScanning() {
+    // Simple check to not run the scan on non cordova platforms
     if (!this.platform.is("cordova")) {
       return;
     }
@@ -207,14 +133,91 @@ export class ConnectPageComponent implements OnDestroy {
     this.scanForDevices();
   }
 
-  connectToDevice(device) {
+  private getConnectedDevices(): Promise<any> {
+    return this._connectService.getLastDevices().then(devices => {
+      this.connectedDevices = devices;
+    });
+  }
+
+  private onConnect(devices: any[]) {
+    this.connectedDevices = devices;
+
+    this.connectedDevices.map(async device => {
+      await this.pingDevice(device);
+      await this.getDeviceBatteryInfo(device);
+    });
+
+    this.startScanning();
+  }
+
+  highlightConnectedDevice(device: any, state: Uint8Array) {
+    if (state.length > 0 && !!state[0]) {
+      if (state[0] > 0) {
+        this.connectedDeviceKeyPressed[device.id] = true;
+      } else {
+        this.connectedDeviceKeyPressed[device.id] = false;
+      }
+    } else {
+      this.connectedDeviceKeyPressed[device.id] = false;
+    }
+    this.cdRef.detectChanges();
+  }
+
+  getDeviceBatteryInfo(device: any) {
+    const service = SERVICES.BATTERY;
+
+    this._connectService
+      .readOne(device.id, service)
+      .then(data => {
+        const state = new Uint8Array(data);
+
+        if (state.length > 0 && !!state[0]) {
+          this.connectedDevices.map(d => {
+            if (d.id === device.id) {
+              d.battery = state[0];
+            }
+          });
+        }
+      })
+      .catch(err => {
+        this._toastService.present({
+          message: "Unable to get device's battery status!",
+          duration: 3000
+        });
+      });
+  }
+
+  pingDevice(device: any) {
+    const service = SERVICES.IOBUTTON;
+
+    const subscription: Subscription = this._connectService
+      .readData(device.id, service)
+      .subscribe(
+        data => {
+          const state = new Uint8Array(data);
+          this.highlightConnectedDevice(device, state);
+        },
+        error => {
+          this._toastService.present({
+            message:
+              "Unable to detect device! Please retry bluetooth connection.",
+            duration: 3000
+          });
+        }
+      );
+
+    this.subscriptions.push(subscription);
+  }
+
+  connectToDevice(device: any) {
     const loading = this.loading("Connecting...");
 
     this._connectService.connectToDeviceId(device.id).subscribe(
       data => {
-        this.connectedDevice = data;
-        this.pingDevice();
-        this.getDeviceBatteryInfo();
+        this._connectService
+          .saveConnectedDevice(data)
+          .then(devices => this.onConnect(devices));
+
         loading.dismiss();
       },
       error => {
@@ -227,22 +230,63 @@ export class ConnectPageComponent implements OnDestroy {
     );
   }
 
-  disconnect() {
-    const loading = this.loading("Disconnecting...");
-
-    this._connectService
-      .disconnect(this.connectedDevice.id)
+  private disconnect(device: any): Promise<any> {
+    return this._connectService
+      .disconnect(device.id)
       .then(_ => {
-        this.isConnectedToAnyDevice();
-        this.scanForDevices();
-        loading.dismiss();
+        // Successfull disconnection
+        return this._connectService.removeConnectedDevice(device);
       })
       .catch(e => {
         this._toastService.present({
           message: "Unable to connect to device. Please retry!",
           duration: 3000
         });
-        loading.dismiss();
+      });
+  }
+
+  disconnectOne(device: any) {
+    const loading = this.loading("Disconnecting...");
+    this.disconnect(device).then(_ => {
+      this.getConnectedDevices();
+    });
+    loading.dismiss();
+    this.startScanning();
+  }
+
+  // isConnectedToAnyDevice() {
+  //   this._connectService
+  //     .getConnectedDevice()
+  //     .then(device => {
+  //       this.connectedDevice = device;
+  //       if (device && device.id) {
+  //         this.pingDevice();
+  //         this.getDeviceBatteryInfo();
+  //       }
+  //     })
+  //     .catch(error => {
+  //       // No device connected
+  //       this.connectedDevice = {};
+  //     });
+  // }
+
+  // Enable bluetooth directly from the app
+  // Only for android apps!
+  enableBluetooth() {
+    this._connectService
+      .enableBluetooth()
+      .then(enabled => {
+        this._toastService.present({
+          message: "Bluetooth enabled!",
+          duration: 1500
+        });
+        this.checkIfBluetoothEnabled();
+      })
+      .catch(error => {
+        this._toastService.present({
+          message: "Something went wrong! Please enable the bluetooth manually",
+          duration: 3000
+        });
       });
   }
 }

@@ -1,5 +1,6 @@
 // Other libraries
 import { Observable } from "rxjs/Observable";
+import * as _ from "lodash";
 // Angular
 import { Injectable } from "@angular/core";
 // Ionic
@@ -13,13 +14,37 @@ export class ConnectService {
 
   // Methods
 
-  private saveConnectedDevice(device: any) {
-    this._storageService.storage.set(StorageKey.CONNECTED_DEVICE, device);
-    return device;
+  updateLocalDevices(devices: any[] = []): Promise<any> {
+    return this._storageService.storage.set(
+      StorageKey.CONNECTED_DEVICES,
+      devices
+    );
   }
 
-  getLastDevice(): Promise<any> {
-    return this._storageService.storage.get(StorageKey.CONNECTED_DEVICE);
+  saveConnectedDevice(device: any): Promise<any> {
+    return this.getLastDevices().then(devices => {
+      if (!devices) {
+        devices = [];
+      }
+      devices.push(device);
+      devices = _.uniqBy(devices, device => {
+        return device.id;
+      });
+      return this.updateLocalDevices(devices);
+    });
+  }
+
+  removeConnectedDevice(device: any): Promise<any> {
+    return this.getLastDevices().then(devices => {
+      devices = devices.filter(d => {
+        return d.id !== device.id;
+      });
+      return this.updateLocalDevices(devices);
+    });
+  }
+
+  getLastDevices(): Promise<any> {
+    return this._storageService.storage.get(StorageKey.CONNECTED_DEVICES);
   }
 
   isBluetoothEnabled(): Promise<any> {
@@ -47,7 +72,8 @@ export class ConnectService {
         // error disconnecting
       });
 
-    return this.ble.connect(id).map(device => this.saveConnectedDevice(device));
+    return this.ble.connect(id);
+    // .map(device => this.saveConnectedDevice(device));
   }
 
   disconnect(id: string): Promise<any> {
@@ -59,7 +85,7 @@ export class ConnectService {
   }
 
   getConnectedDevice(): Promise<any> {
-    return this.getLastDevice().then(device => {
+    return this.getLastDevices().then(device => {
       if (!device) {
         return new Promise(null);
       } else {
