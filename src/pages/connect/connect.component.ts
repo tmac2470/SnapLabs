@@ -36,9 +36,7 @@ export class ConnectPageComponent implements OnDestroy {
   }
 
   ionViewDidEnter() {
-    // this.isConnectedToAnyDevice();
     this.checkIfBluetoothEnabled();
-    this._connectService.updateLocalDevices();
   }
 
   ngOnDestroy() {
@@ -79,6 +77,9 @@ export class ConnectPageComponent implements OnDestroy {
       .isBluetoothEnabled()
       .then(connected => {
         this.isBluetoothEnabled = true;
+        this._connectService.getConnectedDevices().then(_ => {
+          this.getConnectedDevices();
+        });
         this.startScanning();
       })
       .catch(error => {

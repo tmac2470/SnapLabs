@@ -47,6 +47,42 @@ export class ConnectService {
     return this._storageService.storage.get(StorageKey.CONNECTED_DEVICES);
   }
 
+  getConnectedDevices(): Promise<any> {
+    return this.getLastDevices().then(async devices => {
+      let connectedDevices: any[] = [];
+      if (!devices) {
+        devices = [];
+      }
+
+      await Promise.all(
+        devices.map(async (device): Promise<any> => {
+          await this.isConnectedToDevice(device.id)
+            .then(connected => {
+              connectedDevices.push(device);
+            })
+            .catch(e => e);
+        })
+      );
+      return this.updateLocalDevices(connectedDevices);
+    });
+  }
+
+  getConnectedDevice(): Promise<any> {
+    return this.getLastDevices().then(device => {
+      if (!device) {
+        return new Promise(null);
+      } else {
+        return this.isConnectedToDevice(device.id)
+          .then(connected => {
+            return connected ? device : null;
+          })
+          .catch(e => {
+            return e;
+          });
+      }
+    });
+  }
+
   isBluetoothEnabled(): Promise<any> {
     return this.ble.isEnabled();
   }
@@ -82,22 +118,6 @@ export class ConnectService {
 
   isConnectedToDevice(id: string): Promise<any> {
     return this.ble.isConnected(id);
-  }
-
-  getConnectedDevice(): Promise<any> {
-    return this.getLastDevices().then(device => {
-      if (!device) {
-        return new Promise(null);
-      } else {
-        return this.isConnectedToDevice(device.id)
-          .then(connected => {
-            return connected ? device : null;
-          })
-          .catch(e => {
-            return e;
-          });
-      }
-    });
   }
 
   readData(deviceId: string, service: any): Observable<any> {
