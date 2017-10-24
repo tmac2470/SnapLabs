@@ -16,7 +16,8 @@ import {
   HttpService,
   NetworkService,
   StorageService,
-  ToastService
+  ToastService,
+  FileService
 } from "./service";
 import { OrderByPipe } from "./pipe";
 
@@ -34,7 +35,7 @@ export class CoreModule {
   static forRoot(): ModuleWithProviders {
     return {
       ngModule: CoreModule,
-      providers: [HttpService, NetworkService, StorageService, ToastService]
+      providers: [HttpService, NetworkService, StorageService, ToastService, FileService]
     };
   }
 

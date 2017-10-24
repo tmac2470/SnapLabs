@@ -8,7 +8,7 @@ import * as _ from "lodash";
 import { Chart } from "chart.js";
 // SnapApp
 import { ConnectPageComponent, ConnectService } from "../connect";
-import { ToastService } from "../core/service";
+import { ToastService, FileService } from "../core/service";
 import {
   Investigation,
   ISensor,
@@ -16,6 +16,7 @@ import {
   ColorCode
 } from "./investigation-details.model";
 import * as SERVICES from "../connect/connect.config";
+
 
 @Component({
   selector: "investigation-details-page-component",
@@ -76,7 +77,8 @@ export class InvestigationDetailsPageComponent implements OnDestroy {
     private cdRef: ChangeDetectorRef,
     private _navCtrl: NavController,
     private _navParams: NavParams,
-    private _toastService: ToastService
+    private _toastService: ToastService,
+    private _fileService: FileService
   ) {
     this.investigation = this._navParams.get("investigation");
   }
@@ -397,7 +399,18 @@ export class InvestigationDetailsPageComponent implements OnDestroy {
   }
 
   startGraphs() {
-    this.graphsStarted = true;
+    // this.graphsStarted = true;
+    this._fileService.listDir().then( Entry =>
+      {
+
+        const names = Entry.map( entry => entry.name );
+
+        this._toastService.present({
+          message:
+          names.toString(),
+          duration: 3000
+        })
+    });
   }
 
   resetGraphs() {

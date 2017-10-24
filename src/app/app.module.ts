@@ -10,6 +10,7 @@ import { IonicStorageModule } from "@ionic/storage";
 import { BLE } from "@ionic-native/ble";
 import { Keyboard } from "@ionic-native/keyboard";
 import { Network } from "@ionic-native/network";
+import { File } from '@ionic-native/file';
 // SnapLabApp
 import { SnapLabApp } from "./app.component";
 import { AccountModule } from "../pages/account/account.module";
@@ -49,6 +50,7 @@ import { DownloadInvestigationsModule } from "../pages/download-investigations/d
     SplashScreen,
     StatusBar,
     Network,
+    File,
     { provide: ErrorHandler, useClass: IonicErrorHandler }
   ]
 })
