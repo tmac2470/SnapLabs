@@ -400,16 +400,44 @@ export class InvestigationDetailsPageComponent implements OnDestroy {
 
   startGraphs() {
     // this.graphsStarted = true;
-    this._fileService.listDir().then( Entry =>
-      {
+    // this._fileService.listDir().then( Entry =>
+    //   {
 
-        const names = Entry.map( entry => entry.name );
+    //     const names = Entry.map( entry => entry.name );
 
-        this._toastService.present({
-          message:
-          names.toString(),
-          duration: 3000
-        })
+    //     this._toastService.present({
+    //       message:
+    //       names.toString(),
+    //       duration: 3000
+    //     })
+    // });
+
+    // this._fileService.checkStoreDir()
+    // .then()
+    // .catch( err => {
+    //   console.log('in component-->');
+    //   console.log(err);
+    // });
+
+    // this._fileService.createDefaultDir()
+    // .then()
+    // .catch( err => {
+    //   console.log('in component-->');
+    //   console.log(err);
+    // });
+
+    // this._fileService.saveFile('testfile', '12345')
+    // .then()
+    // .catch( err => {
+    //   console.log(err);
+    // });
+
+    this._fileService.getFile('testfile')
+    .then( content => {
+      console.log(content);
+    })
+    .catch( err => {
+      console.log(err);
     });
   }
 
