@@ -1,14 +1,24 @@
+// Other libraries
+import * as moment from 'moment';
+import 'rxjs/add/operator/toPromise';
+
 // Angular
 import { Injectable } from '@angular/core';
 // Ionic
 import { File, Entry, FileEntry, DirectoryEntry, RemoveResult } from '@ionic-native/file';
+
+// SnapApp
+import { AccountService } from '../../account/account.service';
+
+
 
 
 @Injectable()
 export class FileService {
 
   constructor(
-    private _file: File
+    private _file: File,
+    private _accountService: AccountService
   ) {
   }
 
@@ -27,11 +37,20 @@ export class FileService {
     return this._file.removeFile(this.extRoot + this.storeDir, fileName);
   }
 
-  saveFile(fileName: string, text: string): Promise<FileEntry> {
-    return this.checkStoreDir()
-      .then(_ => {
-        return this.store(fileName, text)
-      });
+  saveFile(expName: string, text: string): Promise<FileEntry> {
+
+
+    return this._accountService.getUser().toPromise()
+      .then(user => {
+        let userName = user.username;
+        const timestamp = moment().format('DD_MM_YYYY_HH_mm');
+        const fileName = `${userName}_${expName}_${timestamp}.csv`;
+
+        return this.checkStoreDir()
+          .then(_ => {
+            return this.store(fileName, text)
+          });
+      })
   }
 
   private checkStoreDir(): Promise<boolean | DirectoryEntry> {
@@ -41,8 +60,6 @@ export class FileService {
         return result;
       })
       .catch(err => {
-        console.log('in service-->');
-        console.log(err);
         return this.createDefaultDir();
       });
 

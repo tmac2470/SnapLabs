@@ -9,7 +9,6 @@
 <ion-content padding>
   <h5 padding>Experiments in the device</h5>
   <ion-card>
-
     <ion-list>
       <button ion-item *ngFor="let entry of files" (click)="viewFile(entry)">
         {{ entry.name }}
@@ -19,3 +18,8 @@
 
 
 </ion-content>
+
+
+<ion-footer>
+  <button ion-button color="secondary" full no-margin (click)="saveDummyFile()">Create a dummy file</button>
+</ion-footer>

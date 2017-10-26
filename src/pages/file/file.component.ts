@@ -78,4 +78,11 @@ export class FilePageComponent {
 
   }
 
+  saveDummyFile(){
+    this._fileService.saveFile('123','123').then( newEntry => {
+      this.files.push(newEntry);
+    });
+  }
+
+
 }
