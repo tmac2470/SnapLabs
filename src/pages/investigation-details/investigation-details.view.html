@@ -19,12 +19,15 @@
     <ion-item>
       <h5>
         Status:
-        <span *ngIf="connectedDevice?.id">Connected</span>
-        <span *ngIf="!connectedDevice?.id">Not connected</span>
+        <span *ngIf="connectedDevices?.length">Connected</span>
+        <span *ngIf="!connectedDevices?.length">Not connected</span>
       </h5>
 
-      <h5 *ngIf="connectedDevice?.id">Sensor tag: {{ connectedDevice.id }}</h5>
-      <button *ngIf="!connectedDevice?.id" margin-top ion-button color="secondary" full no-margin (click)="openPage(connectPageComponent)">
+      <div *ngFor="let device of connectedDevices">
+        <h5 *ngIf="device?.id">Sensor tag: {{ device.id }}</h5>
+      </div>
+
+      <button *ngIf="!connectedDevices?.length" margin-top ion-button color="secondary" full no-margin (click)="openPage(connectPageComponent)">
         Connect to sensor tag
       </button>
     </ion-item>
@@ -33,7 +36,15 @@
   <ion-list inset no-lines *ngFor="let sensor of sensors">
     <ion-item text-wrap>
       <h2>{{ sensor.name }}</h2>
-      <h5 *ngIf="sensor?.value">{{ sensor.value }}</h5>
+
+      <div *ngIf="sensor?.value">
+        <h5 *ngFor="let device of connectedDevices">
+          <span *ngIf="sensor.value[device.id]">
+            Device {{ device.id }} - <b>{{ sensor.value[device.id] }}</b>
+          </span>
+        </h5>
+      </div>
+
       <canvas id="{{ sensor.name }}" margin-top></canvas>
 
       <ion-grid class="grid-container" *ngIf="!!sensor.config.grid.griddisplay">

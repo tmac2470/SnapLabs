@@ -26,7 +26,7 @@ export class InvestigationDetailsPageComponent implements OnDestroy {
   connectPageComponent = ConnectPageComponent;
   investigation: Investigation;
   sensors: any[] = [];
-  connectedDevice: any = {};
+  connectedDevices: any[] = [];
   graphsStarted: boolean = false;
   subscriptions: Subscription[] = [];
 
@@ -82,7 +82,9 @@ export class InvestigationDetailsPageComponent implements OnDestroy {
   }
 
   ngOnDestroy() {
-    this.stopNotifications();
+    this.connectedDevices.map(device => {
+      this.stopNotifications(device);
+    });
 
     this.subscriptions.map(subs => {
       if (subs) {
@@ -100,7 +102,8 @@ export class InvestigationDetailsPageComponent implements OnDestroy {
       await this.getSensorTags(sensorTags);
     };
     getSensorTags();
-    this.isConnectedToAnyDevice();
+    // If bluetooth is enabled, start notifications
+    this.checkIfBluetoothEnabled();
   }
 
   ionViewDidEnter() {
@@ -115,12 +118,12 @@ export class InvestigationDetailsPageComponent implements OnDestroy {
   }
 
   // Other methods
-  initialiseChart(chartId) {
+  private initialiseChart(chartId) {
     const ctx = document.getElementById(chartId);
     this.charts[chartId] = this.getChartType(chartId, ctx);
   }
 
-  initialiseGrid(sensor, lineOptions) {
+  private initialiseGrid(sensor, lineOptions) {
     if (!sensor.config.grid.griddisplay) {
       return;
     }
@@ -142,7 +145,9 @@ export class InvestigationDetailsPageComponent implements OnDestroy {
 
     sensor.config.grids = grids;
 
-    this.captureOnClick();
+    this.connectedDevices.map(device => {
+      this.captureOnClick(device);
+    });
     return;
   }
 
@@ -152,8 +157,7 @@ export class InvestigationDetailsPageComponent implements OnDestroy {
   }
 
   // Capture data for grid on click on device
-  captureOnClick() {
-    const device = this.connectedDevice;
+  private captureOnClick(device) {
     const service = SERVICES.IOBUTTON;
 
     const subscription: Subscription = this._connectService
@@ -192,25 +196,54 @@ export class InvestigationDetailsPageComponent implements OnDestroy {
     this.subscriptions.push(subscription);
   }
 
-  isConnectedToAnyDevice() {
+  private getConnectedDevices(): Promise<any> {
+    return this._connectService.getLastDevices().then(devices => {
+      this.connectedDevices = devices;
+
+      devices.map(device => {
+        this.startNotifications(device);
+      });
+    });
+  }
+
+  // Checks if the bluetooth is enabled.
+  // If yes, scan for devices
+  // Else, throw an error
+  private checkIfBluetoothEnabled() {
     this._connectService
-      .getConnectedDevice()
-      .then(device => {
-        this.connectedDevice = device;
-        if (device && device.id) {
-          // Automatically start notifications
-          this.startNotifications();
-        }
+      .isBluetoothEnabled()
+      .then(connected => {
+        this._connectService.getConnectedDevices().then(_ => {
+          this.getConnectedDevices();
+        });
       })
-      .catch(e => {
+      .catch(error => {
         this._toastService.present({
-          message: "No sensor tag connected!",
+          message: "Please enable bluetooth!",
           duration: 3000
         });
       });
   }
 
-  getSensorTags(sensorTags) {
+  // isConnectedToAnyDevice() {
+  //   this._connectService
+  //     .getConnectedDevice()
+  //     .then(device => {
+  //       this.connectedDevice = device;
+  //       if (device && device.id) {
+  //         // Automatically start notifications
+  //         this.startNotifications();
+  //       }
+  //     })
+  //     .catch(e => {
+  //       this._toastService.present({
+  //         message: "No sensor tag connected!",
+  //         duration: 3000
+  //       });
+  //     });
+  // }
+
+  private getSensorTags(sensorTags) {
     this.sensors = [];
     for (let id in sensorTags) {
       const sensorTag: ISensorTag = sensorTags[id];
@@ -249,6 +282,8 @@ export class InvestigationDetailsPageComponent implements OnDestroy {
    * If no device is connected ask the user to connect a device
    * Once a device is connected just start the notifications (that'd happen automatically once user comes back to this page)
    *
+   * DO THIS FOR ALL THE DEVICES
+   *
    * Starting notifications would mean that the data from sensor tags has started coming in.
    * Stopping notifications would stop the notification for all services
    *
@@ -258,7 +293,7 @@ export class InvestigationDetailsPageComponent implements OnDestroy {
    *
    */
 
-  getChartDatasets(chart: string): Array<any> {
+  private getChartDatasets(chart: string): Array<any> {
     const mapDataSetConfig = this.mapDataSetConfig;
 
     switch (chart.toLowerCase()) {
@@ -372,7 +407,7 @@ export class InvestigationDetailsPageComponent implements OnDestroy {
     }
   }
 
-  getChartType(chart: string, ctx: any) {
+  private getChartType(chart: string, ctx: any) {
     switch (chart.toLowerCase()) {
       case "accelerometer":
       case "barometer":
@@ -412,7 +447,7 @@ export class InvestigationDetailsPageComponent implements OnDestroy {
     });
   }
 
-  addData(chart: any, label: string, data: any) {
+  private addData(chart: any, label: string, data: any) {
     chart.data.labels.push(label);
 
     if (typeof data === "string" || typeof data === "number") {
@@ -439,9 +474,7 @@ export class InvestigationDetailsPageComponent implements OnDestroy {
     }
   }
 
-  startNotifications() {
-    const device = this.connectedDevice;
-
+  startNotifications(device: any) {
     this.sensors.forEach(sensorTag => {
       switch (sensorTag.name.toLowerCase()) {
         case "temperature":
@@ -473,16 +506,19 @@ export class InvestigationDetailsPageComponent implements OnDestroy {
     });
   }
 
-  updateSensorValue(name: string, value: string) {
+  private updateSensorValue(device: any, name: string, value: string) {
     this.sensors.map(sensor => {
       if (sensor.name === name) {
-        sensor.value = value;
+        if (!sensor.value) {
+          sensor.value = {};
+        }
+        sensor.value[device.id] = value;
         this.cdRef.detectChanges();
       }
     });
   }
 
-  luxometerNotifications(device: any, luxometerChartId: string) {
+  private luxometerNotifications(device: any, luxometerChartId: string) {
     const service = SERVICES.Luxometer;
     const subscription: Subscription = this._connectService
       .readData(device.id, service)
@@ -503,7 +539,7 @@ export class InvestigationDetailsPageComponent implements OnDestroy {
 
           const luxValue = output / 100.0;
 
-          this.updateSensorValue(luxometerChartId, `${luxValue} lux`);
+          this.updateSensorValue(device, luxometerChartId, `${luxValue} lux`);
 
           const luxometerChart = this.charts[luxometerChartId];
 
@@ -535,7 +571,7 @@ export class InvestigationDetailsPageComponent implements OnDestroy {
     this.subscriptions.push(subscription);
   }
 
-  humidityNotifications(device: any, humidityChartId: string) {
+  private humidityNotifications(device: any, humidityChartId: string) {
     const service = SERVICES.Humidity;
 
     const subscription: Subscription = this._connectService
@@ -557,6 +593,7 @@ export class InvestigationDetailsPageComponent implements OnDestroy {
           };
 
           this.updateSensorValue(
+            device,
             humidityChartId,
             `${humidityValues.RH.toFixed(
               3
@@ -594,7 +631,7 @@ export class InvestigationDetailsPageComponent implements OnDestroy {
     this.subscriptions.push(subscription);
   }
 
-  accGyroMagNotifications(
+  private accGyroMagNotifications(
     device: any,
     accelerometerChartId: string,
     gyroscopeChartId: string,
@@ -673,6 +710,7 @@ export class InvestigationDetailsPageComponent implements OnDestroy {
           this.drawGraphs(magnetometerChart, magnetometerValues);
 
           this.updateSensorValue(
+            device,
             gyroscopeChartId,
             `X : ${gyroscopeValues.X.toFixed(
               3
@@ -681,6 +719,7 @@ export class InvestigationDetailsPageComponent implements OnDestroy {
             )}, Z : ${gyroscopeValues.Z.toFixed(3)}`
           );
           this.updateSensorValue(
+            device,
             accelerometerChartId,
             `X : ${accelerometerValues.X.toFixed(
               3
@@ -693,6 +732,7 @@ export class InvestigationDetailsPageComponent implements OnDestroy {
             )}G`
           );
           this.updateSensorValue(
+            device,
             magnetometerChartId,
             `X : ${magnetometerValues.X.toFixed(
               3
@@ -748,7 +788,7 @@ export class InvestigationDetailsPageComponent implements OnDestroy {
     this.subscriptions.push(subscription);
   }
 
-  temperatureNotifications(device: any, temperatureChartId: string) {
+  private temperatureNotifications(device: any, temperatureChartId: string) {
     const service = SERVICES.Temperature;
 
     const subscription: Subscription = this._connectService
@@ -767,6 +807,7 @@ export class InvestigationDetailsPageComponent implements OnDestroy {
           };
 
           this.updateSensorValue(
+            device,
             temperatureChartId,
             `${temperatureValues["Ambient Temperature (C)"].toFixed(
               3
@@ -812,7 +853,7 @@ export class InvestigationDetailsPageComponent implements OnDestroy {
     this.subscriptions.push(subscription);
   }
 
-  barometerNotifications(device: any, barometerChartId: string) {
+  private barometerNotifications(device: any, barometerChartId: string) {
     const service = SERVICES.Barometer;
     const subscription: Subscription = this._connectService
       .readData(device.id, service)
@@ -826,6 +867,7 @@ export class InvestigationDetailsPageComponent implements OnDestroy {
           const pressureValue = ((flPressureData >> 8) & 0x00ffffff) / 100.0;
 
           this.updateSensorValue(
+            device,
             barometerChartId,
             `${pressureValue} hPa at ${tempValue} °C`
           );
@@ -867,8 +909,8 @@ export class InvestigationDetailsPageComponent implements OnDestroy {
     this.subscriptions.push(subscription);
   }
 
-  stopNotifications() {
-    const device = this.connectedDevice;
+  stopNotifications(device: any) {
+    // const device = this.connectedDevice;
     this.graphsStarted = false;
 
     this.sensors.map(sensor => {
