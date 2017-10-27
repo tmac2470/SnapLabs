@@ -148,7 +148,9 @@ export class ConnectPageComponent implements OnDestroy {
       await this.getDeviceBatteryInfo(device);
     });
 
-    this.startScanning();
+    setTimeout(() => {
+      this.startScanning();
+    }, 1000);
   }
 
   highlightConnectedDevice(device: any, state: Uint8Array) {
@@ -254,22 +256,6 @@ export class ConnectPageComponent implements OnDestroy {
     loading.dismiss();
     this.startScanning();
   }
-
-  // isConnectedToAnyDevice() {
-  //   this._connectService
-  //     .getConnectedDevice()
-  //     .then(device => {
-  //       this.connectedDevice = device;
-  //       if (device && device.id) {
-  //         this.pingDevice();
-  //         this.getDeviceBatteryInfo();
-  //       }
-  //     })
-  //     .catch(error => {
-  //       // No device connected
-  //       this.connectedDevice = {};
-  //     });
-  // }
 
   // Enable bluetooth directly from the app
   // Only for android apps!
