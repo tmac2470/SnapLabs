@@ -155,8 +155,10 @@ export class InvestigationDetailsPageComponent implements OnDestroy {
   }
 
   // Capture data for grid
-  captureData(grid, value) {
+  captureData(grid, value, deviceId) {
     grid.value = value;
+    grid.deviceId = deviceId;
+    this.cdRef.detectChanges();
   }
 
   // Capture data for grid on click on device
@@ -180,7 +182,11 @@ export class InvestigationDetailsPageComponent implements OnDestroy {
                   });
 
                   if (grids.length > 0) {
-                    this.captureData(grids[0], sensor.value);
+                    this.captureData(
+                      grids[0],
+                      sensor.value[device.id],
+                      device.id
+                    );
                   }
                 }
               });
@@ -428,6 +434,14 @@ export class InvestigationDetailsPageComponent implements OnDestroy {
       this.charts[chartId].clear();
       this.charts[chartId].data.datasets.forEach(dataset => {
         dataset.data = [];
+      });
+    });
+  }
+
+  resetGrid() {
+    this.sensors.map(sensor => {
+      sensor.config.grids.map(grid => {
+        grid.value = null;
       });
     });
   }

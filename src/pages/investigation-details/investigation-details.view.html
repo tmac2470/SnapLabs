@@ -50,10 +50,19 @@
 
       <ion-grid class="grid-container" *ngIf="!!sensor.config.grid.griddisplay">
         <ion-row>
+          <ion-col>
+            <h2>GRID</h2>
+            <h5><b>Press any button on sensor tag to record a value</b></h5>
+          </ion-col>
+        </ion-row>
+        <ion-row>
           <ion-col col-1 class="grid" *ngFor="let grid of sensor.config.grids">
-            <div class="grid-data" [id]="grid.id" (click)="captureData(grid, sensor.value)">
+            <div class="grid-data" [id]="grid.id">
               <h4 *ngIf="!grid.value">{{ grid.number }}</h4>
-              <h4 *ngIf="grid.value">{{ grid.value }}</h4>
+              <h3 *ngIf="grid.deviceId">Sensor {{ grid.deviceId }}</h3>
+              <h4 *ngIf="grid.value">
+                <b>{{ grid.value }}</b>
+              </h4>
             </div>
           </ion-col>
         </ion-row>
@@ -73,5 +82,9 @@
 
   <button ion-button no-margin half no-border-radius *ngIf="graphsStarted" color="dark" (click)="resetGraphs()">
     Reset graphs
+  </button>
+
+  <button ion-button no-margin full no-border-radius *ngIf="true" color="dark" (click)="resetGrid()">
+    Reset grid
   </button>
 </ion-footer>

@@ -6,13 +6,14 @@
   }
 
   .grid {
-    min-height: 100px;
-    min-width: 100px;
+    min-height: 125px;
+    min-width: 175px;
 
     .grid-data {
       display: flex;
       justify-content: center;
       align-items: center;
+      flex-direction: column;
 
       height: 100%;
       width: 100%;
@@ -22,7 +23,7 @@
 
       font-weight: 600;
 
-      padding: 2px;
+      padding: 10px;
     }
   }
 }
