@@ -37,10 +37,11 @@
     <ion-item text-wrap>
       <h2>{{ sensor.name }}</h2>
 
-      <div *ngIf="sensor?.value">
-        <h5 *ngFor="let device of connectedDevices">
+      <div *ngFor="let device of connectedDevices">
+        <h5 *ngIf="sensor?.value">
           <span *ngIf="sensor.value[device.id]">
-            Device {{ device.id }} - <b>{{ sensor.value[device.id] }}</b>
+            Device {{ device.id }} -
+            <b>{{ sensor.value[device.id] }}</b>
           </span>
         </h5>
       </div>

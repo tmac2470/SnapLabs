@@ -229,6 +229,9 @@ export class ConnectPageComponent implements OnDestroy {
           duration: 3000
         });
         loading.dismiss();
+        setTimeout(() => {
+          this.startScanning();
+        }, 500);
       }
     );
   }

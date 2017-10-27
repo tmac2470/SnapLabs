@@ -1,6 +1,7 @@
 // Angular
 import { Component, ChangeDetectorRef, OnDestroy } from "@angular/core";
 import { Subscription } from "rxjs/Subscription";
+import "rxjs/add/operator/debounceTime";
 // Ionic
 import { NavParams, NavController, LoadingController } from "ionic-angular";
 // Others
@@ -29,6 +30,7 @@ export class InvestigationDetailsPageComponent implements OnDestroy {
   connectedDevices: any[] = [];
   graphsStarted: boolean = false;
   subscriptions: Subscription[] = [];
+  sampleIntervalTime: number = 1000;
 
   mapDataSetConfig = {
     drawTicks: false,
@@ -97,6 +99,7 @@ export class InvestigationDetailsPageComponent implements OnDestroy {
 
   // LifeCycle methods
   ionViewWillEnter() {
+    this.sampleIntervalTime = parseInt(this.investigation.sampleInterval);
     const sensorTags = this.investigation.sensorTags;
     const getSensorTags = async () => {
       await this.getSensorTags(sensorTags);
@@ -107,9 +110,8 @@ export class InvestigationDetailsPageComponent implements OnDestroy {
   }
 
   ionViewDidEnter() {
-    // console.log(this.sensors);
     this.sensors.forEach(sensorTag => {
-      this.initialiseChart(sensorTag.name);
+      this.initialiseChart(sensorTag);
       this.initialiseGrid(sensorTag, {
         separation: 50,
         color: "#000"
@@ -118,7 +120,8 @@ export class InvestigationDetailsPageComponent implements OnDestroy {
   }
 
   // Other methods
-  private initialiseChart(chartId) {
+  private initialiseChart(sensor) {
+    const chartId = `${sensor.name}`;
     const ctx = document.getElementById(chartId);
     this.charts[chartId] = this.getChartType(chartId, ctx);
   }
@@ -224,24 +227,6 @@ export class InvestigationDetailsPageComponent implements OnDestroy {
         });
       });
   }
-
-  // isConnectedToAnyDevice() {
-  //   this._connectService
-  //     .getConnectedDevice()
-  //     .then(device => {
-  //       this.connectedDevice = device;
-  //       if (device && device.id) {
-  //         // Automatically start notifications
-  //         this.startNotifications();
-  //       }
-  //     })
-  //     .catch(e => {
-  //       this._toastService.present({
-  //         message: "No sensor tag connected!",
-  //         duration: 3000
-  //       });
-  //     });
-  // }
 
   private getSensorTags(sensorTags) {
     this.sensors = [];
@@ -522,6 +507,7 @@ export class InvestigationDetailsPageComponent implements OnDestroy {
     const service = SERVICES.Luxometer;
     const subscription: Subscription = this._connectService
       .readData(device.id, service)
+      .debounceTime(this.sampleIntervalTime)
       .subscribe(
         data => {
           // Luxometer DATA
@@ -576,6 +562,7 @@ export class InvestigationDetailsPageComponent implements OnDestroy {
 
     const subscription: Subscription = this._connectService
       .readData(device.id, service)
+      .debounceTime(this.sampleIntervalTime)
       .subscribe(
         data => {
           // HUMIDITY DATA
@@ -641,6 +628,7 @@ export class InvestigationDetailsPageComponent implements OnDestroy {
 
     const subscription: Subscription = this._connectService
       .readData(device.id, service)
+      .debounceTime(this.sampleIntervalTime)
       .subscribe(
         data => {
           //0 gyro x
@@ -793,6 +781,7 @@ export class InvestigationDetailsPageComponent implements OnDestroy {
 
     const subscription: Subscription = this._connectService
       .readData(device.id, service)
+      .debounceTime(this.sampleIntervalTime)
       .subscribe(
         data => {
           // Calculate target temperature (Celsius).
@@ -857,6 +846,7 @@ export class InvestigationDetailsPageComponent implements OnDestroy {
     const service = SERVICES.Barometer;
     const subscription: Subscription = this._connectService
       .readData(device.id, service)
+      .debounceTime(this.sampleIntervalTime)
       .subscribe(
         data => {
           // BAROMETER DATA
