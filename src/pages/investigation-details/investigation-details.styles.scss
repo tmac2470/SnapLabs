@@ -1,29 +1,39 @@
-.grid-container {
-  padding-top: 20px;
+ion-content {
 
-  ion-row {
-    justify-content: center;
+  .sensor-display {
+    padding-bottom: 50px;
+    ion-item {
+      margin-bottom: 15px;
+    }
   }
 
-  .grid {
-    min-height: 125px;
-    min-width: 175px;
+  .grid-container {
+    padding-top: 20px;
 
-    .grid-data {
-      display: flex;
+    ion-row {
       justify-content: center;
-      align-items: center;
-      flex-direction: column;
+    }
 
-      height: 100%;
-      width: 100%;
+    .grid {
+      min-height: 125px;
+      min-width: 175px;
 
-      color: #000;
-      background: #32db64;
+      .grid-data {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
 
-      font-weight: 600;
+        height: 100%;
+        width: 100%;
 
-      padding: 10px;
+        color: #000;
+        background: #32db64;
+
+        font-weight: 600;
+
+        padding: 10px;
+      }
     }
   }
 }

@@ -31,6 +31,10 @@ export class InvestigationDetailsPageComponent implements OnDestroy {
   graphsStarted: boolean = false;
   subscriptions: Subscription[] = [];
   sampleIntervalTime: number = 1000;
+  display: any = {
+    graph: false,
+    grid: false
+  };
 
   mapDataSetConfig = {
     drawTicks: false,
@@ -121,37 +125,40 @@ export class InvestigationDetailsPageComponent implements OnDestroy {
 
   // Other methods
   private initialiseChart(sensor) {
-    const chartId = `${sensor.name}`;
-    const ctx = document.getElementById(chartId);
-    this.charts[chartId] = this.getChartType(chartId, ctx);
+    if (!!sensor.config.graph.display || !!sensor.config.graph.graphdisplay) {
+      this.display.graph = true;
+      const chartId = `${sensor.name}`;
+      const ctx = document.getElementById(chartId);
+      this.charts[chartId] = this.getChartType(chartId, ctx);
+    }
   }
 
   private initialiseGrid(sensor, lineOptions) {
-    if (!sensor.config.grid.griddisplay) {
+    if (!!sensor.config.grid.display || !!sensor.config.grid.griddisplay) {
+      this.display.grid = true;
+      const chartId = `${sensor.name}-grid`;
+
+      const countX = sensor.config.grid.columns || 1;
+      const countY = sensor.config.grid.rows || 1;
+
+      const numOfGrids = parseInt(countX) * parseInt(countY);
+
+      let grids = [];
+
+      _.times(numOfGrids, count => {
+        grids.push({
+          id: `${chartId}-${count + 1}`,
+          number: count + 1
+        });
+      });
+
+      sensor.config.grids = grids;
+
+      this.connectedDevices.map(device => {
+        this.captureOnClick(device);
+      });
       return;
     }
-    const chartId = `${sensor.name}-grid`;
-
-    const countX = sensor.config.grid.columns || 1;
-    const countY = sensor.config.grid.rows || 1;
-
-    const numOfGrids = parseInt(countX) * parseInt(countY);
-
-    let grids = [];
-
-    _.times(numOfGrids, count => {
-      grids.push({
-        id: `${chartId}-${count + 1}`,
-        number: count + 1
-      });
-    });
-
-    sensor.config.grids = grids;
-
-    this.connectedDevices.map(device => {
-      this.captureOnClick(device);
-    });
-    return;
   }
 
   // Capture data for grid
@@ -475,6 +482,18 @@ export class InvestigationDetailsPageComponent implements OnDestroy {
 
   startNotifications(device: any) {
     this.sensors.forEach(sensorTag => {
+      const config: any = sensorTag.config;
+
+      // if the displays are off, do not start notifications
+      if (
+        !config.graph.display ||
+        !config.graph.graphdisplay ||
+        !config.grid.display ||
+        !config.grid.griddisplay
+      ) {
+        return;
+      }
+
       switch (sensorTag.name.toLowerCase()) {
         case "temperature":
           this.temperatureNotifications(device, "Temperature");
@@ -914,7 +933,6 @@ export class InvestigationDetailsPageComponent implements OnDestroy {
   }
 
   stopNotifications(device: any) {
-    // const device = this.connectedDevice;
     this.graphsStarted = false;
 
     this.sensors.map(sensor => {
