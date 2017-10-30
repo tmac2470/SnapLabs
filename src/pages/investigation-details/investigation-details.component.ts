@@ -9,7 +9,7 @@ import * as _ from "lodash";
 import { Chart } from "chart.js";
 // SnapApp
 import { ConnectPageComponent, ConnectService } from "../connect";
-import { ToastService } from "../core/service";
+import { ToastService, FileService } from "../core/service";
 import {
   Investigation,
   ISensor,
@@ -82,7 +82,8 @@ export class InvestigationDetailsPageComponent {
     private cdRef: ChangeDetectorRef,
     private _navCtrl: NavController,
     private _navParams: NavParams,
-    private _toastService: ToastService
+    private _toastService: ToastService,
+    private _fileService: FileService
   ) {
     this.investigation = this._navParams.get("investigation");
   }
@@ -428,7 +429,47 @@ export class InvestigationDetailsPageComponent {
   }
 
   startGraphs() {
-    this.graphsStarted = true;
+    // this.graphsStarted = true;
+    // this._fileService.listDir().then( Entry =>
+    //   {
+
+    //     const names = Entry.map( entry => entry.name );
+
+    //     this._toastService.present({
+    //       message:
+    //       names.toString(),
+    //       duration: 3000
+    //     })
+    // });
+
+    // this._fileService.checkStoreDir()
+    // .then()
+    // .catch( err => {
+    //   console.log('in component-->');
+    //   console.log(err);
+    // });
+
+    // this._fileService.createDefaultDir()
+    // .then()
+    // .catch( err => {
+    //   console.log('in component-->');
+    //   console.log(err);
+    // });
+
+    // this._fileService.saveFile('testfile', '12345')
+    // .then()
+    // .catch( err => {
+    //   console.log(err);
+    // });
+
+    this._fileService
+      .getFile("testfile")
+      .then(content => {
+        console.log(content);
+      })
+      .catch(err => {
+        console.log(err);
+      });
   }
 
   resetGraphs() {

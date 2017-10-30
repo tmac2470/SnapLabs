@@ -10,6 +10,7 @@ import { IonicStorageModule } from "@ionic/storage";
 import { BLE } from "@ionic-native/ble";
 import { Keyboard } from "@ionic-native/keyboard";
 import { Network } from "@ionic-native/network";
+import { File } from "@ionic-native/file";
 // SnapLabApp
 import { SnapLabApp } from "./app.component";
 import { AccountModule } from "../pages/account/account.module";
@@ -20,6 +21,7 @@ import { InvestigationsModule } from "../pages/investigations/investigations.mod
 import { InvestigationDetailsModule } from "../pages/investigation-details/investigation-details.module";
 import { AppShellPageComponent } from "../pages/app-shell/app-shell.component";
 import { DownloadInvestigationsModule } from "../pages/download-investigations/download-investigations.module";
+import { FileModule } from "../pages/file/file.module";
 
 @NgModule({
   declarations: [SnapLabApp, AppShellPageComponent],
@@ -39,7 +41,8 @@ import { DownloadInvestigationsModule } from "../pages/download-investigations/d
     DownloadInvestigationsModule.forRoot(),
     HomeModule.forRoot(),
     InvestigationDetailsModule.forRoot(),
-    InvestigationsModule.forRoot()
+    InvestigationsModule.forRoot(),
+    FileModule.forRoot()
   ],
   bootstrap: [IonicApp],
   entryComponents: [SnapLabApp, AppShellPageComponent],
@@ -49,6 +52,7 @@ import { DownloadInvestigationsModule } from "../pages/download-investigations/d
     SplashScreen,
     StatusBar,
     Network,
+    File,
     { provide: ErrorHandler, useClass: IonicErrorHandler }
   ]
 })
