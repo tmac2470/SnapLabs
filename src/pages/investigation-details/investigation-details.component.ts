@@ -1,5 +1,5 @@
 // Angular
-import { Component, ChangeDetectorRef, OnDestroy } from "@angular/core";
+import { Component, ChangeDetectorRef } from "@angular/core";
 import { Subscription } from "rxjs/Subscription";
 import "rxjs/add/operator/debounceTime";
 // Ionic
@@ -23,7 +23,7 @@ import * as SERVICES from "../connect/connect.config";
   templateUrl: "investigation-details.view.html",
   styles: ["./investigation-details.styles.scss"]
 })
-export class InvestigationDetailsPageComponent implements OnDestroy {
+export class InvestigationDetailsPageComponent {
   connectPageComponent = ConnectPageComponent;
   investigation: Investigation;
   sensors: any[] = [];
@@ -87,7 +87,7 @@ export class InvestigationDetailsPageComponent implements OnDestroy {
     this.investigation = this._navParams.get("investigation");
   }
 
-  ngOnDestroy() {
+  ionViewWillLeave() {
     this.connectedDevices.map(device => {
       this.stopNotifications(device);
     });
@@ -116,10 +116,7 @@ export class InvestigationDetailsPageComponent implements OnDestroy {
   ionViewDidEnter() {
     this.sensors.forEach(sensorTag => {
       this.initialiseChart(sensorTag);
-      this.initialiseGrid(sensorTag, {
-        separation: 50,
-        color: "#000"
-      });
+      this.initialiseGrid(sensorTag);
     });
   }
 
@@ -133,7 +130,7 @@ export class InvestigationDetailsPageComponent implements OnDestroy {
     }
   }
 
-  private initialiseGrid(sensor, lineOptions) {
+  private initialiseGrid(sensor) {
     if (!!sensor.config.grid.display || !!sensor.config.grid.griddisplay) {
       this.display.grid = true;
       const chartId = `${sensor.name}-grid`;
@@ -153,10 +150,6 @@ export class InvestigationDetailsPageComponent implements OnDestroy {
       });
 
       sensor.config.grids = grids;
-
-      this.connectedDevices.map(device => {
-        this.captureOnClick(device);
-      });
       return;
     }
   }
@@ -184,6 +177,9 @@ export class InvestigationDetailsPageComponent implements OnDestroy {
                 if (sensor.value) {
                   let grids = [];
                   grids = sensor.config.grids;
+                  if (!grids) {
+                    return;
+                  }
                   grids = grids.filter(grid => {
                     return !grid.value;
                   });
@@ -218,6 +214,8 @@ export class InvestigationDetailsPageComponent implements OnDestroy {
 
       devices.map(device => {
         this.startNotifications(device);
+        // Start the capture on click
+        this.captureOnClick(device);
       });
     });
   }
@@ -486,40 +484,38 @@ export class InvestigationDetailsPageComponent implements OnDestroy {
 
       // if the displays are off, do not start notifications
       if (
-        !config.graph.display ||
-        !config.graph.graphdisplay ||
-        !config.grid.display ||
-        !config.grid.griddisplay
+        !!config.graph.display ||
+        !!config.graph.graphdisplay ||
+        !!config.grid.display ||
+        !!config.grid.griddisplay
       ) {
-        return;
-      }
+        switch (sensorTag.name.toLowerCase()) {
+          case "temperature":
+            this.temperatureNotifications(device, "Temperature");
+            break;
+          case "barometer":
+            this.barometerNotifications(device, "Barometer");
+            break;
+          case "accelerometer":
+          case "gyroscope":
+          case "magnetometer":
+            this.accGyroMagNotifications(
+              device,
+              "Accelerometer",
+              "Gyroscope",
+              "Magnetometer"
+            );
+            break;
+          case "humidity":
+            this.humidityNotifications(device, "Humidity");
+            break;
+          case "luxometer":
+            this.luxometerNotifications(device, "Luxometer");
+            break;
 
-      switch (sensorTag.name.toLowerCase()) {
-        case "temperature":
-          this.temperatureNotifications(device, "Temperature");
-          break;
-        case "barometer":
-          this.barometerNotifications(device, "Barometer");
-          break;
-        case "accelerometer":
-        case "gyroscope":
-        case "magnetometer":
-          this.accGyroMagNotifications(
-            device,
-            "Accelerometer",
-            "Gyroscope",
-            "Magnetometer"
-          );
-          break;
-        case "humidity":
-          this.humidityNotifications(device, "Humidity");
-          break;
-        case "luxometer":
-          this.luxometerNotifications(device, "Luxometer");
-          break;
-
-        default:
-          break;
+          default:
+            break;
+        }
       }
     });
   }
@@ -661,7 +657,7 @@ export class InvestigationDetailsPageComponent implements OnDestroy {
 
     const subscription: Subscription = this._connectService
       .readData(device.id, service)
-      .debounceTime(this.sampleIntervalTime)
+      // .debounceTime(this.sampleIntervalTime)
       .subscribe(
         data => {
           //0 gyro x
@@ -879,7 +875,7 @@ export class InvestigationDetailsPageComponent implements OnDestroy {
     const service = SERVICES.Barometer;
     const subscription: Subscription = this._connectService
       .readData(device.id, service)
-      .debounceTime(this.sampleIntervalTime)
+      // .debounceTime(this.sampleIntervalTime)
       .subscribe(
         data => {
           // BAROMETER DATA
@@ -939,6 +935,20 @@ export class InvestigationDetailsPageComponent implements OnDestroy {
       const service = SERVICES[sensor.name];
 
       if (service && service.UUID) {
+        this._connectService
+          .stopReadingData(device, service)
+          .then(e => {
+            // Success
+          })
+          .catch(e => {
+            // Throws some weird error but still stops the notifications.
+          });
+      }
+      // Stop the capture on click too
+      const config: any = sensor.config;
+      if (!!config.grid.display || !!config.grid.griddisplay) {
+        const service = SERVICES.IOBUTTON;
+
         this._connectService
           .stopReadingData(device, service)
           .then(e => {
