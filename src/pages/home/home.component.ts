@@ -12,6 +12,7 @@ import {
 import { ToastService } from "../core/service";
 import { InvestigationsPageComponent } from "../investigations";
 import { DownloadInvestigationsPageComponent } from "../download-investigations";
+import { SavedFilesPageComponent } from '../saved-files';
 
 @Component({
   selector: "home-page-component",
@@ -24,6 +25,7 @@ export class HomePageComponent {
   signinPageComponent = SigninPageComponent;
   signupPageComponent = SignupPageComponent;
   downloadInvestigationsPageComponent = DownloadInvestigationsPageComponent;
+  savedFilesPageComponent = SavedFilesPageComponent;
 
   isLoggedIn: boolean = false;
 

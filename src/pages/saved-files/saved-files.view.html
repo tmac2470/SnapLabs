@@ -1,0 +1,42 @@
+<ion-header>
+  <ion-navbar>
+    <ion-title>
+      File Handling
+    </ion-title>
+  </ion-navbar>
+</ion-header>
+
+<ion-content>
+  <ion-list inset no-lines>
+    <ion-item text-wrap>
+      <h4>
+        Select files to share or delete (with suitable permissions).
+      </h4>
+
+      <h4>
+        <small>Please note files once deleted cannot be retrieved.</small>
+      </h4>
+    </ion-item>
+
+    <ion-item text-wrap>
+      <h5>Files are stored under
+        <b>/SavedDataFiles/SnapLabs</b>
+      </h5>
+    </ion-item>
+  </ion-list>
+
+  <ion-card>
+    <ion-list>
+      <button ion-item *ngFor="let entry of files" (click)="viewFile(entry)">
+        {{ entry.name }}
+      </button>
+    </ion-list>
+  </ion-card>
+
+
+</ion-content>
+
+
+<ion-footer>
+  <button ion-button color="secondary" full no-margin (click)="saveDummyFile()">Create a dummy file</button>
+</ion-footer>

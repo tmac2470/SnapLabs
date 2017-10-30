@@ -21,7 +21,7 @@ import { InvestigationsModule } from "../pages/investigations/investigations.mod
 import { InvestigationDetailsModule } from "../pages/investigation-details/investigation-details.module";
 import { AppShellPageComponent } from "../pages/app-shell/app-shell.component";
 import { DownloadInvestigationsModule } from "../pages/download-investigations/download-investigations.module";
-import { FileModule } from "../pages/file/file.module";
+import { SavedFilesModule } from "../pages/saved-files/saved-files.module";
 
 @NgModule({
   declarations: [SnapLabApp, AppShellPageComponent],
@@ -42,7 +42,7 @@ import { FileModule } from "../pages/file/file.module";
     HomeModule.forRoot(),
     InvestigationDetailsModule.forRoot(),
     InvestigationsModule.forRoot(),
-    FileModule.forRoot()
+    SavedFilesModule.forRoot()
   ],
   bootstrap: [IonicApp],
   entryComponents: [SnapLabApp, AppShellPageComponent],

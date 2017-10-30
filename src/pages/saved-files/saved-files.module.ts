@@ -3,10 +3,10 @@ import { ModuleWithProviders, NgModule, Optional, SkipSelf } from '@angular/core
 // Ionic
 import { IonicModule } from 'ionic-angular';
 // SnapApp
-import { FilePageComponent } from './file.component';
+import { SavedFilesPageComponent } from './saved-files.component';
 
 const pages = [
-  FilePageComponent
+  SavedFilesPageComponent
 ];
 
 @NgModule({
@@ -23,17 +23,17 @@ const pages = [
     ...pages
   ]
 })
-export class FileModule {
+export class SavedFilesModule {
   static forRoot(): ModuleWithProviders {
     return {
-      ngModule: FileModule
+      ngModule: SavedFilesModule
     };
   }
 
-  constructor( @Optional() @SkipSelf() parentModule: FileModule) {
+  constructor( @Optional() @SkipSelf() parentModule: SavedFilesModule) {
     if (parentModule) {
       throw new Error(
-        'FileModule is already loaded. Import it in the AppModule only');
+        'SavedFilesModule is already loaded. Import it in the AppModule only');
     }
   }
 }
