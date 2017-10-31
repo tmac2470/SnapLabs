@@ -987,8 +987,11 @@ export class InvestigationDetailsPageComponent {
         });
       });
     });
+    this.saveDataToFile(gridData);
+  }
 
-    const csvData = this._fileService.convertArrayToCSV(gridData);
+  private saveDataToFile(data: any) {
+    const csvData = this._fileService.convertArrayToCSV(data);
 
     this._fileService
       .getFileExtension(this.investigation.labTitle)
