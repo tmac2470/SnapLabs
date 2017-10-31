@@ -971,6 +971,41 @@ export class InvestigationDetailsPageComponent {
     return loader;
   }
 
+  saveGraphData() {
+    const graphData: any = [];
+
+    _.keys(this.charts).map(chartId => {
+      this.charts[chartId].data.datasets.forEach(dataset => {
+        const dataToPush = dataset.data;
+        const label = dataset.label;
+
+        if (typeof dataToPush === "string" || typeof dataToPush === "number") {
+          graphData.push({
+            chart: chartId,
+            value: dataToPush
+          });
+        } else {
+          let data = {};
+          _.keys(dataToPush).map(key => {
+            if (!data[label]) {
+              data[label] = [];
+            }
+            data[label].push(dataToPush[key]);
+          });
+
+          graphData.push({
+            chart: chartId,
+            ...data
+          });
+        }
+      });
+    });
+
+    console.log(graphData);
+
+    this.saveDataToFile(graphData);
+  }
+
   // Save Grid data
   saveGridData() {
     const gridData: any = [];
@@ -992,6 +1027,8 @@ export class InvestigationDetailsPageComponent {
 
   private saveDataToFile(data: any) {
     const csvData = this._fileService.convertArrayToCSV(data);
+
+    console.log(csvData);
 
     this._fileService
       .getFileExtension(this.investigation.labTitle)

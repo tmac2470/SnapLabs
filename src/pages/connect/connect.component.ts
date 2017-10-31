@@ -136,7 +136,7 @@ export class ConnectPageComponent implements OnDestroy {
 
   private getConnectedDevices(): Promise<any> {
     return this._connectService.getLastDevices().then(devices => {
-      this.connectedDevices = devices;
+      this.onConnect(devices);
     });
   }
 

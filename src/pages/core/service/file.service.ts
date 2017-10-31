@@ -86,18 +86,26 @@ export class FileService {
     return this.file.removeFile(folder, fileName);
   }
 
-  convertArrayToCSV(data: any) {
-    const replacer = (key, value) => (value === null ? "" : value); // specify how you want to handle null values here
-    const header = Object.keys(data[0]);
-    let csvData = data.map(row =>
-      header
-        .map(fieldName => JSON.stringify(row[fieldName], replacer))
-        .join(",")
-    );
-    csvData.unshift(header.join(","));
-    csvData = csvData.join("\r\n");
-
-    return csvData;
+  convertArrayToCSV(objArray: any) {
+    var array = typeof objArray != "object" ? JSON.parse(objArray) : objArray;
+    var str = "";
+    var row = "";
+    for (var index in objArray[0]) {
+      //Now convert each value to string and comma-seprated
+      row += index + ",";
+    }
+    row = row.slice(0, -1);
+    //append Label row with line break
+    str += row + "\r\n";
+    for (var i = 0; i < array.length; i++) {
+      var line = "";
+      for (var index in array[i]) {
+        if (line != "") line += ",";
+        line += '"' + array[i][index] + '"';
+      }
+      str += line + "\r\n";
+    }
+    return str;
   }
 
   getFileExtension(experimentTitle: any): Promise<string> {
