@@ -1,0 +1,41 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>
+      Share Via Email
+    </ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content padding>
+  <ion-fab right bottom>
+    <button ion-fab mini (click)="addRecipient()">
+      <ion-icon name="add"></ion-icon>
+    </button>
+  </ion-fab>
+
+  <form #recipientEmailsForm="ngForm">
+    <h5>Please enter recipient(s) email</h5>
+    <ion-list>
+      <ion-item *ngFor="let recipient of recipients; let i = index" margin-top>
+        <ion-label stacked>
+          Recipient
+        </ion-label>
+        <ion-input type="email" name="{{'email'+1}}" [(ngModel)]="recipient.email" placeholder="max@gmail.com" clearInput appValidateEmail></ion-input>
+      </ion-item>
+    </ion-list>
+  </form>
+
+  <ion-list *ngIf="previousRecipients?.length">
+    <h5>Previous recipients</h5>
+    <ion-item *ngFor="let recipient of previousRecipients">
+      <ion-label>{{ recipient.email }}</ion-label>
+      <ion-checkbox (ionChange)="addOldRecipient($event,recipient.email)"></ion-checkbox>
+    </ion-item>
+  </ion-list>
+</ion-content>
+
+<ion-footer>
+  <button [disabled]="!recipientEmailsForm.form.valid" ion-button color="secondary" full no-margin (click)="done()">
+    Send
+  </button>
+</ion-footer>

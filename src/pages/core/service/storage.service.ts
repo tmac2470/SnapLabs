@@ -8,6 +8,7 @@ export class StorageKey {
   static ALL_USERS_KEY: string = "all_users";
   static CONNECTED_DEVICES: string = "connected_devices";
   static INVESTIGATIONS_STORE: string = "investigations_store";
+  static RECIPIENTS_EMAIL: string = "recipients_email";
 }
 
 @Injectable()

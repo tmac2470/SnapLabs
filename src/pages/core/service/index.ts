@@ -5,4 +5,3 @@ export * from "./http.model";
 export * from "./http.service";
 export * from "./network.service";
 export * from "./file.service";
-export * from "./share.service";

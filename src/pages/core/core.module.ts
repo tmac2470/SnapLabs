@@ -17,8 +17,7 @@ import {
   NetworkService,
   StorageService,
   ToastService,
-  FileService,
-  ShareService
+  FileService
 } from "./service";
 import { OrderByPipe } from "./pipe";
 
@@ -41,8 +40,7 @@ export class CoreModule {
         NetworkService,
         StorageService,
         ToastService,
-        FileService,
-        ShareService
+        FileService
       ]
     };
   }

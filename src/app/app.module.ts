@@ -6,6 +6,7 @@ import { HttpModule } from "@angular/http";
 import { IonicApp, IonicErrorHandler, IonicModule } from "ionic-angular";
 import { SplashScreen } from "@ionic-native/splash-screen";
 import { StatusBar } from "@ionic-native/status-bar";
+import { SocialSharing } from "@ionic-native/social-sharing";
 import { IonicStorageModule } from "@ionic/storage";
 import { BLE } from "@ionic-native/ble";
 import { Keyboard } from "@ionic-native/keyboard";
@@ -22,6 +23,7 @@ import { InvestigationDetailsModule } from "../pages/investigation-details/inves
 import { AppShellPageComponent } from "../pages/app-shell/app-shell.component";
 import { DownloadInvestigationsModule } from "../pages/download-investigations/download-investigations.module";
 import { SavedFilesModule } from "../pages/saved-files/saved-files.module";
+import { ShareModule } from "../pages/share/share.module";
 
 @NgModule({
   declarations: [SnapLabApp, AppShellPageComponent],
@@ -42,7 +44,8 @@ import { SavedFilesModule } from "../pages/saved-files/saved-files.module";
     HomeModule.forRoot(),
     InvestigationDetailsModule.forRoot(),
     InvestigationsModule.forRoot(),
-    SavedFilesModule.forRoot()
+    SavedFilesModule.forRoot(),
+    ShareModule.forRoot()
   ],
   bootstrap: [IonicApp],
   entryComponents: [SnapLabApp, AppShellPageComponent],
@@ -51,6 +54,7 @@ import { SavedFilesModule } from "../pages/saved-files/saved-files.module";
     Keyboard,
     SplashScreen,
     StatusBar,
+    SocialSharing,
     Network,
     File,
     { provide: ErrorHandler, useClass: IonicErrorHandler }

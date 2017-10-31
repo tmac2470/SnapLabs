@@ -2,14 +2,16 @@
 import { Component } from "@angular/core";
 // Ionic
 import {
-  LoadingController,
   ActionSheetController,
+  LoadingController,
+  ModalController,
   Platform
 } from "ionic-angular";
 import { Entry } from "@ionic-native/file";
 
 // SnapApp
 import { ToastService, FileService } from "../core/service";
+import { ShareService, SharePageComponent } from "../share";
 
 @Component({
   selector: "file-page-component",
@@ -25,21 +27,23 @@ export class SavedFilesPageComponent {
     private _loadingCtrl: LoadingController,
     private _toastService: ToastService,
     private _fileService: FileService,
-    private platform: Platform
+    private _shareService: ShareService,
+    private platform: Platform,
+    private _modalController: ModalController
   ) {}
 
   // LifeCycle methods
   ionViewWillEnter() {
     this.storageLocationPath = this._fileService.getStorageLocation().fullPath;
     this.fetchFiles();
-    this.createDummyFile();
+    // this.createDummyFile();
   }
 
   createDummyFile() {
     const expName = Math.floor(Math.random() * 100).toString();
 
     this._fileService
-      .saveFile(expName, "LOOOOOOOL")
+      .saveExperimentData(expName, "LOOOOOOOL")
       .then(success => {
         console.log(success);
       })
@@ -70,15 +74,40 @@ export class SavedFilesPageComponent {
       });
   }
 
+  openSharePageModalAndShareOnDismiss(file: Entry) {
+    let modal = this._modalController.create(SharePageComponent);
+    modal.onDidDismiss(data => {
+      if (data && data.recipients) {
+        let emails: string[] = [];
+
+        data.recipients.map(recipient => {
+          emails.push(recipient.email);
+        });
+
+        console.log(data.recipients);
+        console.log(emails);
+
+        // this._shareService.shareViaEmail(
+        //   "Hi! Please find the attached experiment data",
+        //   "",
+        //   [],
+        //   file.toURL()
+        // );
+      }
+    });
+    modal.present();
+  }
+
   showFileOptions(file: Entry) {
     const actionSheet = this._actionSheetController.create({
       title: "File Options",
       buttons: [
         {
-          text: "Share",
+          text: "Share via Email",
           icon: !this.platform.is("ios") ? "share" : null,
           handler: () => {
             console.log("Share clicked");
+            this.openSharePageModalAndShareOnDismiss(file);
           }
         },
         {

@@ -89,7 +89,7 @@ export class FileService {
     return this.file.removeFile(folder, fileName);
   }
 
-  saveFile(experiment: string, text: string): Promise<FileEntry> {
+  saveExperimentData(experiment: string, text: string): Promise<FileEntry> {
     return this._accountService
       .getUser()
       .toPromise()
