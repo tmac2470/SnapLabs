@@ -26,8 +26,8 @@ export class ShareService {
           message,
           subject,
           recipients,
-          null,
-          null,
+          [],
+          [],
           file
         );
       })

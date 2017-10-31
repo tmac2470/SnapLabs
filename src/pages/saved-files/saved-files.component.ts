@@ -36,19 +36,18 @@ export class SavedFilesPageComponent {
   ionViewWillEnter() {
     this.storageLocationPath = this._fileService.getStorageLocation().fullPath;
     this.fetchFiles();
-    // this.createDummyFile();
   }
 
-  createDummyFile() {
-    const expName = Math.floor(Math.random() * 100).toString();
+  // createDummyFile() {
+  //   const expName = Math.floor(Math.random() * 100).toString();
 
-    this._fileService
-      .saveExperimentData(expName, "LOOOOOOOL")
-      .then(success => {
-        console.log(success);
-      })
-      .catch(e => console.log(e));
-  }
+  //   this._fileService
+  //     .saveExperimentData(expName, "LOOOOOOOL")
+  //     .then(success => {
+  //       console.log(success);
+  //     })
+  //     .catch(e => console.log(e));
+  // }
 
   loading() {
     let loader = this._loadingCtrl.create({
@@ -66,7 +65,6 @@ export class SavedFilesPageComponent {
         this.files = entries;
       })
       .catch(e => {
-        console.log(e);
         this._toastService.present({
           message: "File service not available!",
           duration: 3000
@@ -84,57 +82,69 @@ export class SavedFilesPageComponent {
           emails.push(recipient.email);
         });
 
-        console.log(data.recipients);
-        console.log(emails);
-
-        // this._shareService.shareViaEmail(
-        //   "Hi! Please find the attached experiment data",
-        //   "",
-        //   [],
-        //   file.toURL()
-        // );
+        if (emails.length > 0) {
+          this._shareService
+            .shareViaEmail(
+              "Hi! Please find the attached experiment data",
+              "Snaplabs: Experiment data",
+              emails,
+              file.nativeURL
+            )
+            .then(e => {
+              this._toastService.present({
+                message: 'Experiment data shared via Email',
+                duration: 3000
+              });
+            })
+            .catch(e => {
+              this._toastService.present({
+                message: e.message,
+                duration: 3000
+              });
+            });
+        }
       }
     });
     modal.present();
+  }
+
+  deleteFile(file) {
+    this._fileService
+      .deleteFile(file.name)
+      .then(e => {
+        this.files = this.files.filter(f => {
+          return f.name !== file.name;
+        });
+
+        this._toastService.present({
+          message: `File ${file.name} deleted!`,
+          duration: 3000
+        });
+      })
+      .catch(e => {
+        this._toastService.present({
+          message: "File could not be deleted! ",
+          duration: 3000
+        });
+      });
   }
 
   showFileOptions(file: Entry) {
     const actionSheet = this._actionSheetController.create({
       title: "File Options",
       buttons: [
-        {
-          text: "Share via Email",
-          icon: !this.platform.is("ios") ? "share" : null,
-          handler: () => {
-            console.log("Share clicked");
-            this.openSharePageModalAndShareOnDismiss(file);
-          }
-        },
+        // {
+        //   text: "Share via Email",
+        //   icon: !this.platform.is("ios") ? "share" : null,
+        //   handler: () => {
+        //     this.openSharePageModalAndShareOnDismiss(file);
+        //   }
+        // },
         {
           text: "Delete",
           role: "destructive",
           icon: !this.platform.is("ios") ? "trash" : null,
-          handler: () => {
-            this._fileService
-              .deleteFile(file.name)
-              .then(e => {
-                this.files = this.files.filter(f => {
-                  return f.name !== file.name;
-                });
-
-                this._toastService.present({
-                  message: `File ${file.name} deleted!`,
-                  duration: 3000
-                });
-              })
-              .catch(e => {
-                console.log(e);
-                this._toastService.present({
-                  message: "File could not be deleted! ",
-                  duration: 3000
-                });
-              });
-          }
+          handler: () => this.deleteFile(file)
         },
         {
           text: "Cancel",
