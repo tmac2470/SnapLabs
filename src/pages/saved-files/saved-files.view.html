@@ -20,23 +20,27 @@
 
     <ion-item text-wrap>
       <h5>Files are stored under
-        <b>/SavedDataFiles/SnapLabs</b>
+        <b>{{ storageLocationPath }}</b>
       </h5>
     </ion-item>
   </ion-list>
 
   <ion-card>
-    <ion-list>
-      <button ion-item *ngFor="let entry of files" (click)="viewFile(entry)">
-        {{ entry.name }}
+    <ion-list *ngIf="!files?.length">
+      <ion-item>
+        <h5>No files available!</h5>
+      </ion-item>
+    </ion-list>
+
+    <ion-list *ngIf="files?.length">
+      <ion-item>
+        <h6>Stored files</h6>
+      </ion-item>
+
+      <button ion-item *ngFor="let file of files" (click)="showFileOptions(file)">
+        {{ file.name }}
       </button>
     </ion-list>
   </ion-card>
 
-
 </ion-content>
-
-
-<ion-footer>
-  <button ion-button color="secondary" full no-margin (click)="saveDummyFile()">Create a dummy file</button>
-</ion-footer>

@@ -18,54 +18,97 @@ import { AccountService } from "../../account/account.service";
 
 @Injectable()
 export class FileService {
-  constructor(private _file: File, private _accountService: AccountService) {}
+  constructor(private file: File, private _accountService: AccountService) {}
 
-  private extRoot: string = this._file.externalRootDirectory;
-  private storeDir: string = "SnapLabs";
+  // Root folder where all files are stored for the app
+  private dirRoot: string = this.file.dataDirectory;
+  // Root folder extension or the folder inside the root folder to store the data files
+  private dirExt: string = "SnapLabs";
 
-  getFiles(): Promise<Entry[]> {
-    return this._file.listDir(this.extRoot, this.storeDir);
+  // Set up the data storage directories
+  getStorageLocation() {
+    return {
+      root: this.dirRoot,
+      dir: this.dirExt,
+      fullPath: `${this.dirRoot}${this.dirExt}`
+    };
   }
 
-  getFile(fileName: string): Promise<string> {
-    return this._file.readAsText(this.extRoot + this.storeDir, fileName);
+  /**
+   * How to
+   *
+   * 1. Check if the default directory exists
+   * 2. If no, create the default directory at the supplied location.
+   * 3. If yes, return the files from the directory.
+   */
+
+  private createDefaultDir(
+    directory: string = this.getStorageLocation().dir,
+    replace: boolean = false
+  ): Promise<DirectoryEntry> {
+    return this.file.createDir(
+      this.getStorageLocation().root,
+      directory,
+      replace
+    );
   }
 
-  deleteFile(fileName: string): Promise<RemoveResult> {
-    return this._file.removeFile(this.extRoot + this.storeDir, fileName);
+  private checkDefaultDir(): Promise<boolean> {
+    return this.file.checkDir(this.dirRoot, this.dirExt);
   }
 
-  saveFile(expName: string, text: string): Promise<FileEntry> {
+  getFiles(
+    root: string = this.getStorageLocation().root,
+    dir: string = this.getStorageLocation().dir
+  ): Promise<Entry[]> {
+    console.log("Fetching files from", root, dir);
+
+    return this.checkDefaultDir()
+      .then(success => {
+        return this.file.listDir(root, dir);
+      })
+      .catch(rootFolderNotFound => {
+        return this.createDefaultDir()
+        .then(success => {
+          return this.file.listDir(root, dir);
+        });
+      });
+  }
+
+  getFile(
+    fileName: string,
+    folder: string = this.getStorageLocation().fullPath
+  ): Promise<string> {
+    return this.file.readAsText(folder, fileName);
+  }
+
+  deleteFile(
+    fileName: string,
+    folder: string = this.getStorageLocation().fullPath
+  ): Promise<RemoveResult> {
+    return this.file.removeFile(folder, fileName);
+  }
+
+  saveFile(experiment: string, text: string): Promise<FileEntry> {
     return this._accountService
       .getUser()
       .toPromise()
       .then(user => {
         let userName = user.username;
         const timestamp = moment().format("DD_MM_YYYY_HH_mm");
-        const fileName = `${userName}_${expName}_${timestamp}.csv`;
+        const fileName = `${userName}_${experiment}_${timestamp}.csv`;
 
-        return this.checkStoreDir().then(_ => {
-          return this.store(fileName, text);
+        return this.checkDefaultDir().then(_ => {
+          return this.saveFileToStorage(fileName, text);
         });
       });
   }
 
-  private checkStoreDir(): Promise<boolean | DirectoryEntry> {
-    return this._file
-      .checkDir(this.extRoot, this.storeDir)
-      .then(result => {
-        return result;
-      })
-      .catch(err => {
-        return this.createDefaultDir();
-      });
-  }
-
-  private createDefaultDir(): Promise<DirectoryEntry> {
-    return this._file.createDir(this.extRoot, this.storeDir, true);
-  }
-
-  private store(fileName: string, text: string): Promise<FileEntry> {
-    return this._file.writeFile(this.extRoot + this.storeDir, fileName, text);
+  private saveFileToStorage(
+    fileName: string,
+    text: string,
+    folder: string = this.getStorageLocation().fullPath
+  ): Promise<FileEntry> {
+    return this.file.writeFile(folder, fileName, text);
   }
 }
