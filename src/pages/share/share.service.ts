@@ -32,7 +32,6 @@ export class ShareService {
         );
       })
       .catch(e => {
-        console.log(e);
         // Sharing via email is not possible
         return new Error("Sharing via Email is not available at the moment");
       });

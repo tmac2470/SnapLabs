@@ -61,15 +61,12 @@ export class FileService {
     root: string = this.getStorageLocation().root,
     dir: string = this.getStorageLocation().dir
   ): Promise<Entry[]> {
-    console.log("Fetching files from", root, dir);
-
     return this.checkDefaultDir()
       .then(success => {
         return this.file.listDir(root, dir);
       })
       .catch(rootFolderNotFound => {
-        return this.createDefaultDir()
-        .then(success => {
+        return this.createDefaultDir().then(success => {
           return this.file.listDir(root, dir);
         });
       });
@@ -89,19 +86,44 @@ export class FileService {
     return this.file.removeFile(folder, fileName);
   }
 
-  saveExperimentData(experiment: string, text: string): Promise<FileEntry> {
+  convertArrayToCSV(data: any) {
+    const replacer = (key, value) => (value === null ? "" : value); // specify how you want to handle null values here
+    const header = Object.keys(data[0]);
+    let csvData = data.map(row =>
+      header
+        .map(fieldName => JSON.stringify(row[fieldName], replacer))
+        .join(",")
+    );
+    csvData.unshift(header.join(","));
+    csvData = csvData.join("\r\n");
+
+    return csvData;
+  }
+
+  getFileExtension(experimentTitle: any): Promise<string> {
+    experimentTitle = experimentTitle.split(" ");
+    experimentTitle = experimentTitle.join("_");
+
     return this._accountService
       .getUser()
       .toPromise()
       .then(user => {
-        let userName = user.username;
-        const timestamp = moment().format("DD_MM_YYYY_HH_mm");
-        const fileName = `${userName}_${experiment}_${timestamp}.csv`;
+        let userExt = user.email;
+        if (user.username) {
+          userExt = `${user.username}_${userExt}`;
+        }
 
-        return this.checkDefaultDir().then(_ => {
-          return this.saveFileToStorage(fileName, text);
-        });
+        const timestamp = moment().format("DD_MM_YYYY_HH_mm");
+        const fileName = `${userExt}_${experimentTitle}_${timestamp}.csv`;
+
+        return fileName;
       });
+  }
+
+  saveExperimentData(fileName: string, text: string): Promise<FileEntry> {
+    return this.checkDefaultDir().then(_ => {
+      return this.saveFileToStorage(fileName, text);
+    });
   }
 
   private saveFileToStorage(

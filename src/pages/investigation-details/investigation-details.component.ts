@@ -429,47 +429,7 @@ export class InvestigationDetailsPageComponent {
   }
 
   startGraphs() {
-    // this.graphsStarted = true;
-    // this._fileService.listDir().then( Entry =>
-    //   {
-
-    //     const names = Entry.map( entry => entry.name );
-
-    //     this._toastService.present({
-    //       message:
-    //       names.toString(),
-    //       duration: 3000
-    //     })
-    // });
-
-    // this._fileService.checkStoreDir()
-    // .then()
-    // .catch( err => {
-    //   console.log('in component-->');
-    //   console.log(err);
-    // });
-
-    // this._fileService.createDefaultDir()
-    // .then()
-    // .catch( err => {
-    //   console.log('in component-->');
-    //   console.log(err);
-    // });
-
-    // this._fileService.saveFile('testfile', '12345')
-    // .then()
-    // .catch( err => {
-    //   console.log(err);
-    // });
-
-    this._fileService
-      .getFile("testfile")
-      .then(content => {
-        console.log(content);
-      })
-      .catch(err => {
-        console.log(err);
-      });
+    this.graphsStarted = true;
   }
 
   resetGraphs() {
@@ -1009,6 +969,45 @@ export class InvestigationDetailsPageComponent {
     });
     loader.present();
     return loader;
+  }
+
+  // Save Grid data
+  saveGridData() {
+    const gridData: any = [];
+
+    this.sensors.map(sensor => {
+      sensor.config.grids.map(grid => {
+        if (!grid.value) {
+          return;
+        }
+        gridData.push({
+          id: grid.id,
+          device: grid.deviceId,
+          value: grid.value
+        });
+      });
+    });
+
+    const csvData = this._fileService.convertArrayToCSV(gridData);
+
+    this._fileService
+      .getFileExtension(this.investigation.labTitle)
+      .then(fileName => {
+        this._fileService
+          .saveExperimentData(fileName, csvData)
+          .then(success => {
+            this._toastService.present({
+              message: "Experiment data successfully saved to file " + fileName,
+              duration: 3000
+            });
+          })
+          .catch(error => {
+            this._toastService.present({
+              message: "Unable to save experiment data! ",
+              duration: 3000
+            });
+          });
+      });
   }
 
   // Helper to open a given page

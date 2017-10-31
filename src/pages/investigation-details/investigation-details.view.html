@@ -89,7 +89,11 @@
 </ion-footer>
 
 <ion-footer flex *ngIf="display.grid">
-  <button ion-button no-margin full no-border-radius *ngIf="true" color="dark" (click)="resetGrid()">
+  <button ion-button no-margin full no-border-radius color="primary" (click)="saveGridData()">
+    Save grid data
+  </button>
+
+  <button ion-button no-margin full no-border-radius color="dark" (click)="resetGrid()">
     Reset grid
   </button>
 </ion-footer>

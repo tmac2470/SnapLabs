@@ -37,7 +37,7 @@
         <h6>Stored files</h6>
       </ion-item>
 
-      <button ion-item *ngFor="let file of files" (click)="showFileOptions(file)">
+      <button ion-item text-wrap *ngFor="let file of files" (click)="showFileOptions(file)">
         {{ file.name }}
       </button>
     </ion-list>
