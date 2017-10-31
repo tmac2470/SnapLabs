@@ -1,8 +1,8 @@
-export * from './storage.service';
-export * from './toast.service';
-export * from './error.model';
-export * from './http.model';
-export * from './http.service';
-export * from './network.service';
-export * from './file.service';
-
+export * from "./storage.service";
+export * from "./toast.service";
+export * from "./error.model";
+export * from "./http.model";
+export * from "./http.service";
+export * from "./network.service";
+export * from "./file.service";
+export * from "./share.service";
