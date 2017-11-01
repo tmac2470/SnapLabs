@@ -76,13 +76,13 @@
 </ion-content>
 
 <ion-footer flex *ngIf="display.graph">
+  <button ion-button no-margin full no-border-radius color="secondary" *ngIf="graphsStartedAtLeastOnce" (click)="saveGraphData()">
+    Save graph data
+  </button>
+
   <button ion-button no-margin full no-border-radius *ngIf="!graphsStarted" (click)="startGraphs()">
     Start graphs
   </button>
-<!--
-  <button ion-button no-margin full no-border-radius color="primary" *ngIf="graphsStarted" (click)="saveGraphData()">
-    Save graph data
-  </button> -->
 
   <button ion-button no-margin half no-border-radius *ngIf="graphsStarted" color="danger" (click)="stopGraphs()">
     Stop graphs
@@ -94,7 +94,7 @@
 </ion-footer>
 
 <ion-footer flex *ngIf="display.grid">
-  <button ion-button no-margin full no-border-radius color="primary" (click)="saveGridData()">
+  <button ion-button no-margin full no-border-radius color="secondary" (click)="saveGridData()">
     Save grid data
   </button>
 

@@ -29,6 +29,7 @@ export class InvestigationDetailsPageComponent {
   sensors: any[] = [];
   connectedDevices: any[] = [];
   graphsStarted: boolean = false;
+  graphsStartedAtLeastOnce: boolean = false;
   subscriptions: Subscription[] = [];
   sampleIntervalTime: number = 1000;
   display: any = {
@@ -430,6 +431,7 @@ export class InvestigationDetailsPageComponent {
 
   startGraphs() {
     this.graphsStarted = true;
+    this.graphsStartedAtLeastOnce = true;
   }
 
   resetGraphs() {
@@ -453,13 +455,22 @@ export class InvestigationDetailsPageComponent {
   }
 
   private addData(chart: any, label: string, data: any) {
-    chart.data.labels.push(label);
-
     if (typeof data === "string" || typeof data === "number") {
+      chart.data.labels.push({
+        deviceId: label,
+        data: data,
+        key: chart.data.datasets[0].label
+      });
+
       chart.data.datasets.forEach(dataset => {
         dataset.data.push(data);
       });
     } else {
+      chart.data.labels.push({
+        deviceId: label,
+        data: data
+      });
+
       chart.data.datasets.forEach(dataset => {
         _.keys(data).map(key => {
           if (key == dataset.label) {
@@ -473,9 +484,9 @@ export class InvestigationDetailsPageComponent {
   }
 
   // Draw graphs
-  drawGraphs(chart: any, value: any) {
+  drawGraphs(deviceId: string, chart: any, value: any) {
     if (this.graphsStarted && chart) {
-      this.addData(chart, "null", value);
+      this.addData(chart, deviceId, value);
     }
   }
 
@@ -559,7 +570,7 @@ export class InvestigationDetailsPageComponent {
 
           const luxometerChart = this.charts[luxometerChartId];
 
-          this.drawGraphs(luxometerChart, luxValue);
+          this.drawGraphs(device.id, luxometerChart, luxValue);
         },
         error => {
           this._toastService.present({
@@ -619,7 +630,7 @@ export class InvestigationDetailsPageComponent {
 
           const humidityChart = this.charts[humidityChartId];
 
-          this.drawGraphs(humidityChart, humidityValues.RH);
+          this.drawGraphs(device.id, humidityChart, humidityValues.RH);
         },
         error => {
           this._toastService.present({
@@ -723,9 +734,9 @@ export class InvestigationDetailsPageComponent {
           const gyroscopeChart = this.charts[gyroscopeChartId];
           const magnetometerChart = this.charts[magnetometerChartId];
 
-          this.drawGraphs(accelerometerChart, accelerometerValues);
-          this.drawGraphs(gyroscopeChart, gyroscopeValues);
-          this.drawGraphs(magnetometerChart, magnetometerValues);
+          this.drawGraphs(device.id, accelerometerChart, accelerometerValues);
+          this.drawGraphs(device.id, gyroscopeChart, gyroscopeValues);
+          this.drawGraphs(device.id, magnetometerChart, magnetometerValues);
 
           this.updateSensorValue(
             device,
@@ -837,7 +848,7 @@ export class InvestigationDetailsPageComponent {
 
           const temperatureChart = this.charts[temperatureChartId];
 
-          this.drawGraphs(temperatureChart, temperatureValues);
+          this.drawGraphs(device.id, temperatureChart, temperatureValues);
         },
         error => {
           this._toastService.present({
@@ -894,7 +905,7 @@ export class InvestigationDetailsPageComponent {
 
           const barometerChart = this.charts[barometerChartId];
 
-          this.drawGraphs(barometerChart, pressureValue);
+          this.drawGraphs(device.id, barometerChart, pressureValue);
         },
         error => {
           this._toastService.present({
@@ -972,36 +983,69 @@ export class InvestigationDetailsPageComponent {
   }
 
   saveGraphData() {
+    const fields: string[] = ["A", "B"];
     const graphData: any = [];
 
-    _.keys(this.charts).map(chartId => {
-      this.charts[chartId].data.datasets.forEach(dataset => {
-        const dataToPush = dataset.data;
-        const label = dataset.label;
+    this.connectedDevices.map(device => {
+      graphData.push({
+        A: "",
+        B: ""
+      });
+      graphData.push({
+        A: "",
+        B: ""
+      });
+      graphData.push({
+        A: `Sensor Identifier ${device.id}`,
+        B: ""
+      });
 
-        if (typeof dataToPush === "string" || typeof dataToPush === "number") {
-          graphData.push({
-            chart: chartId,
-            value: dataToPush
-          });
-        } else {
-          let data = {};
-          _.keys(dataToPush).map(key => {
-            if (!data[label]) {
-              data[label] = [];
+      _.keys(this.charts).map(chartId => {
+        graphData.push({
+          A: "",
+          B: ""
+        });
+        graphData.push({
+          A: "",
+          B: ""
+        });
+        graphData.push({
+          A: `Type: ${chartId}`,
+          B: ""
+        });
+        graphData.push({
+          A: "",
+          B: ""
+        });
+        graphData.push({
+          A: "label",
+          B: "Value"
+        });
+
+        this.charts[chartId].data.labels.map(label => {
+          if (device.id === label.deviceId) {
+            if (
+              typeof label.data === "string" ||
+              typeof label.data === "number"
+            ) {
+              graphData.push({
+                A: label.key,
+                B: label.data
+              });
+            } else {
+              _.keys(label.data).map(key => {
+                graphData.push({
+                  A: key,
+                  B: label.data[key]
+                });
+              });
             }
-            data[label].push(dataToPush[key]);
-          });
-
-          graphData.push({
-            chart: chartId,
-            ...data
-          });
-        }
+          }
+        });
       });
     });
 
-    // this.saveDataToFile(graphData);
+    this.saveDataToFile(fields, graphData);
   }
 
   // Save Grid data
@@ -1010,6 +1054,14 @@ export class InvestigationDetailsPageComponent {
     const gridData: any = [];
 
     this.connectedDevices.map(device => {
+      gridData.push({
+        A: "",
+        B: ""
+      });
+      gridData.push({
+        A: "",
+        B: ""
+      });
       gridData.push({
         A: `Sensor Identifier ${device.id}`,
         B: ""
