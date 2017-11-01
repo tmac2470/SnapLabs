@@ -1,6 +1,7 @@
 // Other libraries
 import * as moment from "moment";
 import "rxjs/add/operator/toPromise";
+import * as json2csv from "json2csv";
 
 // Angular
 import { Injectable } from "@angular/core";
@@ -86,26 +87,9 @@ export class FileService {
     return this.file.removeFile(folder, fileName);
   }
 
-  convertArrayToCSV(objArray: any) {
-    var array = typeof objArray != "object" ? JSON.parse(objArray) : objArray;
-    var str = "";
-    var row = "";
-    for (var index in objArray[0]) {
-      //Now convert each value to string and comma-seprated
-      row += index + ",";
-    }
-    row = row.slice(0, -1);
-    //append Label row with line break
-    str += row + "\r\n";
-    for (var i = 0; i < array.length; i++) {
-      var line = "";
-      for (var index in array[i]) {
-        if (line != "") line += ",";
-        line += '"' + array[i][index] + '"';
-      }
-      str += line + "\r\n";
-    }
-    return str;
+  convertArrayToCSV(fields: string[], data: any[]) {
+    const csv = json2csv({ data: data, fields: fields });
+    return csv;
   }
 
   getFileExtension(experimentTitle: any): Promise<string> {
@@ -128,7 +112,10 @@ export class FileService {
       });
   }
 
-  saveExperimentData(fileName: string, text: string): Promise<FileEntry> {
+  saveExperimentData(
+    fileName: string,
+    text: string | Blob
+  ): Promise<FileEntry> {
     return this.checkDefaultDir().then(_ => {
       return this.saveFileToStorage(fileName, text);
     });
@@ -136,7 +123,7 @@ export class FileService {
 
   private saveFileToStorage(
     fileName: string,
-    text: string,
+    text: string | Blob,
     folder: string = this.getStorageLocation().fullPath
   ): Promise<any> {
     // return this.file

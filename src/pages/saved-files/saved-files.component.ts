@@ -11,7 +11,7 @@ import { Entry } from "@ionic-native/file";
 
 // SnapApp
 import { ToastService, FileService } from "../core/service";
-import { ShareService, SharePageComponent } from "../share";
+import { ShareService } from "../share";
 
 @Component({
   selector: "file-page-component",
@@ -36,18 +36,6 @@ export class SavedFilesPageComponent {
   ionViewWillEnter() {
     this.storageLocationPath = this._fileService.getStorageLocation().fullPath;
     this.fetchFiles();
-    // this.createDummyFile();
-  }
-
-  createDummyFile() {
-    // const expName = Math.floor(Math.random() * 100).toString();
-
-    // this._fileService
-    //   .saveExperimentData(expName, "LOOOOOOOL")
-    //   .then(success => {
-    //     console.log(success);
-    //   })
-    //   .catch(e => console.log(e));
   }
 
   loading() {
@@ -73,40 +61,27 @@ export class SavedFilesPageComponent {
       });
   }
 
-  openSharePageModalAndShareOnDismiss(file: Entry) {
-    let modal = this._modalController.create(SharePageComponent);
-    modal.onDidDismiss(data => {
-      if (data && data.recipients) {
-        let emails: string[] = [];
-
-        data.recipients.map(recipient => {
-          emails.push(recipient.email);
+  shareFileViaEmail(file: Entry) {
+    this._shareService
+      .shareViaEmail(
+        "Hi! Please find the attached experiment data",
+        "Snaplabs: Experiment data",
+        [],
+        file.nativeURL
+      )
+      .then(e => {
+        // console.log('success');
+        // this._toastService.present({
+        //   message: "Experiment data shared via Email",
+        //   duration: 3000
+        // });
+      })
+      .catch(e => {
+        this._toastService.present({
+          message: e.message,
+          duration: 3000
         });
-
-        if (emails.length > 0) {
-          this._shareService
-            .shareViaEmail(
-              "Hi! Please find the attached experiment data",
-              "Snaplabs: Experiment data",
-              emails,
-              file.nativeURL
-            )
-            .then(e => {
-              this._toastService.present({
-                message: "Experiment data shared via Email",
-                duration: 3000
-              });
-            })
-            .catch(e => {
-              this._toastService.present({
-                message: e.message,
-                duration: 3000
-              });
-            });
-        }
-      }
-    });
-    modal.present();
+      });
   }
 
   deleteFile(file) {
@@ -134,13 +109,13 @@ export class SavedFilesPageComponent {
     const actionSheet = this._actionSheetController.create({
       title: "File Options",
       buttons: [
-        // {
-        //   text: "Share via Email",
-        //   icon: !this.platform.is("ios") ? "share" : null,
-        //   handler: () => {
-        //     this.openSharePageModalAndShareOnDismiss(file);
-        //   }
-        // },
+        {
+          text: "Share via Email",
+          icon: !this.platform.is("ios") ? "share" : null,
+          handler: () => {
+            this.shareFileViaEmail(file);
+          }
+        },
         {
           text: "Delete",
           role: "destructive",

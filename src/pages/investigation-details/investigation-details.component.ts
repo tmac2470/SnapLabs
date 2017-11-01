@@ -1001,34 +1001,62 @@ export class InvestigationDetailsPageComponent {
       });
     });
 
-    console.log(graphData);
-
-    this.saveDataToFile(graphData);
+    // this.saveDataToFile(graphData);
   }
 
   // Save Grid data
   saveGridData() {
+    const fields: string[] = ["A", "B"];
     const gridData: any = [];
 
-    this.sensors.map(sensor => {
-      sensor.config.grids.map(grid => {
-        if (!grid.value) {
-          return;
-        }
+    this.connectedDevices.map(device => {
+      gridData.push({
+        A: `Sensor Identifier ${device.id}`,
+        B: ""
+      });
+
+      this.sensors.map(sensor => {
         gridData.push({
-          id: grid.id,
-          device: grid.deviceId,
-          value: grid.value
+          A: "",
+          B: ""
+        });
+        gridData.push({
+          A: "",
+          B: ""
+        });
+        gridData.push({
+          A: `Type: ${sensor.name}`,
+          B: ""
+        });
+        gridData.push({
+          A: "",
+          B: ""
+        });
+
+        gridData.push({
+          A: "Grid",
+          B: "Value"
+        });
+
+        sensor.config.grids.map((grid, i) => {
+          if (!grid.value) {
+            return;
+          }
+          if (grid.deviceId === device.id) {
+            gridData.push({
+              A: i + 1,
+              B: grid.value
+            });
+          }
         });
       });
     });
-    this.saveDataToFile(gridData);
+
+    this.saveDataToFile(fields, gridData);
   }
 
-  private saveDataToFile(data: any) {
-    const csvData = this._fileService.convertArrayToCSV(data);
-
-    console.log(csvData);
+  private saveDataToFile(fields: string[], data: any[]) {
+    const csvData = this._fileService.convertArrayToCSV(fields, data);
 
     this._fileService
       .getFileExtension(this.investigation.labTitle)
