@@ -139,13 +139,15 @@ export class FileService {
     text: string,
     folder: string = this.getStorageLocation().fullPath
   ): Promise<any> {
-    return this.file
-      .createFile(folder, fileName, true)
-      .then(success => {
-        return this.file.writeExistingFile(folder, fileName, text);
-      })
-      .catch(e => {
-        return new Error("Unable to write file");
-      });
+    // return this.file
+    //   .createFile(folder, fileName, true)
+    //   .then(success => {
+    //   })
+    //   .catch(e => {
+    //     return new Error("Unable to write file");
+    //   });
+    return this.file.writeFile(folder, fileName, text, {
+      replace: true
+    });
   }
 }
