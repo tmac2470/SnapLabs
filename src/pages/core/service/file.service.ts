@@ -21,7 +21,7 @@ export class FileService {
   constructor(private file: File, private _accountService: AccountService) {}
 
   // Root folder where all files are stored for the app
-  private dirRoot: string = this.file.dataDirectory;
+  private dirRoot: string = this.file.externalRootDirectory;
   // Root folder extension or the folder inside the root folder to store the data files
   private dirExt: string = "SnapLabs";
 
@@ -42,7 +42,7 @@ export class FileService {
    * 3. If yes, return the files from the directory.
    */
 
-  private createDefaultDir(
+  createDefaultDir(
     directory: string = this.getStorageLocation().dir,
     replace: boolean = false
   ): Promise<DirectoryEntry> {
@@ -138,7 +138,14 @@ export class FileService {
     fileName: string,
     text: string,
     folder: string = this.getStorageLocation().fullPath
-  ): Promise<FileEntry> {
-    return this.file.writeFile(folder, fileName, text);
+  ): Promise<any> {
+    return this.file
+      .createFile(folder, fileName, true)
+      .then(success => {
+        return this.file.writeExistingFile(folder, fileName, text);
+      })
+      .catch(e => {
+        return new Error("Unable to write file");
+      });
   }
 }

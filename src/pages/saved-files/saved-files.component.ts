@@ -36,18 +36,19 @@ export class SavedFilesPageComponent {
   ionViewWillEnter() {
     this.storageLocationPath = this._fileService.getStorageLocation().fullPath;
     this.fetchFiles();
+    this.createDummyFile();
   }
 
-  // createDummyFile() {
-  //   const expName = Math.floor(Math.random() * 100).toString();
+  createDummyFile() {
+    const expName = Math.floor(Math.random() * 100).toString();
 
-  //   this._fileService
-  //     .saveExperimentData(expName, "LOOOOOOOL")
-  //     .then(success => {
-  //       console.log(success);
-  //     })
-  //     .catch(e => console.log(e));
-  // }
+    this._fileService
+      .saveExperimentData(expName, "LOOOOOOOL")
+      .then(success => {
+        console.log(success);
+      })
+      .catch(e => console.log(e));
+  }
 
   loading() {
     let loader = this._loadingCtrl.create({
@@ -92,7 +93,7 @@ export class SavedFilesPageComponent {
             )
             .then(e => {
               this._toastService.present({
-                message: 'Experiment data shared via Email',
+                message: "Experiment data shared via Email",
                 duration: 3000
               });
             })
