@@ -64,7 +64,7 @@ export class SavedFilesPageComponent {
   shareFileViaEmail(file: Entry) {
     this._shareService
       .shareViaEmail(
-        "Hi! Please find the attached experiment data",
+        "Hello! Please find the attached experiment data.",
         "Snaplabs: Experiment data",
         [],
         file.nativeURL
