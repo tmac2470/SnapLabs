@@ -58,8 +58,9 @@
             </h5>
           </ion-col>
         </ion-row>
+
         <ion-row>
-          <ion-col col-1 class="grid" *ngFor="let grid of sensor.config.grids">
+          <ion-col class="grid" *ngFor="let grid of sensor.config.grids" [ngStyle]="{'max-width': maxGridWidth, 'min-width': maxGridWidth}">
             <div class="grid-data" [id]="grid.id">
               <h4 *ngIf="!grid.value">{{ grid.number }}</h4>
               <h3 *ngIf="grid.deviceId">Sensor {{ grid.deviceId }}</h3>

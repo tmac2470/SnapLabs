@@ -32,6 +32,7 @@ export class InvestigationDetailsPageComponent {
   graphsStartedAtLeastOnce: boolean = false;
   subscriptions: Subscription[] = [];
   sampleIntervalTime: number = 1000;
+  maxGridWidth: string = "20vw";
   display: any = {
     graph: false,
     grid: false
@@ -110,6 +111,7 @@ export class InvestigationDetailsPageComponent {
     const getSensorTags = async () => {
       await this.getSensorTags(sensorTags);
     };
+    console.log(sensorTags);
     getSensorTags();
     // If bluetooth is enabled, start notifications
     this.checkIfBluetoothEnabled();
@@ -136,6 +138,8 @@ export class InvestigationDetailsPageComponent {
     if (!!sensor.config.grid.display || !!sensor.config.grid.griddisplay) {
       this.display.grid = true;
       const chartId = `${sensor.name}-grid`;
+
+      this.maxGridWidth = `${78/parseInt(sensor.config.grid.columns)}vw`;
 
       const countX = sensor.config.grid.columns || 1;
       const countY = sensor.config.grid.rows || 1;
