@@ -139,7 +139,7 @@ export class InvestigationDetailsPageComponent {
       this.display.grid = true;
       const chartId = `${sensor.name}-grid`;
 
-      this.maxGridWidth = `${78/parseInt(sensor.config.grid.columns)}vw`;
+      this.maxGridWidth = `${78 / parseInt(sensor.config.grid.columns)}vw`;
 
       const countX = sensor.config.grid.columns || 1;
       const countY = sensor.config.grid.rows || 1;
@@ -161,14 +161,56 @@ export class InvestigationDetailsPageComponent {
   }
 
   // Capture data for grid
-  captureData(grid, value, deviceId) {
-    grid.value = value;
-    grid.deviceId = deviceId;
+  captureData(grid: any, deviceId: string, sensor: any) {
+    if (!grid.value) {
+      grid.value = {};
+    }
+    if (!grid.value[deviceId]) {
+      grid.value[deviceId] = {};
+    }
+
+    grid.value[deviceId] = {
+      value: sensor.value[deviceId]
+    };
     this.cdRef.detectChanges();
   }
 
+  captureDeviceDataForGrid() {
+    this.connectedDevices.map(device => {
+      this.sensors.map(sensor => {
+        if (sensor.value) {
+          let grids = [];
+          grids = sensor.config.grids;
+          if (!grids) {
+            return;
+          }
+          // Filter out the grids who've had values from all the devices
+          grids = grids.filter(grid => {
+            const keys = _.keys(grid.value);
+            if (
+              keys &&
+              keys.length &&
+              keys.length >= this.connectedDevices.length
+            ) {
+              return false;
+            } else {
+              return true;
+            }
+            // return !grid.value;
+          });
+
+          if (grids.length > 0) {
+            this.captureData(grids[0], device.id, sensor);
+          }
+        }
+      });
+    });
+  }
+
   // Capture data for grid on click on device
-  private captureOnClick(device) {
+  // When a button is pressed on any device capture data for
+  // all the devices
+  private captureOnClick(device: any) {
     const service = SERVICES.IOBUTTON;
 
     const subscription: Subscription = this._connectService
@@ -176,30 +218,8 @@ export class InvestigationDetailsPageComponent {
       .subscribe(
         data => {
           const state = new Uint8Array(data);
-
           if (state.length > 0 && !!state[0]) {
-            if (state[0] > 0) {
-              this.sensors.map(sensor => {
-                if (sensor.value) {
-                  let grids = [];
-                  grids = sensor.config.grids;
-                  if (!grids) {
-                    return;
-                  }
-                  grids = grids.filter(grid => {
-                    return !grid.value;
-                  });
-
-                  if (grids.length > 0) {
-                    this.captureData(
-                      grids[0],
-                      sensor.value[device.id],
-                      device.id
-                    );
-                  }
-                }
-              });
-            }
+            this.captureDeviceDataForGrid();
           }
         },
         error => {

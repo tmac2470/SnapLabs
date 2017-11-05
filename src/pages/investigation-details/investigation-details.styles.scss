@@ -15,8 +15,10 @@ ion-content {
     }
 
     .grid {
-      // min-height: 125px;
-        // width: 20vw;
+      min-height: 125px;
+        min-width: 30vw !important;
+        max-width: 30vw !important;
+        width: 50vw;
 
       .grid-data {
         display: flex;

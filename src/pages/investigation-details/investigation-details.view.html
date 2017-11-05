@@ -60,13 +60,17 @@
         </ion-row>
 
         <ion-row>
-          <ion-col class="grid" *ngFor="let grid of sensor.config.grids" [ngStyle]="{'max-width': maxGridWidth, 'min-width': maxGridWidth}">
+          <ion-col class="grid" *ngFor="let grid of sensor.config.grids" [ngStyle]="{'max-width': maxGridWidth, 'min-width': maxGridWidth}" (click)="captureDeviceDataForGrid()">
             <div class="grid-data" [id]="grid.id">
               <h4 *ngIf="!grid.value">{{ grid.number }}</h4>
-              <h3 *ngIf="grid.deviceId">Sensor {{ grid.deviceId }}</h3>
-              <h4 *ngIf="grid.value">
-                <b>{{ grid.value }}</b>
-              </h4>
+              <div *ngFor="let device of connectedDevices">
+                <div *ngIf="grid.value && grid.value[device.id]?.value">
+                  <h3>Sensor {{ device.id }}</h3>
+                  <h4>
+                    <b>{{ grid.value[device.id].value }}</b>
+                  </h4>
+                </div>
+              </div>
             </div>
           </ion-col>
         </ion-row>
