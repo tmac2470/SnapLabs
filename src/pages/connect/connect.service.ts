@@ -10,15 +10,27 @@ import { StorageService, StorageKey } from "../core/service";
 
 @Injectable()
 export class ConnectService {
+  connectedDevices: any = [];
   constructor(private ble: BLE, private _storageService: StorageService) {}
 
   // Methods
 
   updateLocalDevices(devices: any[] = []): Promise<any> {
+    this.connectedDevices = devices;
     return this._storageService.storage.set(
       StorageKey.CONNECTED_DEVICES,
       devices
     );
+  }
+
+  getLastDevices(): Promise<any> {
+    if (this.connectedDevices.length > 0) {
+      return new Promise(resolve => {
+        resolve(this.connectedDevices);
+      });
+    } else {
+      return this._storageService.storage.get(StorageKey.CONNECTED_DEVICES);
+    }
   }
 
   saveConnectedDevice(device: any): Promise<any> {
@@ -43,10 +55,6 @@ export class ConnectService {
     });
   }
 
-  getLastDevices(): Promise<any> {
-    return this._storageService.storage.get(StorageKey.CONNECTED_DEVICES);
-  }
-
   getConnectedDevices(): Promise<any> {
     return this.getLastDevices().then(async devices => {
       let connectedDevices: any[] = [];
@@ -67,21 +75,21 @@ export class ConnectService {
     });
   }
 
-  getConnectedDevice(): Promise<any> {
-    return this.getLastDevices().then(device => {
-      if (!device) {
-        return new Promise(null);
-      } else {
-        return this.isConnectedToDevice(device.id)
-          .then(connected => {
-            return connected ? device : null;
-          })
-          .catch(e => {
-            return e;
-          });
-      }
-    });
-  }
+  // getConnectedDevice(): Promise<any> {
+  //   return this.getLastDevices().then(device => {
+  //     if (!device) {
+  //       return new Promise(null);
+  //     } else {
+  //       return this.isConnectedToDevice(device.id)
+  //         .then(connected => {
+  //           return connected ? device : null;
+  //         })
+  //         .catch(e => {
+  //           return e;
+  //         });
+  //     }
+  //   });
+  // }
 
   isBluetoothEnabled(): Promise<any> {
     return this.ble.isEnabled();
