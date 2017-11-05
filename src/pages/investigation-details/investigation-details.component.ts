@@ -572,7 +572,7 @@ export class InvestigationDetailsPageComponent {
     const service = SERVICES.Luxometer;
     const subscription: Subscription = this._connectService
       .readData(device.id, service)
-      .debounceTime(this.sampleIntervalTime)
+      // .debounceTime(this.sampleIntervalTime)
       .subscribe(
         data => {
           // Luxometer DATA
