@@ -65,10 +65,10 @@
               <h4 *ngIf="!grid.value">{{ grid.number }}</h4>
               <div *ngFor="let device of connectedDevices">
                 <div *ngIf="grid.value && grid.value[device.id]?.value">
-                  <h3>Sensor {{ device.id }}</h3>
-                  <h4>
-                    <b>{{ grid.value[device.id].value }}</b>
-                  </h4>
+                  <!-- <h3>Sensor {{ device.id }}</h3> -->
+                  <h6>
+                    {{ grid.value[device.id].value }}
+                  </h6>
                 </div>
               </div>
             </div>

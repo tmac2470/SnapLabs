@@ -111,7 +111,6 @@ export class InvestigationDetailsPageComponent {
     const getSensorTags = async () => {
       await this.getSensorTags(sensorTags);
     };
-    console.log(sensorTags);
     getSensorTags();
     // If bluetooth is enabled, start notifications
     this.checkIfBluetoothEnabled();
@@ -168,6 +167,9 @@ export class InvestigationDetailsPageComponent {
     if (!grid.value[deviceId]) {
       grid.value[deviceId] = {};
     }
+
+    // Attach the rawValues to the grid
+    grid.rawValue = sensor.rawValue;
 
     grid.value[deviceId] = {
       value: sensor.value[deviceId]
@@ -556,13 +558,24 @@ export class InvestigationDetailsPageComponent {
     });
   }
 
-  private updateSensorValue(device: any, name: string, value: string) {
+  // Also send in the raw values for each sensor
+  private updateSensorValue(
+    device: any,
+    name: string,
+    value: string,
+    dataValueMap: any
+  ) {
     this.sensors.map(sensor => {
       if (sensor.name === name) {
         if (!sensor.value) {
           sensor.value = {};
         }
+        if (!sensor.rawValue) {
+          sensor.rawValue = {};
+        }
+
         sensor.value[device.id] = value;
+        sensor.rawValue[device.id] = dataValueMap;
         this.cdRef.detectChanges();
       }
     });
@@ -590,7 +603,9 @@ export class InvestigationDetailsPageComponent {
 
           const luxValue = output / 100.0;
 
-          this.updateSensorValue(device, luxometerChartId, `${luxValue} lux`);
+          this.updateSensorValue(device, luxometerChartId, `${luxValue} lux`, {
+            lux: luxValue
+          });
 
           const luxometerChart = this.charts[luxometerChartId];
 
@@ -649,7 +664,17 @@ export class InvestigationDetailsPageComponent {
             humidityChartId,
             `${humidityValues.RH.toFixed(
               3
-            )}% RH at ${humidityValues.TEMP.toFixed(3)} °C`
+            )}% RH at ${humidityValues.TEMP.toFixed(3)} °C`,
+            [
+              {
+                unit: "% RH",
+                value: humidityValues.RH.toFixed(3)
+              },
+              {
+                unit: "°C",
+                value: humidityValues.TEMP.toFixed(3)
+              }
+            ]
           );
 
           const humidityChart = this.charts[humidityChartId];
@@ -769,7 +794,21 @@ export class InvestigationDetailsPageComponent {
               3
             )}, Y : ${gyroscopeValues.Y.toFixed(
               3
-            )}, Z : ${gyroscopeValues.Z.toFixed(3)}`
+            )}, Z : ${gyroscopeValues.Z.toFixed(3)}`,
+            [
+              {
+                unit: "X",
+                value: gyroscopeValues.X.toFixed(3)
+              },
+              {
+                unit: "Y",
+                value: gyroscopeValues.Y.toFixed(3)
+              },
+              {
+                unit: "Z",
+                value: gyroscopeValues.Z.toFixed(3)
+              }
+            ]
           );
           this.updateSensorValue(
             device,
@@ -782,7 +821,21 @@ export class InvestigationDetailsPageComponent {
               3
             )}G, Scalar Value : ${accelerometerValues["Scalar Value"].toFixed(
               3
-            )}G`
+            )}G`,
+            [
+              {
+                unit: "X (G)",
+                value: accelerometerValues.X.toFixed(3)
+              },
+              {
+                unit: "Y (G)",
+                value: accelerometerValues.Y.toFixed(3)
+              },
+              {
+                unit: "Z (G)",
+                value: accelerometerValues.Z.toFixed(3)
+              }
+            ]
           );
           this.updateSensorValue(
             device,
@@ -795,7 +848,21 @@ export class InvestigationDetailsPageComponent {
               3
             )}μT, Scalar Value : ${accelerometerValues["Scalar Value"].toFixed(
               3
-            )}μT`
+            )}μT`,
+            [
+              {
+                unit: "X (μT)",
+                value: magnetometerValues.X.toFixed(3)
+              },
+              {
+                unit: "Y (μT)",
+                value: magnetometerValues.Y.toFixed(3)
+              },
+              {
+                unit: "Z (μT)",
+                value: magnetometerValues.Z.toFixed(3)
+              }
+            ]
           );
         },
         error => {
@@ -867,7 +934,15 @@ export class InvestigationDetailsPageComponent {
               3
             )} °C [Amb], ${temperatureValues[
               "Target (IR) Temperature (C)"
-            ].toFixed(3)} °C [IR] `
+            ].toFixed(3)} °C [IR]`,
+            {
+              "°C [Amb]": temperatureValues["Ambient Temperature (C)"].toFixed(
+                3
+              ),
+              "°C [IR]": temperatureValues[
+                "Target (IR) Temperature (C)"
+              ].toFixed(3)
+            }
           );
 
           const temperatureChart = this.charts[temperatureChartId];
@@ -924,7 +999,17 @@ export class InvestigationDetailsPageComponent {
           this.updateSensorValue(
             device,
             barometerChartId,
-            `${pressureValue} hPa at ${tempValue} °C`
+            `${pressureValue} hPa at ${tempValue} °C`,
+            [
+              {
+                unit: "hPa",
+                value: pressureValue
+              },
+              {
+                unit: "°C",
+                value: tempValue
+              }
+            ]
           );
 
           const barometerChart = this.charts[barometerChartId];
@@ -1006,6 +1091,7 @@ export class InvestigationDetailsPageComponent {
     return loader;
   }
 
+  // Pick data from the sensor.rawValues
   saveGraphData() {
     const fields: string[] = ["A", "B"];
     const graphData: any = [];
@@ -1073,8 +1159,9 @@ export class InvestigationDetailsPageComponent {
   }
 
   // Save Grid data
+  // Pick data from the sensor.rawValues
   saveGridData() {
-    const fields: string[] = ["A", "B"];
+    const fields: string[] = ["A", "B", "C", "D", "E", "F", "G", "H"];
     const gridData: any = [];
 
     this.connectedDevices.map(device => {
@@ -1109,25 +1196,52 @@ export class InvestigationDetailsPageComponent {
           B: ""
         });
 
-        gridData.push({
-          A: "Grid",
-          B: "Value"
+        /**
+         * First collect all the units used
+         * Assign a header/field value to each unit
+         * Use the field value of the unit to push data into it
+         */
+        let unitMap = {};
+        let fieldMap = {};
+        sensor.config.grids.map((grid, i) => {
+          if (!!grid.rawValue && !!grid.rawValue[device.id]) {
+            const rawValueMap = grid.rawValue[device.id];
+
+            _.keys(rawValueMap).map((rawValueKey, i) => {
+              if (!unitMap[rawValueKey]) {
+                unitMap[rawValueKey] = {};
+              }
+
+              unitMap[rawValueKey] = fields[i];
+              fieldMap[fields[i]] = rawValueKey;
+            });
+          }
         });
 
+        gridData.push(fieldMap);
+
         sensor.config.grids.map((grid, i) => {
-          if (!grid.value) {
-            return;
-          }
-          if (grid.deviceId === device.id) {
-            gridData.push({
-              A: i + 1,
-              B: grid.value
+          if (!!grid.rawValue && !!grid.rawValue[device.id]) {
+            const rawValueMap = grid.rawValue[device.id];
+            let modifiedRawValueMap = {};
+
+            _.keys(rawValueMap).map(rawValueKey => {
+              if (!modifiedRawValueMap[unitMap[rawValueKey]]) {
+                modifiedRawValueMap[unitMap[rawValueKey]] = {};
+              }
+              modifiedRawValueMap[unitMap[rawValueKey]] =
+                rawValueMap[rawValueKey];
             });
+
+            console.log(rawValueMap);
+            console.log(modifiedRawValueMap);
+            gridData.push(modifiedRawValueMap);
           }
         });
       });
     });
 
+    console.log(gridData);
     this.saveDataToFile(fields, gridData);
   }
 

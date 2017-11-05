@@ -1,5 +1,4 @@
 ion-content {
-
   .sensor-display {
     padding-bottom: 50px;
     ion-item {
@@ -15,10 +14,10 @@ ion-content {
     }
 
     .grid {
-      min-height: 125px;
-        min-width: 30vw !important;
-        max-width: 30vw !important;
-        width: 50vw;
+      // min-height: 125px;
+      //   min-width: 30vw !important;
+      //   max-width: 30vw !important;
+      //   width: 50vw;
 
       .grid-data {
         display: flex;
@@ -31,8 +30,6 @@ ion-content {
 
         color: #000;
         background: #32db64;
-
-        font-weight: 600;
 
         padding: 10px;
       }
