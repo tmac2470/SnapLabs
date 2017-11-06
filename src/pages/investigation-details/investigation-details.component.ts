@@ -480,23 +480,18 @@ export class InvestigationDetailsPageComponent {
     });
   }
 
-  private addData(chart: any, label: string, data: any) {
-    if (typeof data === "string" || typeof data === "number") {
-      chart.data.labels.push({
-        deviceId: label,
-        data: data,
-        key: chart.data.datasets[0].label
-      });
+  private addData(chart: any, label: string, data: any, dataValueMap: any) {
+    chart.data.labels.push({
+      deviceId: label,
+      dataValueMap: dataValueMap,
+      key: chart.data.datasets[0].label
+    });
 
+    if (typeof data === "string" || typeof data === "number") {
       chart.data.datasets.forEach(dataset => {
         dataset.data.push(data);
       });
     } else {
-      chart.data.labels.push({
-        deviceId: label,
-        data: data
-      });
-
       chart.data.datasets.forEach(dataset => {
         _.keys(data).map(key => {
           if (key == dataset.label) {
@@ -510,9 +505,9 @@ export class InvestigationDetailsPageComponent {
   }
 
   // Draw graphs
-  drawGraphs(deviceId: string, chart: any, value: any) {
+  drawGraphs(deviceId: string, chart: any, value: any, dataValueMap: any) {
     if (this.graphsStarted && chart) {
-      this.addData(chart, deviceId, value);
+      this.addData(chart, deviceId, value, dataValueMap);
     }
   }
 
@@ -609,7 +604,9 @@ export class InvestigationDetailsPageComponent {
 
           const luxometerChart = this.charts[luxometerChartId];
 
-          this.drawGraphs(device.id, luxometerChart, luxValue);
+          this.drawGraphs(device.id, luxometerChart, luxValue, {
+            lux: luxValue
+          });
         },
         error => {
           this._toastService.present({
@@ -665,21 +662,18 @@ export class InvestigationDetailsPageComponent {
             `${humidityValues.RH.toFixed(
               3
             )}% RH at ${humidityValues.TEMP.toFixed(3)} °C`,
-            [
-              {
-                unit: "% RH",
-                value: humidityValues.RH.toFixed(3)
-              },
-              {
-                unit: "°C",
-                value: humidityValues.TEMP.toFixed(3)
-              }
-            ]
+            {
+              "% RH": humidityValues.RH.toFixed(3),
+              "°C": humidityValues.TEMP.toFixed(3)
+            }
           );
 
           const humidityChart = this.charts[humidityChartId];
 
-          this.drawGraphs(device.id, humidityChart, humidityValues.RH);
+          this.drawGraphs(device.id, humidityChart, humidityValues.RH, {
+            "% RH": humidityValues.RH.toFixed(3),
+            "°C": humidityValues.TEMP.toFixed(3)
+          });
         },
         error => {
           this._toastService.present({
@@ -783,9 +777,23 @@ export class InvestigationDetailsPageComponent {
           const gyroscopeChart = this.charts[gyroscopeChartId];
           const magnetometerChart = this.charts[magnetometerChartId];
 
-          this.drawGraphs(device.id, accelerometerChart, accelerometerValues);
-          this.drawGraphs(device.id, gyroscopeChart, gyroscopeValues);
-          this.drawGraphs(device.id, magnetometerChart, magnetometerValues);
+          this.drawGraphs(device.id, accelerometerChart, accelerometerValues, {
+            X: accelerometerValues.X.toFixed(3),
+            Y: accelerometerValues.Y.toFixed(3),
+            Z: accelerometerValues.Z.toFixed(3),
+            "Scalar Value": accelerometerValues["Scalar Value"].toFixed(3)
+          });
+          this.drawGraphs(device.id, gyroscopeChart, gyroscopeValues, {
+            X: gyroscopeValues.X.toFixed(3),
+            Y: gyroscopeValues.Y.toFixed(3),
+            Z: gyroscopeValues.Z.toFixed(3)
+          });
+          this.drawGraphs(device.id, magnetometerChart, magnetometerValues, {
+            X: magnetometerValues.X.toFixed(3),
+            Y: magnetometerValues.Y.toFixed(3),
+            Z: magnetometerValues.Z.toFixed(3),
+            "Scalar Value": magnetometerValues["Scalar Value"].toFixed(3)
+          });
 
           this.updateSensorValue(
             device,
@@ -795,20 +803,11 @@ export class InvestigationDetailsPageComponent {
             )}, Y : ${gyroscopeValues.Y.toFixed(
               3
             )}, Z : ${gyroscopeValues.Z.toFixed(3)}`,
-            [
-              {
-                unit: "X",
-                value: gyroscopeValues.X.toFixed(3)
-              },
-              {
-                unit: "Y",
-                value: gyroscopeValues.Y.toFixed(3)
-              },
-              {
-                unit: "Z",
-                value: gyroscopeValues.Z.toFixed(3)
-              }
-            ]
+            {
+              X: gyroscopeValues.X.toFixed(3),
+              Y: gyroscopeValues.Y.toFixed(3),
+              Z: gyroscopeValues.Z.toFixed(3)
+            }
           );
           this.updateSensorValue(
             device,
@@ -822,20 +821,12 @@ export class InvestigationDetailsPageComponent {
             )}G, Scalar Value : ${accelerometerValues["Scalar Value"].toFixed(
               3
             )}G`,
-            [
-              {
-                unit: "X (G)",
-                value: accelerometerValues.X.toFixed(3)
-              },
-              {
-                unit: "Y (G)",
-                value: accelerometerValues.Y.toFixed(3)
-              },
-              {
-                unit: "Z (G)",
-                value: accelerometerValues.Z.toFixed(3)
-              }
-            ]
+            {
+              X: accelerometerValues.X.toFixed(3),
+              Y: accelerometerValues.Y.toFixed(3),
+              Z: accelerometerValues.Z.toFixed(3),
+              "Scalar Value": accelerometerValues["Scalar Value"].toFixed(3)
+            }
           );
           this.updateSensorValue(
             device,
@@ -846,23 +837,15 @@ export class InvestigationDetailsPageComponent {
               3
             )}μT, Z : ${magnetometerValues.Z.toFixed(
               3
-            )}μT, Scalar Value : ${accelerometerValues["Scalar Value"].toFixed(
+            )}μT, Scalar Value : ${magnetometerValues["Scalar Value"].toFixed(
               3
             )}μT`,
-            [
-              {
-                unit: "X (μT)",
-                value: magnetometerValues.X.toFixed(3)
-              },
-              {
-                unit: "Y (μT)",
-                value: magnetometerValues.Y.toFixed(3)
-              },
-              {
-                unit: "Z (μT)",
-                value: magnetometerValues.Z.toFixed(3)
-              }
-            ]
+            {
+              X: magnetometerValues.X.toFixed(3),
+              Y: magnetometerValues.Y.toFixed(3),
+              Z: magnetometerValues.Z.toFixed(3),
+              "Scalar Value": magnetometerValues["Scalar Value"].toFixed(3)
+            }
           );
         },
         error => {
@@ -936,10 +919,10 @@ export class InvestigationDetailsPageComponent {
               "Target (IR) Temperature (C)"
             ].toFixed(3)} °C [IR]`,
             {
-              "°C [Amb]": temperatureValues["Ambient Temperature (C)"].toFixed(
-                3
-              ),
-              "°C [IR]": temperatureValues[
+              "Ambient Temperature (°C)": temperatureValues[
+                "Ambient Temperature (C)"
+              ].toFixed(3),
+              "Target (IR) Temperature (°C)": temperatureValues[
                 "Target (IR) Temperature (C)"
               ].toFixed(3)
             }
@@ -947,7 +930,14 @@ export class InvestigationDetailsPageComponent {
 
           const temperatureChart = this.charts[temperatureChartId];
 
-          this.drawGraphs(device.id, temperatureChart, temperatureValues);
+          this.drawGraphs(device.id, temperatureChart, temperatureValues, {
+            "Ambient Temperature (°C)": temperatureValues[
+              "Ambient Temperature (C)"
+            ].toFixed(3),
+            "Target (IR) Temperature (°C)": temperatureValues[
+              "Target (IR) Temperature (C)"
+            ].toFixed(3)
+          });
         },
         error => {
           this._toastService.present({
@@ -1000,21 +990,18 @@ export class InvestigationDetailsPageComponent {
             device,
             barometerChartId,
             `${pressureValue} hPa at ${tempValue} °C`,
-            [
-              {
-                unit: "hPa",
-                value: pressureValue
-              },
-              {
-                unit: "°C",
-                value: tempValue
-              }
-            ]
+            {
+              hPa: pressureValue,
+              "°C": tempValue
+            }
           );
 
           const barometerChart = this.charts[barometerChartId];
 
-          this.drawGraphs(device.id, barometerChart, pressureValue);
+          this.drawGraphs(device.id, barometerChart, pressureValue, {
+            hPa: pressureValue,
+            "°C": tempValue
+          });
         },
         error => {
           this._toastService.present({
@@ -1093,9 +1080,8 @@ export class InvestigationDetailsPageComponent {
 
   // Pick data from the sensor.rawValues
   saveGraphData() {
-    const fields: string[] = ["A", "B"];
+    const fields: string[] = ["A", "B", "C", "D", "E", "F", "G", "H"];
     const graphData: any = [];
-
     this.connectedDevices.map(device => {
       graphData.push({
         A: "",
@@ -1127,29 +1113,41 @@ export class InvestigationDetailsPageComponent {
           A: "",
           B: ""
         });
-        graphData.push({
-          A: "label",
-          B: "Value"
-        });
+
+        /**
+            * First collect all the units used
+            * Assign a header/field value to each unit
+            * Use the field value of the unit to push data into it
+            */
+        let unitMap = {};
+        let fieldMap = {};
 
         this.charts[chartId].data.labels.map(label => {
           if (device.id === label.deviceId) {
-            if (
-              typeof label.data === "string" ||
-              typeof label.data === "number"
-            ) {
-              graphData.push({
-                A: label.key,
-                B: label.data
-              });
-            } else {
-              _.keys(label.data).map(key => {
-                graphData.push({
-                  A: key,
-                  B: label.data[key]
-                });
-              });
-            }
+            _.keys(label.dataValueMap).map((dataValueKey, i) => {
+              if (!unitMap[dataValueKey]) {
+                unitMap[dataValueKey] = {};
+              }
+              unitMap[dataValueKey] = fields[i];
+              fieldMap[fields[i]] = dataValueKey;
+            });
+          }
+        });
+        graphData.push(fieldMap);
+
+        this.charts[chartId].data.labels.map(label => {
+          if (device.id === label.deviceId) {
+            let modifiedDataValueMap = {};
+
+            _.keys(label.dataValueMap).map(dataValueKey => {
+              if (!modifiedDataValueMap[unitMap[dataValueKey]]) {
+                modifiedDataValueMap[unitMap[dataValueKey]] = {};
+              }
+              modifiedDataValueMap[unitMap[dataValueKey]] =
+                label.dataValueMap[dataValueKey];
+            });
+
+            graphData.push(modifiedDataValueMap);
           }
         });
       });
@@ -1233,15 +1231,12 @@ export class InvestigationDetailsPageComponent {
                 rawValueMap[rawValueKey];
             });
 
-            console.log(rawValueMap);
-            console.log(modifiedRawValueMap);
             gridData.push(modifiedRawValueMap);
           }
         });
       });
     });
 
-    console.log(gridData);
     this.saveDataToFile(fields, gridData);
   }
 
