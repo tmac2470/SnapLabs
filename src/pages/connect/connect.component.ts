@@ -187,6 +187,10 @@ export class ConnectPageComponent implements OnDestroy {
           message: "Unable to get device's battery status!",
           duration: 3000
         });
+
+        setTimeout(() => {
+          this.startScanning();
+        }, 500);
       });
   }
 

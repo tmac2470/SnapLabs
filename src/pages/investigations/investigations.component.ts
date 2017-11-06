@@ -8,6 +8,7 @@ import { InvestigationDetailsPageComponent } from "../investigation-details";
 import { InvestigationsService } from "./investigations.service";
 import { Investigation } from "../investigation-details";
 import { DownloadInvestigationsService } from "../download-investigations";
+import { ConnectPageComponent } from "../connect";
 
 class SortInvestigations {
   static NAME = "labTitle";
@@ -19,6 +20,7 @@ class SortInvestigations {
   styles: ["./investigations.styles.scss"]
 })
 export class InvestigationsPageComponent {
+  connectPageComponent = ConnectPageComponent;
   sortOrderInvestigations: string = SortInvestigations.NAME;
   localInvestigationFiles = [
     "Balloon_Pressure_Investigation.json",
@@ -79,5 +81,10 @@ export class InvestigationsPageComponent {
     this._navCtrl.push(InvestigationDetailsPageComponent, {
       investigation: investigation
     });
+  }
+
+  // Helper to open a given page
+  openPage(page: any) {
+    this._navCtrl.push(page);
   }
 }

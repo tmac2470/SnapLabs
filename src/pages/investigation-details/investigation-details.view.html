@@ -1,21 +1,13 @@
 <ion-header>
   <ion-navbar>
-    <ion-title>
-      {{ investigation.name }}
+    <ion-title text-wrap>
+      {{ investigation.labTitle }}
     </ion-title>
-
-    <ion-buttons end>
-      <button ion-button outline (click)="openPage(connectPageComponent)">Sensor tag</button>
-    </ion-buttons>
   </ion-navbar>
 </ion-header>
 
 <ion-content>
   <ion-list inset no-lines>
-    <ion-item text-wrap>
-      <h1 text-center>{{ investigation.labTitle }}</h1>
-    </ion-item>
-
     <ion-item>
       <h5>
         Status:

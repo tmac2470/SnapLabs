@@ -8,7 +8,7 @@ import { NavParams, NavController, LoadingController } from "ionic-angular";
 import * as _ from "lodash";
 import { Chart } from "chart.js";
 // SnapApp
-import { ConnectPageComponent, ConnectService } from "../connect";
+import { ConnectService } from "../connect";
 import { ToastService, FileService } from "../core/service";
 import {
   Investigation,
@@ -24,7 +24,6 @@ import * as SERVICES from "../connect/connect.config";
   styles: ["./investigation-details.styles.scss"]
 })
 export class InvestigationDetailsPageComponent {
-  connectPageComponent = ConnectPageComponent;
   investigation: Investigation;
   sensors: any[] = [];
   connectedDevices: any[] = [];
