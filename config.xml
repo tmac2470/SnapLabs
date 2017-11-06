@@ -1,8 +1,8 @@
 <?xml version='1.0' encoding='utf-8'?>
-<widget id="io.ionic.starter" version="1.1.0" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
+<widget id="io.ionic.starter" version="2.0.0" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
     <name>SnapLabs App</name>
     <description>TI Sensor Tag Application</description>
-    <content original-src="index.html" src="http://10.0.0.81:8100" />
+    <content src="index.html" />
     <access origin="*" />
     <allow-navigation href="http://ionic.local/*" />
     <allow-navigation href="http://192.168.1.10:8100" />
@@ -82,7 +82,6 @@
     <allow-navigation href="http://192.168.2.91:8100" />
     <allow-navigation href="http://10.0.0.82:8100" />
     <allow-navigation href="http://10.0.0.81:8100" />
-    <allow-navigation href="http://169.254.212.92:8100" />
     <engine name="android" spec="^6.2.3" />
     <engine name="ios" spec="^4.4.0" />
     <plugin name="cordova-plugin-ble-central" spec="^1.1.4" />
@@ -95,4 +94,5 @@
     <plugin name="cordova-plugin-whitelist" spec="^1.3.1" />
     <plugin name="cordova-plugin-x-socialsharing" spec="^5.2.1" />
     <plugin name="ionic-plugin-keyboard" spec="^2.2.1" />
+    <allow-navigation href="http://169.254.212.92:8100" />
 </widget>
