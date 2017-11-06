@@ -184,8 +184,13 @@ export class ConnectPageComponent implements OnDestroy {
       })
       .catch(err => {
         this._toastService.present({
-          message: "Unable to get device's battery status!",
+          message: "Unable to reach device " + device.id,
           duration: 3000
+        });
+
+        // Filter out the disconnected device
+        this.connectedDevices = this.connectedDevices.filter(d => {
+          return d.id !== device.id;
         });
 
         setTimeout(() => {
@@ -206,10 +211,18 @@ export class ConnectPageComponent implements OnDestroy {
         },
         error => {
           this._toastService.present({
-            message:
-              "Unable to detect device! Please retry bluetooth connection.",
+            message: "Unable to reach device " + device.id,
             duration: 3000
           });
+
+          // Filter out the disconnected device
+          this.connectedDevices = this.connectedDevices.filter(d => {
+            return d.id !== device.id;
+          });
+
+          setTimeout(() => {
+            this.startScanning();
+          }, 500);
         }
       );
 
@@ -229,9 +242,15 @@ export class ConnectPageComponent implements OnDestroy {
       },
       error => {
         this._toastService.present({
-          message: "Unable to connect to device. Please retry!",
+          message: "Unable to reach device " + device.id,
           duration: 3000
         });
+
+        // Filter out the disconnected device
+        this.connectedDevices = this.connectedDevices.filter(d => {
+          return d.id !== device.id;
+        });
+
         loading.dismiss();
         setTimeout(() => {
           this.startScanning();
