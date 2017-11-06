@@ -161,6 +161,10 @@ export class InvestigationDetailsPageComponent {
 
   // Capture data for grid
   captureData(grid: any, deviceId: string, sensor: any) {
+    if (!sensor.value || !sensor.value[deviceId]) {
+      return;
+    }
+
     if (!grid.value) {
       grid.value = {};
     }
@@ -177,35 +181,39 @@ export class InvestigationDetailsPageComponent {
     this.cdRef.detectChanges();
   }
 
-  captureDeviceDataForGrid() {
+  captureDeviceDataForGrid(currentGrid: any = {}, currentSensor: any = {}) {
     this.connectedDevices.map(device => {
-      this.sensors.map(sensor => {
-        if (sensor.value) {
-          let grids = [];
-          grids = sensor.config.grids;
-          if (!grids) {
-            return;
-          }
-          // Filter out the grids who've had values from all the devices
-          grids = grids.filter(grid => {
-            const keys = _.keys(grid.value);
-            if (
-              keys &&
-              keys.length &&
-              keys.length >= this.connectedDevices.length
-            ) {
-              return false;
-            } else {
-              return true;
+      if (currentGrid && currentGrid.id && currentSensor && currentSensor) {
+        this.captureData(currentGrid, device.id, currentSensor);
+      } else {
+        this.sensors.map(sensor => {
+          if (sensor.value) {
+            let grids = [];
+            grids = sensor.config.grids;
+            if (!grids) {
+              return;
             }
-            // return !grid.value;
-          });
+            // Filter out the grids who've had values from all the devices
+            grids = grids.filter(grid => {
+              const keys = _.keys(grid.value);
+              if (
+                keys &&
+                keys.length &&
+                keys.length >= this.connectedDevices.length
+              ) {
+                return false;
+              } else {
+                return true;
+              }
+              // return !grid.value;
+            });
 
-          if (grids.length > 0) {
-            this.captureData(grids[0], device.id, sensor);
+            if (grids.length > 0) {
+              this.captureData(grids[0], device.id, sensor);
+            }
           }
-        }
-      });
+        });
+      }
     });
   }
 
