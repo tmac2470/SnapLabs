@@ -18,10 +18,6 @@
       <div *ngFor="let device of connectedDevices">
         <h5 *ngIf="device?.id">Sensor tag: {{ device.id }}</h5>
       </div>
-
-      <button *ngIf="!connectedDevices?.length" margin-top ion-button color="secondary" full no-margin (click)="openPage(connectPageComponent)">
-        Connect to sensor tag
-      </button>
     </ion-item>
   </ion-list>
 
