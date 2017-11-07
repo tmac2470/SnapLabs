@@ -27,7 +27,8 @@ export class InvestigationsPageComponent {
     "Classroom_Heat_and_Light_Investigation.json",
     "Investigating_the_SensorTags.json",
     "Magnetic_Mining_Investigation.json",
-    "Rocket_Acceleration_Investigation.json"
+    "Rocket_Acceleration_Investigation.json",
+    "Thermal_Conductivity.json"
   ];
 
   investigations: Investigation[] = [];
