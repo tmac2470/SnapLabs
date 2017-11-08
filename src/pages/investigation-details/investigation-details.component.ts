@@ -465,12 +465,14 @@ export class InvestigationDetailsPageComponent {
   resetGraphs() {
     this.stopGraphs();
 
-    _.keys(this.charts).map(chartId => {
+    _.keys(this.charts).forEach(chartId => {
       this.charts[chartId].reset();
       this.charts[chartId].clear();
       this.charts[chartId].data.datasets.forEach(dataset => {
         dataset.data = [];
       });
+      // Also delete labels to reset the data completely
+      this.charts[chartId].data.labels = [];
     });
   }
 
