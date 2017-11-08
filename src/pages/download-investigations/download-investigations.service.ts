@@ -23,6 +23,64 @@ export class DownloadInvestigationsService {
     });
   }
 
+  private sanitiseInvestigations(investigations: any[]): any[] {
+    return investigations.filter(i => {
+      return !!i && !!i.labTitle;
+    });
+  }
+
+  private _updateInvestigation(investigation: any): Observable<any> {
+    return this.getLocalInvestigations().mergeMap(investigations => {
+      if (!investigations) {
+        investigations = [];
+      }
+
+      // Sanitise investigations
+      let sanitisedInvestigations = this.sanitiseInvestigations(investigations);
+
+      // First remove the old copy of investigation
+      investigations = sanitisedInvestigations.filter(i => {
+        return i._id !== investigation._id;
+      });
+
+      // Now push the new copy
+      investigations.push(investigation);
+
+      const promise = this._storageService.storage.set(
+        StorageKey.INVESTIGATIONS_STORE,
+        investigations
+      );
+      return Observable.fromPromise(promise);
+    });
+  }
+
+  updateInvestigation(id: string): Observable<any> {
+    return this.getInvestigation(id).mergeMap(investigation => {
+      return this._updateInvestigation(investigation);
+    });
+  }
+
+  deleteInvestigation(id: string): Observable<any> {
+    return this.getLocalInvestigations().mergeMap(investigations => {
+      if (!investigations) {
+        investigations = [];
+      }
+
+      // Sanitise investigations
+      let sanitisedInvestigations = this.sanitiseInvestigations(investigations);
+
+      investigations = sanitisedInvestigations.filter(i => {
+        return i._id !== id;
+      });
+
+      const promise = this._storageService.storage.set(
+        StorageKey.INVESTIGATIONS_STORE,
+        investigations
+      );
+      return Observable.fromPromise(promise);
+    });
+  }
+
   getInvestigation(id: string): Observable<any> {
     return this._http.get(`${this.API_PATH_EXPERIMENTS}/${id}`);
   }
@@ -41,9 +99,12 @@ export class DownloadInvestigationsService {
       }
       investigations.push(investigation);
 
+      // Sanitise investigations
+      let sanitisedInvestigations = this.sanitiseInvestigations(investigations);
+
       const promise = this._storageService.storage.set(
         StorageKey.INVESTIGATIONS_STORE,
-        investigations
+        sanitisedInvestigations
       );
       return Observable.fromPromise(promise);
     });

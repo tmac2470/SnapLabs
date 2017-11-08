@@ -10,9 +10,9 @@
   <h5 padding>Select an investigation</h5>
 
   <ion-list *ngIf="investigations?.length>0">
-    <ion-item *ngFor="let investigation of investigations | snOrderBy: sortOrderInvestigations" detail-push (click)="openInvestigationDetails(investigation)">
-      {{ investigation.labTitle }}
-    </ion-item>
+    <button ion-item text-wrap *ngFor="let investigation of investigations" (click)="openInvestigationOptions(investigation)">
+      {{ investigation ? investigation.labTitle : "lol" }}
+    </button>
   </ion-list>
 </ion-content>
 
