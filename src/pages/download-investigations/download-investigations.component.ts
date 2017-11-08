@@ -210,6 +210,38 @@ export class DownloadInvestigationsPageComponent {
       });
   }
 
+  updateInvestigation(investigation: any) {
+    const loading = this.loading();
+    this._downloadInvestigationsService
+      .updateInvestigation(investigation._id)
+      .subscribe(_ => {
+        this._toastService.present({
+          message: "Investigation details successfully updated!",
+          duration: 3000
+        });
+        loading.dismiss();
+      });
+  }
+
+  deleteInvestigation(investigation: any) {
+    const loading = this.loading();
+
+    this._downloadInvestigationsService
+      .deleteInvestigation(investigation._id)
+      .subscribe(_ => {
+        this._toastService.present({
+          message: "Investigation deleted!",
+          duration: 3000
+        });
+
+        this.localInvestigations = this.localInvestigations.filter(i => {
+          return i._id !== investigation._id;
+        });
+
+        loading.dismiss();
+      });
+  }
+
   // Helper to open a given investigation details page
   openInvestigationDetails(investigation: Investigation) {
     this._downloadInvestigationsService

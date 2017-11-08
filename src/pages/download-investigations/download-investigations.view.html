@@ -35,6 +35,9 @@
         <br>
         <button ion-button color="secondary" full (click)="downloadInvestigation(investigation)" *ngIf="!isInvestigationLocal(investigation)">Download</button>
         <button ion-button color="primary" full (click)="openInvestigationDetails(investigation)" *ngIf="isInvestigationLocal(investigation)">Open</button>
+        <button ion-button color="secondary" full (click)="updateInvestigation(investigation)" *ngIf="isInvestigationLocal(investigation)">Update</button>
+        <br>
+        <button ion-button color="danger" full (click)="deleteInvestigation(investigation)" *ngIf="isInvestigationLocal(investigation)">Delete</button>
       </div>
     </ion-item>
   </ion-list>
