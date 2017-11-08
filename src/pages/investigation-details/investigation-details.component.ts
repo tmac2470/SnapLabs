@@ -47,6 +47,10 @@ export class InvestigationDetailsPageComponent {
   };
 
   mapOptions = {
+    title: {
+      display: true,
+      text: "Graph"
+    },
     scales: {
       yAxes: [
         {
@@ -128,7 +132,7 @@ export class InvestigationDetailsPageComponent {
       this.display.graph = true;
       const chartId = `${sensor.name}`;
       const ctx = document.getElementById(chartId);
-      this.charts[chartId] = this.getChartType(chartId, ctx);
+      this.charts[chartId] = this.getChartType(chartId, ctx, sensor);
     }
   }
 
@@ -324,23 +328,61 @@ export class InvestigationDetailsPageComponent {
    *
    */
 
-  private getChartDatasets(chart: string): Array<any> {
+  private getChartDatasets(chart: string, sensor: any): Array<any> {
     const mapDataSetConfig = this.mapDataSetConfig;
+    const sensorParams = sensor.config.parameters;
+
+    const xyzDataSet = [
+      {
+        mapDataSetConfig,
+        borderColor: ColorCode.RED,
+        label: "X"
+      },
+      {
+        mapDataSetConfig,
+        borderColor: ColorCode.BLUE,
+        label: "Y"
+      },
+      {
+        mapDataSetConfig,
+        borderColor: ColorCode.GREEN,
+        label: "Z"
+      }
+    ];
+
+    const scalarDataSet = [
+      {
+        mapDataSetConfig,
+        borderColor: ColorCode.BLACK,
+        label: "Scalar Value"
+      }
+    ];
 
     switch (chart.toLowerCase()) {
       case "temperature":
-        return [
-          {
-            mapDataSetConfig,
-            borderColor: ColorCode.RED,
-            label: "Ambient Temperature (C)"
-          },
-          {
-            mapDataSetConfig,
-            borderColor: ColorCode.GREEN,
-            label: "Target (IR) Temperature (C)"
-          }
-        ];
+        let tempDataSets = [];
+
+        let ambientDataSet = {
+          mapDataSetConfig,
+          borderColor: ColorCode.RED,
+          label: "Ambient Temperature (C)"
+        };
+
+        let irDataSet = {
+          mapDataSetConfig,
+          borderColor: ColorCode.GREEN,
+          label: "Target (IR) Temperature (C)"
+        };
+
+        if (sensorParams.ambient) {
+          tempDataSets.push(ambientDataSet);
+        }
+
+        if (sensorParams.IR) {
+          tempDataSets.push(irDataSet);
+        }
+
+        return tempDataSets;
 
       case "barometer":
         return [
@@ -360,72 +402,24 @@ export class InvestigationDetailsPageComponent {
           }
         ];
 
-      case "magnetometer":
-        return [
-          {
-            mapDataSetConfig,
-            borderColor: ColorCode.RED,
-            label: "X"
-          },
-          {
-            mapDataSetConfig,
-            borderColor: ColorCode.BLUE,
-            label: "Y"
-          },
-          {
-            mapDataSetConfig,
-            borderColor: ColorCode.GREEN,
-            label: "Z"
-          },
-          {
-            mapDataSetConfig,
-            borderColor: ColorCode.BLACK,
-            label: "Scalar Value"
-          }
-        ];
-
-      case "gyroscope":
-        return [
-          {
-            mapDataSetConfig,
-            borderColor: ColorCode.RED,
-            label: "X"
-          },
-          {
-            mapDataSetConfig,
-            borderColor: ColorCode.BLUE,
-            label: "Y"
-          },
-          {
-            mapDataSetConfig,
-            borderColor: ColorCode.GREEN,
-            label: "Z"
-          }
-        ];
-
+      // Accelerometer and magnetometer share similar data set config
       case "accelerometer":
-        return [
-          {
-            mapDataSetConfig,
-            borderColor: ColorCode.RED,
-            label: "X"
-          },
-          {
-            mapDataSetConfig,
-            borderColor: ColorCode.BLUE,
-            label: "Y"
-          },
-          {
-            mapDataSetConfig,
-            borderColor: ColorCode.GREEN,
-            label: "Z"
-          },
-          {
-            mapDataSetConfig,
-            borderColor: ColorCode.BLACK,
-            label: "Scalar Value"
-          }
-        ];
+      case "magnetometer":
+        let xyzScalarDataSet = [];
+
+        if (sensorParams.xyz) {
+          xyzScalarDataSet = xyzScalarDataSet.concat(xyzDataSet);
+        }
+
+        if (sensorParams.scalar) {
+          xyzScalarDataSet = xyzScalarDataSet.concat(scalarDataSet);
+        }
+
+        return xyzScalarDataSet;
+
+      // Gyroscope shares the same xyzDataSet
+      case "gyroscope":
+        return xyzDataSet;
 
       case "humidity":
         return [
@@ -438,7 +432,8 @@ export class InvestigationDetailsPageComponent {
     }
   }
 
-  private getChartType(chart: string, ctx: any) {
+  private getChartType(chart: string, ctx: any, sensor: any) {
+    this.mapOptions.title.text = sensor.config.graph.graphTitle;
     switch (chart.toLowerCase()) {
       case "accelerometer":
       case "barometer":
@@ -451,7 +446,7 @@ export class InvestigationDetailsPageComponent {
         return new Chart(ctx, {
           type: "line",
           data: {
-            datasets: this.getChartDatasets(chart)
+            datasets: this.getChartDatasets(chart, sensor)
           },
           options: this.mapOptions
         });
