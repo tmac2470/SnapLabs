@@ -8,6 +8,9 @@
 
 <ion-content>
   <ion-list inset no-lines>
+    <ion-item *ngIf="investigation.sampleInterval">
+      <h5>Sample Interval: {{ investigation.sampleInterval }}ms</h5>
+    </ion-item>
     <ion-item>
       <h5>
         Status:
