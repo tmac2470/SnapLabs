@@ -1,3 +1,5 @@
+// Other libraries
+import * as moment from "moment";
 // Angular
 import { Component, ChangeDetectorRef } from "@angular/core";
 import { Subscription } from "rxjs/Subscription";
@@ -175,9 +177,14 @@ export class InvestigationDetailsPageComponent {
       grid.value[deviceId] = {};
     }
 
-    // Attach the rawValues to the grid
-    grid.rawValue = sensor.rawValue;
+    if (!grid.rawValue) {
+      grid.rawValue = {};
+    }
+    if (!grid.rawValue[deviceId]) {
+      grid.rawValue[deviceId] = {};
+    }
 
+    grid.rawValue = sensor.rawValue;
     grid.value[deviceId] = {
       value: sensor.value[deviceId]
     };
@@ -508,10 +515,22 @@ export class InvestigationDetailsPageComponent {
     chart.update();
   }
 
+  addTimeStampValues(dataValueMap: any) {
+    const timestamp = new Date();
+    dataValueMap["Unix Timestamp"] = moment(timestamp).valueOf();
+    dataValueMap["Timestamp"] = moment(timestamp).format("d/MM/YYYY, hh:mm:ss:SSS");
+    return dataValueMap;
+  }
+
   // Draw graphs
   drawGraphs(deviceId: string, chart: any, value: any, dataValueMap: any) {
     if (this.graphsStarted && chart) {
-      this.addData(chart, deviceId, value, dataValueMap);
+      this.addData(
+        chart,
+        deviceId,
+        value,
+        this.addTimeStampValues(dataValueMap)
+      );
     }
   }
 
@@ -572,7 +591,7 @@ export class InvestigationDetailsPageComponent {
         if (!sensor.rawValue) {
           sensor.rawValue = {};
         }
-
+        dataValueMap = this.addTimeStampValues(dataValueMap);
         sensor.value[device.id] = value;
         sensor.rawValue[device.id] = dataValueMap;
         this.cdRef.detectChanges();
@@ -1086,6 +1105,11 @@ export class InvestigationDetailsPageComponent {
   saveGraphData() {
     const fields: string[] = ["A", "B", "C", "D", "E", "F", "G", "H"];
     const graphData: any = [];
+    graphData.push({
+      A: "Sample Interval(ms)",
+      B: this.sampleIntervalTime
+    });
+
     this.connectedDevices.map(device => {
       graphData.push({
         A: "",
@@ -1156,7 +1180,6 @@ export class InvestigationDetailsPageComponent {
         });
       });
     });
-
     this.saveDataToFile(fields, graphData);
   }
 
@@ -1165,6 +1188,11 @@ export class InvestigationDetailsPageComponent {
   saveGridData() {
     const fields: string[] = ["A", "B", "C", "D", "E", "F", "G", "H"];
     const gridData: any = [];
+
+    gridData.push({
+      A: "Sample Interval(ms)",
+      B: this.sampleIntervalTime
+    });
 
     this.connectedDevices.map(device => {
       gridData.push({

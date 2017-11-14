@@ -2,7 +2,7 @@
 <widget id="io.ionic.starter" version="2.0.0" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
     <name>SnapLabs App</name>
     <description>TI Sensor Tag Application</description>
-    <content src="index.html" />
+    <content original-src="index.html" src="http://10.0.0.82:8100" />
     <access origin="*" />
     <allow-navigation href="http://ionic.local/*" />
     <allow-navigation href="http://192.168.1.10:8100" />
