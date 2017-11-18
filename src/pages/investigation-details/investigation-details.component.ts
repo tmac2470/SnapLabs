@@ -122,19 +122,20 @@ export class InvestigationDetailsPageComponent {
   }
 
   ionViewDidEnter() {
+    // Only initialise grids
+    // Graphs would be initialised per device
     this.sensors.forEach(sensorTag => {
-      this.initialiseChart(sensorTag);
       this.initialiseGrid(sensorTag);
     });
   }
 
   // Other methods
-  private initialiseChart(sensor) {
+  private initialiseChart(sensor: any, deviceId: string) {
     if (!!sensor.config.graph.display || !!sensor.config.graph.graphdisplay) {
       this.display.graph = true;
       const chartId = `${sensor.name}`;
       const ctx = document.getElementById(chartId);
-      this.charts[chartId] = this.getChartType(chartId, ctx, sensor);
+      this.charts[chartId] = this.getChartType(chartId, ctx, sensor, deviceId);
     }
   }
 
@@ -257,7 +258,7 @@ export class InvestigationDetailsPageComponent {
     this.subscriptions.push(subscription);
   }
 
-  private getConnectedDevices(): Promise<any> {
+  private onConnectedDevices(): Promise<any> {
     return this._connectService.getLastDevices().then(devices => {
       this.connectedDevices = devices;
 
@@ -265,6 +266,15 @@ export class InvestigationDetailsPageComponent {
         this.startNotifications(device);
         // Start the capture on click
         this.captureOnClick(device);
+
+        // Lifecycle issue here.
+        // This is getting called even before the graph's canvas can
+        // be drawn on the UI
+        setTimeout(() => {
+          this.sensors.map(sensorTag => {
+            this.initialiseChart(sensorTag, device.id);
+          });
+        }, 1500);
       });
     });
   }
@@ -277,7 +287,7 @@ export class InvestigationDetailsPageComponent {
       .isBluetoothEnabled()
       .then(connected => {
         this._connectService.getConnectedDevices().then(_ => {
-          this.getConnectedDevices();
+          this.onConnectedDevices();
         });
       })
       .catch(error => {
@@ -442,7 +452,10 @@ export class InvestigationDetailsPageComponent {
     }
   }
 
-  private getChartType(chart: string, ctx: any, sensor: any) {
+  private getChartType(chart: string, ctx: any, sensor: any, deviceId: string) {
+    if (!ctx || !chart) {
+      return;
+    }
     this.mapOptions.title.text = sensor.config.graph.graphTitle;
     switch (chart.toLowerCase()) {
       case "accelerometer":
@@ -456,6 +469,7 @@ export class InvestigationDetailsPageComponent {
         return new Chart(ctx, {
           type: "line",
           data: {
+            deviceId,
             datasets: this.getChartDatasets(chart, sensor)
           },
           options: this.mapOptions
@@ -494,9 +508,14 @@ export class InvestigationDetailsPageComponent {
     });
   }
 
-  private addData(chart: any, label: string, data: any, dataValueMap: any) {
+  // Add data to the graph corresponding to the deviceId
+  private addData(chart: any, deviceId: string, data: any, dataValueMap: any) {
+    if (deviceId !== chart.data.deviceId) {
+      return;
+    }
+
     chart.data.labels.push({
-      deviceId: label,
+      deviceId: deviceId,
       dataValueMap: dataValueMap,
       key: chart.data.datasets[0].label
     });
