@@ -184,9 +184,12 @@ export class InvestigationDetailsPageComponent {
       grid.rawValue[deviceId] = {};
     }
 
-    grid.rawValue = sensor.rawValue;
+    const sensorValue = sensor.value[deviceId];
+    const sensorRawValue = sensor.rawValue[deviceId];
+    grid.rawValue[deviceId] = sensorRawValue;
+
     grid.value[deviceId] = {
-      value: sensor.value[deviceId]
+      value: sensorValue
     };
     this.cdRef.detectChanges();
   }
@@ -518,7 +521,9 @@ export class InvestigationDetailsPageComponent {
   addTimeStampValues(dataValueMap: any) {
     const timestamp = new Date();
     dataValueMap["Unix Timestamp"] = moment(timestamp).valueOf();
-    dataValueMap["Timestamp"] = moment(timestamp).format("d/MM/YYYY, hh:mm:ss:SSS");
+    dataValueMap["Timestamp"] = moment(timestamp).format(
+      "d/MM/YYYY, hh:mm:ss:SSS"
+    );
     return dataValueMap;
   }
 
@@ -1268,7 +1273,6 @@ export class InvestigationDetailsPageComponent {
         });
       });
     });
-
     this.saveDataToFile(fields, gridData);
   }
 
