@@ -11,7 +11,7 @@
 
   <ion-list *ngIf="investigations?.length>0">
     <button ion-item text-wrap *ngFor="let investigation of investigations" (click)="openInvestigationOptions(investigation)">
-      {{ investigation ? investigation.labTitle : "lol" }}
+      {{ investigation ? investigation.labTitle : "" }}
     </button>
   </ion-list>
 </ion-content>
