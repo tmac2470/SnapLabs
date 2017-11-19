@@ -3,6 +3,7 @@ import { Component } from "@angular/core";
 // Ionic
 import {
   ActionSheetController,
+  AlertController,
   LoadingController,
   ModalController,
   Platform
@@ -24,6 +25,7 @@ export class SavedFilesPageComponent {
 
   constructor(
     private _actionSheetController: ActionSheetController,
+    private _alertController: AlertController,
     private _loadingCtrl: LoadingController,
     private _toastService: ToastService,
     private _fileService: FileService,
@@ -84,6 +86,28 @@ export class SavedFilesPageComponent {
       });
   }
 
+  deleteFileConfirmation(file) {
+    let confirm = this._alertController.create({
+      title: "Delete file",
+      message: `Delete the file ${file.name} permanently?`,
+      buttons: [
+        {
+          text: "No",
+          handler: () => {
+            // Nothing
+          }
+        },
+        {
+          text: "Yes",
+          handler: () => {
+            this.deleteFile(file);
+          }
+        }
+      ]
+    });
+    confirm.present();
+  }
+
   deleteFile(file) {
     this._fileService
       .deleteFile(file.name)
@@ -120,7 +144,7 @@ export class SavedFilesPageComponent {
           text: "Delete",
           role: "destructive",
           icon: !this.platform.is("ios") ? "trash" : null,
-          handler: () => this.deleteFile(file)
+          handler: () => this.deleteFileConfirmation(file)
         },
         {
           text: "Cancel",
