@@ -80,7 +80,6 @@ export class ConnectPageComponent implements OnDestroy {
         this._connectService.getConnectedDevices().then(_ => {
           this.getConnectedDevices();
         });
-        this.startScanning();
       })
       .catch(error => {
         this.isBluetoothEnabled = false;
