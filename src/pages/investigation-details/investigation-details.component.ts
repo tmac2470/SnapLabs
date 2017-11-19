@@ -1,5 +1,6 @@
 // Other libraries
 import * as moment from "moment";
+import * as randomcolor from 'randomcolor';
 // Angular
 import { Component, ChangeDetectorRef } from "@angular/core";
 import { Subscription } from "rxjs/Subscription";
@@ -42,9 +43,9 @@ export class InvestigationDetailsPageComponent {
   mapDataSetConfig = {
     drawTicks: false,
     fill: false,
-    lineTension: 0.2,
+    lineTension: 0.1,
     data: [],
-    pointBorderWidth: 0.1,
+    pointBorderWidth: 0.01,
     backgroundColor: ColorCode.WHITE
   };
 
@@ -72,7 +73,10 @@ export class InvestigationDetailsPageComponent {
     },
     legend: {
       display: true,
-      position: "bottom"
+      position: "bottom",
+      labels: {
+        fontSize: 10
+      }
     },
     elements: {
       line: {
@@ -130,12 +134,15 @@ export class InvestigationDetailsPageComponent {
   }
 
   // Other methods
-  private initialiseChart(sensor: any, deviceId: string) {
+
+  // Initialise a chart only once.
+  // The datasets need to be configured per device though.
+  private initialiseChart(sensor: any, devices: any[]) {
     if (!!sensor.config.graph.display || !!sensor.config.graph.graphdisplay) {
       this.display.graph = true;
       const chartId = `${sensor.name}`;
       const ctx = document.getElementById(chartId);
-      this.charts[chartId] = this.getChartType(chartId, ctx, sensor, deviceId);
+      this.charts[chartId] = this.getChartType(chartId, ctx, sensor, devices);
     }
   }
 
@@ -266,15 +273,10 @@ export class InvestigationDetailsPageComponent {
         this.startNotifications(device);
         // Start the capture on click
         this.captureOnClick(device);
+      });
 
-        // Lifecycle issue here.
-        // This is getting called even before the graph's canvas can
-        // be drawn on the UI
-        setTimeout(() => {
-          this.sensors.map(sensorTag => {
-            this.initialiseChart(sensorTag, device.id);
-          });
-        }, 1500);
+      this.sensors.map(sensorTag => {
+        this.initialiseChart(sensorTag, devices);
       });
     });
   }
@@ -348,33 +350,41 @@ export class InvestigationDetailsPageComponent {
    *
    */
 
-  private getChartDatasets(chart: string, sensor: any): Array<any> {
+  private getChartDatasets(
+    chart: string,
+    sensor: any,
+    deviceId: string
+  ): Array<any> {
     const mapDataSetConfig = this.mapDataSetConfig;
     const sensorParams = sensor.config.parameters;
 
     const xyzDataSet = [
       {
         mapDataSetConfig,
-        borderColor: ColorCode.RED,
-        label: "X"
+        borderColor: randomcolor(),
+        label: "X",
+        deviceId
       },
       {
         mapDataSetConfig,
-        borderColor: ColorCode.BLUE,
-        label: "Y"
+        borderColor: randomcolor(),
+        label: "Y",
+        deviceId
       },
       {
         mapDataSetConfig,
-        borderColor: ColorCode.GREEN,
-        label: "Z"
+        borderColor: randomcolor(),
+        label: "Z",
+        deviceId
       }
     ];
 
     const scalarDataSet = [
       {
         mapDataSetConfig,
-        borderColor: ColorCode.BLACK,
-        label: "Scalar Value"
+        borderColor: randomcolor(),
+        label: "Scalar Value",
+        deviceId
       }
     ];
 
@@ -384,14 +394,18 @@ export class InvestigationDetailsPageComponent {
 
         let ambientDataSet = {
           mapDataSetConfig,
-          borderColor: ColorCode.RED,
-          label: "Ambient Temperature (C)"
+          borderColor: randomcolor(),
+          label: `Ambient Temperature (C)-${deviceId}`,
+          deviceId,
+          name: "Ambient Temperature (C)"
         };
 
         let irDataSet = {
           mapDataSetConfig,
-          borderColor: ColorCode.GREEN,
-          label: "Target (IR) Temperature (C)"
+          borderColor: randomcolor(),
+          label: `Target (IR) Temperature (C)-${deviceId}`,
+          deviceId,
+          name: "Target (IR) Temperature (C)"
         };
 
         if (sensorParams.ambient) {
@@ -408,8 +422,10 @@ export class InvestigationDetailsPageComponent {
         return [
           {
             mapDataSetConfig,
-            borderColor: ColorCode.RED,
-            label: "Pressure (hPa)"
+            borderColor: randomcolor(),
+            label: `Pressure (hPa)-${deviceId}`,
+            deviceId,
+            name: "Pressure (hPa)"
           }
         ];
 
@@ -417,8 +433,9 @@ export class InvestigationDetailsPageComponent {
         return [
           {
             mapDataSetConfig,
-            borderColor: ColorCode.RED,
-            label: "lux"
+            borderColor: randomcolor(),
+            label: "lux",
+            deviceId
           }
         ];
 
@@ -445,14 +462,15 @@ export class InvestigationDetailsPageComponent {
         return [
           {
             mapDataSetConfig,
-            borderColor: ColorCode.RED,
-            label: "RH"
+            borderColor: randomcolor(),
+            label: "RH",
+            deviceId
           }
         ];
     }
   }
 
-  private getChartType(chart: string, ctx: any, sensor: any, deviceId: string) {
+  private getChartType(chart: string, ctx: any, sensor: any, devices: any[]) {
     if (!ctx || !chart) {
       return;
     }
@@ -465,12 +483,22 @@ export class InvestigationDetailsPageComponent {
       case "luxometer":
       case "magnetometer":
       case "temperature":
+        let datasets = [];
+        const getDatasets = async () => {
+          await devices.map(device => {
+            datasets = datasets.concat(
+              this.getChartDatasets(chart, sensor, device.id)
+            );
+          });
+        };
+
+        getDatasets();
+
         // These all above use the same graph
         return new Chart(ctx, {
           type: "line",
           data: {
-            deviceId,
-            datasets: this.getChartDatasets(chart, sensor)
+            datasets
           },
           options: this.mapOptions
         });
@@ -510,27 +538,27 @@ export class InvestigationDetailsPageComponent {
 
   // Add data to the graph corresponding to the deviceId
   private addData(chart: any, deviceId: string, data: any, dataValueMap: any) {
-    if (deviceId !== chart.data.deviceId) {
-      return;
-    }
-
     chart.data.labels.push({
       deviceId: deviceId,
       dataValueMap: dataValueMap,
-      key: chart.data.datasets[0].label
+      key: chart.data.datasets[0].name
     });
 
     if (typeof data === "string" || typeof data === "number") {
       chart.data.datasets.forEach(dataset => {
-        dataset.data.push(data);
+        if (dataset.deviceId === deviceId) {
+          dataset.data.push(data);
+        }
       });
     } else {
       chart.data.datasets.forEach(dataset => {
-        _.keys(data).map(key => {
-          if (key == dataset.label) {
-            dataset.data.push(data[key]);
-          }
-        });
+        if (dataset.deviceId === deviceId) {
+          _.keys(data).map(key => {
+            if (key == dataset.name) {
+              dataset.data.push(data[key]);
+            }
+          });
+        }
       });
     }
 
