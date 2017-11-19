@@ -1,10 +1,9 @@
 // Other libraries
 import * as moment from "moment";
-import * as randomcolor from 'randomcolor';
+import * as randomcolor from "randomcolor";
 // Angular
 import { Component, ChangeDetectorRef } from "@angular/core";
 import { Subscription } from "rxjs/Subscription";
-import "rxjs/add/operator/debounceTime";
 // Ionic
 import { NavParams, NavController, LoadingController } from "ionic-angular";
 // Others
@@ -362,19 +361,22 @@ export class InvestigationDetailsPageComponent {
       {
         mapDataSetConfig,
         borderColor: randomcolor(),
-        label: "X",
+        label: `X-${deviceId}`,
+        name: "X",
         deviceId
       },
       {
         mapDataSetConfig,
         borderColor: randomcolor(),
-        label: "Y",
+        label: `Y-${deviceId}`,
+        name: "Y",
         deviceId
       },
       {
         mapDataSetConfig,
         borderColor: randomcolor(),
-        label: "Z",
+        label: `Z-${deviceId}`,
+        name: "Z",
         deviceId
       }
     ];
@@ -383,7 +385,8 @@ export class InvestigationDetailsPageComponent {
       {
         mapDataSetConfig,
         borderColor: randomcolor(),
-        label: "Scalar Value",
+        label: `Scalar Value-${deviceId}`,
+        name: "Scalar Value",
         deviceId
       }
     ];
@@ -396,16 +399,16 @@ export class InvestigationDetailsPageComponent {
           mapDataSetConfig,
           borderColor: randomcolor(),
           label: `Ambient Temperature (C)-${deviceId}`,
-          deviceId,
-          name: "Ambient Temperature (C)"
+          name: "Ambient Temperature (C)",
+          deviceId
         };
 
         let irDataSet = {
           mapDataSetConfig,
           borderColor: randomcolor(),
           label: `Target (IR) Temperature (C)-${deviceId}`,
-          deviceId,
-          name: "Target (IR) Temperature (C)"
+          name: "Target (IR) Temperature (C)",
+          deviceId
         };
 
         if (sensorParams.ambient) {
@@ -424,8 +427,8 @@ export class InvestigationDetailsPageComponent {
             mapDataSetConfig,
             borderColor: randomcolor(),
             label: `Pressure (hPa)-${deviceId}`,
-            deviceId,
-            name: "Pressure (hPa)"
+            name: "Pressure (hPa)",
+            deviceId
           }
         ];
 
@@ -434,7 +437,8 @@ export class InvestigationDetailsPageComponent {
           {
             mapDataSetConfig,
             borderColor: randomcolor(),
-            label: "lux",
+            label: `lux-${deviceId}`,
+            name: "lux",
             deviceId
           }
         ];
@@ -463,7 +467,8 @@ export class InvestigationDetailsPageComponent {
           {
             mapDataSetConfig,
             borderColor: randomcolor(),
-            label: "RH",
+            label: `RH-${deviceId}`,
+            name: "RH",
             deviceId
           }
         ];
@@ -655,7 +660,6 @@ export class InvestigationDetailsPageComponent {
     const service = SERVICES.Luxometer;
     const subscription: Subscription = this._connectService
       .readData(device.id, service)
-      // .debounceTime(this.sampleIntervalTime)
       .subscribe(
         data => {
           // Luxometer DATA
@@ -714,7 +718,6 @@ export class InvestigationDetailsPageComponent {
 
     const subscription: Subscription = this._connectService
       .readData(device.id, service)
-      .debounceTime(this.sampleIntervalTime)
       .subscribe(
         data => {
           // HUMIDITY DATA
@@ -787,7 +790,6 @@ export class InvestigationDetailsPageComponent {
 
     const subscription: Subscription = this._connectService
       .readData(device.id, service)
-      // .debounceTime(this.sampleIntervalTime)
       .subscribe(
         data => {
           //0 gyro x
@@ -971,7 +973,6 @@ export class InvestigationDetailsPageComponent {
 
     const subscription: Subscription = this._connectService
       .readData(device.id, service)
-      .debounceTime(this.sampleIntervalTime)
       .subscribe(
         data => {
           // Calculate target temperature (Celsius).
@@ -1051,7 +1052,6 @@ export class InvestigationDetailsPageComponent {
     const service = SERVICES.Barometer;
     const subscription: Subscription = this._connectService
       .readData(device.id, service)
-      // .debounceTime(this.sampleIntervalTime)
       .subscribe(
         data => {
           // BAROMETER DATA
