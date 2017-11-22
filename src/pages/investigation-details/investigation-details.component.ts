@@ -39,6 +39,9 @@ export class InvestigationDetailsPageComponent {
     grid: false
   };
 
+  _debouncedAddDataToChart: any = {};
+  _debouncedUpdateSensorValue: any = {};
+
   mapDataSetConfig = {
     drawTicks: false,
     fill: false,
@@ -272,6 +275,56 @@ export class InvestigationDetailsPageComponent {
         this.startNotifications(device);
         // Start the capture on click
         this.captureOnClick(device);
+
+        this._debouncedAddDataToChart[device.id] = _.throttle(
+          (chart: any, deviceId: string, data: any, dataValueMap: any) => {
+            chart.data.labels.push({
+              deviceId: deviceId,
+              dataValueMap: dataValueMap,
+              key: chart.data.datasets[0].name
+            });
+
+            if (typeof data === "string" || typeof data === "number") {
+              chart.data.datasets.forEach(dataset => {
+                if (dataset.deviceId === deviceId) {
+                  dataset.data.push(data);
+                }
+              });
+            } else {
+              chart.data.datasets.forEach(dataset => {
+                if (dataset.deviceId === deviceId) {
+                  _.keys(data).map(key => {
+                    if (key == dataset.name) {
+                      dataset.data.push(data[key]);
+                    }
+                  });
+                }
+              });
+            }
+
+            chart.update();
+          },
+          this.sampleIntervalTime
+        );
+
+        this._debouncedUpdateSensorValue[device.id] = _.throttle(
+          (device: any, name: string, value: string, dataValueMap: any) => {
+            this.sensors.map(sensor => {
+              if (sensor.name === name) {
+                if (!sensor.value) {
+                  sensor.value = {};
+                }
+                if (!sensor.rawValue) {
+                  sensor.rawValue = {};
+                }
+                dataValueMap = this.addTimeStampValues(dataValueMap);
+                sensor.value[device.id] = value;
+                sensor.rawValue[device.id] = dataValueMap;
+              }
+            });
+          },
+          this.sampleIntervalTime
+        );
       });
 
       this.sensors.map(sensorTag => {
@@ -543,31 +596,10 @@ export class InvestigationDetailsPageComponent {
 
   // Add data to the graph corresponding to the deviceId
   private addData(chart: any, deviceId: string, data: any, dataValueMap: any) {
-    chart.data.labels.push({
-      deviceId: deviceId,
-      dataValueMap: dataValueMap,
-      key: chart.data.datasets[0].name
-    });
-
-    if (typeof data === "string" || typeof data === "number") {
-      chart.data.datasets.forEach(dataset => {
-        if (dataset.deviceId === deviceId) {
-          dataset.data.push(data);
-        }
-      });
-    } else {
-      chart.data.datasets.forEach(dataset => {
-        if (dataset.deviceId === deviceId) {
-          _.keys(data).map(key => {
-            if (key == dataset.name) {
-              dataset.data.push(data[key]);
-            }
-          });
-        }
-      });
+    const _debouncedFnForDevice = this._debouncedAddDataToChart[deviceId];
+    if (!!_debouncedFnForDevice) {
+      _debouncedFnForDevice(chart, deviceId, data, dataValueMap);
     }
-
-    chart.update();
   }
 
   addTimeStampValues(dataValueMap: any) {
@@ -640,20 +672,12 @@ export class InvestigationDetailsPageComponent {
     value: string,
     dataValueMap: any
   ) {
-    this.sensors.map(sensor => {
-      if (sensor.name === name) {
-        if (!sensor.value) {
-          sensor.value = {};
-        }
-        if (!sensor.rawValue) {
-          sensor.rawValue = {};
-        }
-        dataValueMap = this.addTimeStampValues(dataValueMap);
-        sensor.value[device.id] = value;
-        sensor.rawValue[device.id] = dataValueMap;
-        this.cdRef.detectChanges();
-      }
-    });
+    const _debouncedFnForDevice = this._debouncedUpdateSensorValue[device.id];
+    if (!!_debouncedFnForDevice) {
+      _debouncedFnForDevice(device, name, value, dataValueMap);
+    }
+
+    this.cdRef.detectChanges();
   }
 
   private luxometerNotifications(device: any, luxometerChartId: string) {
@@ -1025,12 +1049,12 @@ export class InvestigationDetailsPageComponent {
       );
 
     /**
-       * We must send some data to write to the device before
-       * we can start receiving any notifications.
-       * Also, it seems like the barometerConfig should hold
-       * some unique value. Currently any value seems to work
-       *
-       */
+     * We must send some data to write to the device before
+     * we can start receiving any notifications.
+     * Also, it seems like the barometerConfig should hold
+     * some unique value. Currently any value seems to work
+     *
+     */
     const tempConfig = new Uint8Array(1);
     tempConfig[0] = 0x01;
     this._connectService
@@ -1088,12 +1112,12 @@ export class InvestigationDetailsPageComponent {
       );
 
     /**
-       * We must send some data to write to the device before
-       * we can start receiving any notifications.
-       * Also, it seems like the barometerConfig should hold
-       * some unique value. Currently any value seems to work
-       *
-       */
+     * We must send some data to write to the device before
+     * we can start receiving any notifications.
+     * Also, it seems like the barometerConfig should hold
+     * some unique value. Currently any value seems to work
+     *
+     */
     const barometerConfig = new Uint8Array(1);
     barometerConfig[0] = 0x01;
     this._connectService
@@ -1195,10 +1219,10 @@ export class InvestigationDetailsPageComponent {
         });
 
         /**
-            * First collect all the units used
-            * Assign a header/field value to each unit
-            * Use the field value of the unit to push data into it
-            */
+         * First collect all the units used
+         * Assign a header/field value to each unit
+         * Use the field value of the unit to push data into it
+         */
         let unitMap = {};
         let fieldMap = {};
 
