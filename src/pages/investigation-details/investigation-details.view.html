@@ -24,6 +24,13 @@
     </ion-item>
   </ion-list>
 
+  <ion-list inset no-lines *ngIf="!datasetsAvailable?.length">
+    <ion-item text-wrap>
+      <h5>No sensors enabled to run the investigation!</h5>
+      <h6>Please recheck if at least one parameter (eg IR) has been enabled for the chosen sensor (eg Temperature).</h6>
+    </ion-item>
+  </ion-list>
+
   <ion-list class="sensor-display" inset no-lines *ngIf="sensors?.length">
     <ion-item text-wrap *ngFor="let sensor of sensors">
       <h2>{{ sensor.name }}</h2>
@@ -77,7 +84,7 @@
 
 </ion-content>
 
-<ion-footer flex *ngIf="display.graph">
+<ion-footer flex *ngIf="display.graph && datasetsAvailable?.length>0">
   <button ion-button no-margin full no-border-radius color="secondary" *ngIf="graphsStartedAtLeastOnce" (click)="saveGraphData()">
     Save graph data
   </button>
@@ -95,7 +102,7 @@
   </button>
 </ion-footer>
 
-<ion-footer flex *ngIf="display.grid">
+<ion-footer flex *ngIf="display.grid && datasetsAvailable?.length>0">
   <button ion-button no-margin full no-border-radius color="secondary" (click)="saveGridData()">
     Save grid data
   </button>

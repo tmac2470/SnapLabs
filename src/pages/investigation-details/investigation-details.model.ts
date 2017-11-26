@@ -25,6 +25,7 @@ interface SensorData {
 }
 
 interface SensorGraph {
+  display: String;
   graphdisplay: String;
   graphType: String;
   graphTitle: String;

@@ -38,6 +38,7 @@ export class InvestigationDetailsPageComponent {
     graph: false,
     grid: false
   };
+  datasetsAvailable: any[]= [];
 
   _debouncedAddDataToChart: any = {};
   _debouncedUpdateSensorValue: any = {};
@@ -367,6 +368,7 @@ export class InvestigationDetailsPageComponent {
           // Fetch only the sensors which have been switched "on"
           if (
             sensor.data.display ||
+            sensor.graph.display ||
             sensor.graph.graphdisplay ||
             sensor.grid.griddisplay
           ) {
@@ -551,6 +553,7 @@ export class InvestigationDetailsPageComponent {
         };
 
         getDatasets();
+        this.datasetsAvailable = this.datasetsAvailable.concat(datasets);
 
         // These all above use the same graph
         return new Chart(ctx, {
