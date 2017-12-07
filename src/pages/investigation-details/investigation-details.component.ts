@@ -737,6 +737,21 @@ export class InvestigationDetailsPageComponent {
         });
       });
 
+    // turn luxometer period on
+    const periodData = new Uint8Array([this.sampleIntervalTime/10]);
+    //periodData[0] = this.sampleIntervalTime;
+    this._connectService
+      .writePeriodToDevice(device.id, service, periodData.buffer)
+      .then(e => {
+        // Success
+      })
+      .catch(e => {
+        this._toastService.present({
+          message: "Unable to write to device! Please reconnect device.",
+          duration: 3000
+        });
+      });
+
     this.subscriptions.push(subscription);
   }
 
@@ -800,6 +815,21 @@ export class InvestigationDetailsPageComponent {
         this._toastService.present({
           message:
             "Problem with bluetooth connection! Please reconnect device.",
+          duration: 3000
+        });
+      });
+
+    // turn humidity period on
+    const periodData = new Uint8Array([this.sampleIntervalTime/10]);
+    //periodData[0] = this.sampleIntervalTime;
+    this._connectService
+      .writePeriodToDevice(device.id, service, periodData.buffer)
+      .then(e => {
+        // Success
+      })
+      .catch(e => {
+        this._toastService.present({
+          message: "Unable to write to device! Please reconnect device.",
           duration: 3000
         });
       });
@@ -978,10 +1008,10 @@ export class InvestigationDetailsPageComponent {
       });
 
     // turn accelerometer period on
-    const periodData = new Uint8Array(1);
-    periodData[0] = 0x0a;
+    const periodData = new Uint8Array([this.sampleIntervalTime/10]);
+    //periodData[0] = this.sampleIntervalTime;
     this._connectService
-      .writeToDevice(device.id, service, configData.buffer)
+      .writePeriodToDevice(device.id, service, periodData.buffer)
       .then(e => {
         // Success
       })
@@ -1072,6 +1102,21 @@ export class InvestigationDetailsPageComponent {
         });
       });
 
+    // turn temperature period on
+    const periodData = new Uint8Array([this.sampleIntervalTime/10]);
+    //periodData[0] = this.sampleIntervalTime;
+    this._connectService
+      .writePeriodToDevice(device.id, service, periodData.buffer)
+      .then(e => {
+        // Success
+      })
+      .catch(e => {
+        this._toastService.present({
+          message: "Unable to write to device! Please reconnect device.",
+          duration: 3000
+        });
+      });
+
     this.subscriptions.push(subscription);
   }
 
@@ -1131,6 +1176,21 @@ export class InvestigationDetailsPageComponent {
       .catch(e => {
         this._toastService.present({
           message: "Unable to write to device! Please reconnect device.",
+          duration: 3000
+        });
+      });
+
+    // turn barometer period on
+    const periodData = new Uint8Array([this.sampleIntervalTime/10]);
+    //periodData[0] = this.sampleIntervalTime;
+    this._connectService
+      .writePeriodToDevice(device.id, service, periodData.buffer)
+      .then(e => {
+        // Success
+      })
+      .catch(e => {
+        this._toastService.present({
+          message: "Unable to write period to device! Please reconnect device.",
           duration: 3000
         });
       });
