@@ -380,9 +380,18 @@ export class InvestigationDetailsPageComponent {
             sensor.graph.graphdisplay ||
             sensor.grid.griddisplay
           ) {
+
+            let parameters = [];
+            _.map(_.keys(sensor.parameters), (key, value) => {
+              parameters.push({
+                key: key,
+                value: value
+              });
+            });
             this.sensors.push({
               name: iSensor,
-              config: sensor
+              config: sensor,
+              parameters
             });
           }
         }
