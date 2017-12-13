@@ -1,5 +1,6 @@
 // Angular
 import { Component } from "@angular/core";
+import * as _ from 'lodash';
 // Ionic
 import {
   ActionSheetController,
@@ -54,6 +55,9 @@ export class SavedFilesPageComponent {
       .getFiles()
       .then(entries => {
         this.files = entries;
+        this.files = _.sortBy(this.files, file => {
+          return file.name;
+        });
       })
       .catch(e => {
         this._toastService.present({
