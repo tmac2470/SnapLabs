@@ -106,7 +106,7 @@ export class FileService {
         }
 
         const timestamp = moment().format("DD_MM_YYYY_HH_mm");
-        const fileName = `${userExt}_${experimentTitle}_${timestamp}.csv`;
+        const fileName = `${timestamp}_${experimentTitle}_${userExt}.csv`;
 
         return fileName;
       });
