@@ -128,14 +128,6 @@ export class InvestigationDetailsPageComponent {
     this.checkIfBluetoothEnabled();
   }
 
-  ionViewDidEnter() {
-    // Only initialise grids
-    // Graphs would be initialised per device
-    this.sensors.forEach(sensorTag => {
-      this.initialiseGrid(sensorTag);
-    });
-  }
-
   // Other methods
 
   // Initialise a chart only once.
@@ -149,7 +141,7 @@ export class InvestigationDetailsPageComponent {
     }
   }
 
-  private initialiseGrid(sensor) {
+  private initialiseGrid(sensor: any, devices: any[]) {
     if (!!sensor.config.grid.display || !!sensor.config.grid.griddisplay) {
       this.display.grid = true;
       const chartId = `${sensor.name}-grid`;
@@ -171,6 +163,21 @@ export class InvestigationDetailsPageComponent {
       });
 
       sensor.config.grids = grids;
+
+      // Need datasets to decide if the grids can work
+      let datasets = [];
+      const chart = `${sensor.name}`;
+      const getDatasets = async () => {
+        await devices.map(device => {
+          datasets = datasets.concat(
+            this.getChartDatasets(chart, sensor, device.id)
+          );
+        });
+      };
+
+      getDatasets();
+      this.datasetsAvailable = this.datasetsAvailable.concat(datasets);
+
       return;
     }
   }
@@ -330,6 +337,7 @@ export class InvestigationDetailsPageComponent {
 
       this.sensors.map(sensorTag => {
         this.initialiseChart(sensorTag, devices);
+        this.initialiseGrid(sensorTag, devices);
       });
     });
   }
