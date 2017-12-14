@@ -1437,8 +1437,9 @@ export class InvestigationDetailsPageComponent {
           .saveExperimentData(fileName, csvData)
           .then(success => {
             this._toastService.present({
-              message: "Experiment data successfully saved to file " + fileName,
-              duration: 3000
+              message: "Experiment data successfully saved to file \n" + fileName,
+              duration: 5000,
+              cssClass: "longToast"
             });
           })
           .catch(error => {
