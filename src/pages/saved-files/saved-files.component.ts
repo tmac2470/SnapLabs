@@ -1,6 +1,6 @@
 // Angular
 import { Component } from "@angular/core";
-import * as _ from 'lodash';
+import * as _ from "lodash";
 // Ionic
 import {
   ActionSheetController,
@@ -68,6 +68,7 @@ export class SavedFilesPageComponent {
   }
 
   shareFileViaEmail(file: Entry) {
+    console.log("lol");
     this._shareService
       .shareViaEmail(
         "Hello! Please find the attached experiment data.",
@@ -76,11 +77,12 @@ export class SavedFilesPageComponent {
         file.nativeURL
       )
       .then(e => {
-        // console.log('success');
-        // this._toastService.present({
-        //   message: "Experiment data shared via Email",
-        //   duration: 3000
-        // });
+        if (e instanceof Error) {
+          this._toastService.present({
+            message: e.message,
+            duration: 3000
+          });
+        }
       })
       .catch(e => {
         this._toastService.present({
