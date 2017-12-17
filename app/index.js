@@ -1,54 +1,42 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- * @flow
- */
+import React, { Component } from "react";
+import { StyleSheet, Text, View } from "react-native";
+import { connectStyle } from "@shoutem/theme";
 
-import React, { Component } from 'react';
-import {
-  Platform,
-  StyleSheet,
-  Text,
-  View
-} from 'react-native';
-
-const instructions = Platform.select({
-  ios: 'Press Cmd+R to reload,\n' +
-    'Cmd+D or shake for dev menu',
-  android: 'Double tap R on your keyboard to reload,\n' +
-    'Shake or press menu button for dev menu',
-});
-
-export default class App extends Component {
+class App extends Component<{}> {
   render() {
+    const styles = this.props.style;
     return (
       <View style={styles.container}>
-        <Text style={styles.welcome}>
-          Welcome to React Native!
-        </Text>
-        <Text style={styles.instructions}>
-          {instructions}
-        </Text>
+        <Image
+          style={styles.avatarImage}
+          source={{
+            uri: "https://shoutem.github.io/img/ui-toolkit/examples/image-9.png"
+          }}
+        />
+        <Text style={styles.title}>John Doe</Text>
       </View>
     );
   }
 }
 
-const styles = StyleSheet.create({
+const styles = {
   container: {
     flex: 1,
+    height: 50,
+    flexDirection: 'row',
     justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#F5FCFF',
   },
-  welcome: {
-    fontSize: 20,
-    textAlign: 'center',
-    margin: 10,
+  avatarImage: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
   },
-  instructions: {
-    textAlign: 'center',
-    color: '#333333',
-    marginBottom: 5,
+  title: {
+    flex: 1,
+    fontSize: 19,
+    fontWeight: 'bold',
   },
-});
+};
+
+// connect the component to the theme
+export default connectStyle('com.example.App', styles)(App);
