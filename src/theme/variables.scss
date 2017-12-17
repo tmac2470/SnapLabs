@@ -27,7 +27,7 @@ $colors: (
   primary:    #488aff,
   secondary:  #32db64,
   danger:     #f53d3d,
-  light:      #f4f4f4,
+  light:      #fff,
   dark:       #222
 );
 
@@ -79,7 +79,7 @@ $colors: (
 
 // Override Ionic variables
 // --------------------------------------------------
-$background-color: #efefef;
+$background-color: #fff;
 
 // Prevent ionic from uppercasing the text in android
 $button-md-text-transform: none;

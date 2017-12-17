@@ -35,6 +35,20 @@
     <ion-item text-wrap *ngFor="let sensor of sensors">
       <h2>{{ sensor.name }}</h2>
 
+      <ion-grid *ngIf="sensor.parameters?.length>0">
+        <ion-row>
+            <h6>Enabled parameters:</h6>
+        </ion-row>
+        <ion-row *ngFor="let param of sensor.parameters">
+          <ion-col no-padding no-margin>
+            <h6><b>{{ param.key }}</b></h6>
+          </ion-col>
+          <ion-col no-padding no-margin>
+            <h6>{{ param.value ? 'ON': 'OFF' }}</h6>
+          </ion-col>
+        </ion-row>
+      </ion-grid>
+
       <div *ngFor="let device of connectedDevices">
         <h5 *ngIf="sensor?.value">
           <span *ngIf="sensor.value[device.id]">

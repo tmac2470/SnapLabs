@@ -144,6 +144,10 @@ export class ConnectService {
     return this.ble.write(deviceId, service.UUID, service.CONFIG, buffer);
   }
 
+  writePeriodToDevice(deviceId: string, service: any, buffer: any): Promise<any> {
+    return this.ble.write(deviceId, service.UUID, service.PERIOD, buffer);
+  }
+
   bytesToString(buffer) {
     return String.fromCharCode.apply(null, new Uint8Array(buffer));
   }
