@@ -18,6 +18,7 @@ const styles = {
     flex: 1,
     alignItems: "center",
     flexDirection: "row",
-    justifyContent: "center"
+    justifyContent: "center",
+    backgroundColor: "white"
   }
 };

@@ -3,19 +3,26 @@ import { StackNavigator } from "react-navigation";
 import HomeScreen from "./Home/Screen/index";
 import JoinScreen from "./Auth/Screen/index";
 
-const RootNavigator = StackNavigator({
-  Home: {
-    screen: HomeScreen,
-    navigationOptions: {
-      headerBackTitle: null
+const RootNavigator = StackNavigator(
+  {
+    Home: {
+      screen: HomeScreen
+    },
+    Join: {
+      screen: JoinScreen
     }
   },
-  Join: {
-    screen: JoinScreen,
+  {
+    headerMode: "screen",
     navigationOptions: {
-      headerBackTitle: null
+      headerBackTitle: null,
+      headerTintColor: "white",
+      headerStyle: {
+        backgroundColor: "#1CA7FC",
+        borderBottomColor: "#1CA7FC"
+      }
     }
   }
-});
+);
 
 export default RootNavigator;
