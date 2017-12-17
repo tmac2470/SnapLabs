@@ -1,14 +1,20 @@
 import { StackNavigator } from "react-navigation";
 
-import HomeScreen from './Home/Screen/index';
-import JoinScreen from './Auth/Screen/index'
+import HomeScreen from "./Home/Screen/index";
+import JoinScreen from "./Auth/Screen/index";
 
 const RootNavigator = StackNavigator({
   Home: {
-    screen: HomeScreen
+    screen: HomeScreen,
+    navigationOptions: {
+      headerBackTitle: null
+    }
   },
   Join: {
-    screen: HomeScreen
+    screen: JoinScreen,
+    navigationOptions: {
+      headerBackTitle: null
+    }
   }
 });
 

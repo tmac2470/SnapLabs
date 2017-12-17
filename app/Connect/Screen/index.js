@@ -1,9 +1,9 @@
 import React, { Component } from "react";
 import { StyleSheet, Text, View, Button } from "react-native";
 
-export default class Join extends Component<{}> {
+export default class Connect extends Component<{}> {
   static navigationOptions = {
-    title: "Join"
+    title: "Connect"
   };
 
   goToHome() {
