@@ -1,5 +1,6 @@
 import React, { Component } from "react";
-import { StyleSheet, Text, View, Image, Button } from "react-native";
+import { StyleSheet, Text, View, Image } from "react-native";
+import { Button } from 'nachos-ui';
 
 export default class Home extends Component<{}> {
   static navigationOptions = {
@@ -16,10 +17,9 @@ export default class Home extends Component<{}> {
             uri: "http://www.ti.com/ww/en/wireless_connectivity/sensortag/images/sensorTag-main-visual.png"
           }}
         />
-        <Button
-          onPress={() => navigate('Join')}
-          title="Join"
-        />
+        <Button onPress={() => navigate('Join')}>
+          Join
+        </Button>
       </View>
     );
   }
