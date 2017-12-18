@@ -5,8 +5,8 @@
   "scripts": {
     "start": "node node_modules/react-native/local-cli/cli.js start",
     "test": "jest",
-    "live:ios": "react-native run-ios",
-    "live:android": "react-native run-android"
+    "sim:ios": "react-native run-ios",
+    "sim:android": "react-native run-android"
   },
   "dependencies": {
     "nachos-ui": "^0.1.2",

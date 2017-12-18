@@ -3,6 +3,8 @@ import { StackNavigator } from "react-navigation";
 import HomeScreen from "./Home/Screen/index";
 import JoinScreen from "./Auth/Screen/index";
 
+require('./Theme/index');
+
 const RootNavigator = StackNavigator(
   {
     Home: {

@@ -1,6 +1,8 @@
 import React, { Component } from "react";
-import { StyleSheet, Text, View, Image } from "react-native";
-import { Button } from "nachos-ui";
+import { View, Image, Platform } from "react-native";
+import { Button, H2 } from "nachos-ui";
+
+import Colors from '../../Theme/colors';
 
 export default class Home extends Component<{}> {
   static navigationOptions = {
@@ -9,9 +11,20 @@ export default class Home extends Component<{}> {
 
   render() {
     const { navigate } = this.props.navigation;
+    const iOSpic = require('../../../data/images/ti-sensor-tag.jpeg');
+    const androidPic = require('../../../data/images/ti-sensor.png');
+
+    const pic = Platform.OS === 'ios' ? iOSpic : androidPic;
+
     return (
       <View style={styles.container}>
-        <Button onPress={() => navigate("Join")}>Join</Button>
+        <Image source={pic} style={styles.image} />
+        <H2 style={styles.textStyle}>Create. Investigate. Share.</H2>
+        <View style={styles.btnContainer}>
+          <Button onPress={() => navigate("Join")} style={styles.joinButton}>
+            Join
+          </Button>
+        </View>
       </View>
     );
   }
@@ -21,13 +34,24 @@ const styles = {
   container: {
     flex: 1,
     alignItems: "center",
-    flexDirection: "row",
+    flexDirection: "column",
     justifyContent: "center",
     backgroundColor: "white"
   },
-  title: {
-    flex: 1,
-    fontSize: 19,
-    fontWeight: "bold"
+  image: {
+    width: "100%",
+    height: "60%"
+  },
+  joinButton: {
+    minWidth: '100%'
+  },
+  btnContainer: {
+    margin: "10%",
+    marginTop: "12%",
+    flex: 1
+  },
+  textStyle: {
+    color: Colors.primaryBackground,
+    fontWeight: '600'
   }
 };
