@@ -51,7 +51,7 @@ const styles = {
     flex: 1
   },
   textStyle: {
-    color: Colors.primaryBackground,
+    color: Colors.primary,
     fontWeight: '600'
   }
 };

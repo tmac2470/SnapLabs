@@ -1,5 +1,8 @@
 import React, { Component } from "react";
-import { StyleSheet, Text, View, Button } from "react-native";
+import { View } from "react-native";
+
+import { Input } from "nachos-ui";
+import Colors from "../../Theme/colors";
 
 export default class Join extends Component<{}> {
   static navigationOptions = {
@@ -11,13 +14,46 @@ export default class Join extends Component<{}> {
     goBack();
   }
 
+  state = {
+    email: "",
+    username: ""
+  };
+
   render() {
     return (
-      <View>
-        <Button onPress={this.goToHome.bind(this)} title="Home" />
+      <View style={styles.container}>
+        <Input
+          style={styles.inputStyle}
+          placeholder="Username"
+          onChangeText={username => this.setState({ username })}
+          value={this.state.username}
+        />
+        <Input
+          style={[styles.inputStyle, styles.marginTop]}
+          placeholder="Email"
+          keyboardType="email-address"
+          onChangeText={email => this.setState({ email })}
+          value={this.state.email}
+        />
       </View>
     );
   }
 }
 
-const styles = {};
+const styles = {
+  container: {
+    flex: 1,
+    alignItems: "center",
+    flexDirection: "column",
+    justifyContent: "center",
+    backgroundColor: "white",
+    padding: "5%",
+    marginBottom: "10%"
+  },
+  inputStyle: {
+    borderColor: Colors.primary
+  },
+  marginTop: {
+    marginTop: "5%"
+  }
+};
