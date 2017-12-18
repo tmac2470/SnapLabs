@@ -4,6 +4,7 @@ import "rxjs/add/operator/toPromise";
 import * as json2csv from "json2csv";
 
 // Angular
+
 import { Injectable } from "@angular/core";
 // Ionic
 import {
@@ -13,16 +14,26 @@ import {
   DirectoryEntry,
   RemoveResult
 } from "@ionic-native/file";
-
+// Ionic
+import { Platform } from "ionic-angular";
 // SnapApp
 import { AccountService } from "../../account/account.service";
 
 @Injectable()
 export class FileService {
-  constructor(private file: File, private _accountService: AccountService) {}
+  constructor(
+    private file: File,
+    private _accountService: AccountService,
+    private platform: Platform
+  ) {
+    if (this.platform.is("ios")) {
+      this.isIOS();
+    }
+  }
 
   // Root folder where all files are stored for the app
-  private dirRoot: string = this.file.externalRootDirectory;
+  // externalCacheDirectory is the default for android apps
+  private dirRoot: string = this.file.externalCacheDirectory;
   // Root folder extension or the folder inside the root folder to store the data files
   private dirExt: string = "SnapLabs";
 
@@ -33,6 +44,12 @@ export class FileService {
       dir: this.dirExt,
       fullPath: `${this.dirRoot}${this.dirExt}`
     };
+  }
+
+  // iOS related settings
+  isIOS() {
+    // iOS can only store in documentsDirectory
+    this.dirRoot = this.file.documentsDirectory;
   }
 
   /**
@@ -106,7 +123,7 @@ export class FileService {
         }
 
         const timestamp = moment().format("DD_MM_YYYY_HH_mm");
-        const fileName = `${userExt}_${experimentTitle}_${timestamp}.csv`;
+        const fileName = `${timestamp}_${experimentTitle}_${userExt}.csv`;
 
         return fileName;
       });
@@ -126,13 +143,6 @@ export class FileService {
     text: string | Blob,
     folder: string = this.getStorageLocation().fullPath
   ): Promise<any> {
-    // return this.file
-    //   .createFile(folder, fileName, true)
-    //   .then(success => {
-    //   })
-    //   .catch(e => {
-    //     return new Error("Unable to write file");
-    //   });
     return this.file.writeFile(folder, fileName, text, {
       replace: true
     });

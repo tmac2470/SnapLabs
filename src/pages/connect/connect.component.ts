@@ -1,3 +1,5 @@
+// Other
+import * as _ from "lodash";
 // Angular
 import { Component, ChangeDetectorRef, OnDestroy } from "@angular/core";
 import { Subscription } from "rxjs/Subscription";
@@ -98,6 +100,9 @@ export class ConnectPageComponent implements OnDestroy {
     this._connectService.startScanning([]).subscribe(
       device => {
         this.devices.push(device);
+        this.devices = _.uniqBy(this.devices, device => {
+          return device.id;
+        });
       },
       error => {
         this._toastService.present({
