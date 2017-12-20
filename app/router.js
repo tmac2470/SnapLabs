@@ -3,6 +3,8 @@ import { StackNavigator } from "react-navigation";
 import HomeScreen from "./Home/Screen/index";
 import JoinScreen from "./Auth/Screen/index";
 
+import Colors from './Theme/colors';
+
 require('./Theme/index');
 
 const RootNavigator = StackNavigator(
@@ -20,8 +22,8 @@ const RootNavigator = StackNavigator(
       headerBackTitle: null,
       headerTintColor: "white",
       headerStyle: {
-        backgroundColor: "#1CA7FC",
-        borderBottomColor: "#1CA7FC"
+        backgroundColor: Colors.primary,
+        borderBottomColor: Colors.primary
       }
     }
   }
