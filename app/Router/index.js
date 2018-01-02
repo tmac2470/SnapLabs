@@ -1,30 +1,27 @@
-import { StackNavigator } from "react-navigation";
+import React, { Component } from "react";
+import { connect } from "react-redux";
+import { addNavigationHelpers } from "react-navigation";
 
-import HomeScreen from "../containers/Home";
-import JoinScreen from "../containers/Auth";
+import AppNavigator from "./routes";
 
-import Colors from '../Theme/colors';
-
-const RootNavigator = StackNavigator(
-  {
-    Home: {
-      screen: HomeScreen
-    },
-    Join: {
-      screen: JoinScreen
-    }
-  },
-  {
-    headerMode: "screen",
-    navigationOptions: {
-      headerBackTitle: null,
-      headerTintColor: "white",
-      headerStyle: {
-        backgroundColor: Colors.primary,
-        borderBottomColor: Colors.primary
-      }
-    }
+class AppWithNavigation extends Component {
+  render() {
+    return (
+      <AppNavigator
+        navigation={addNavigationHelpers({
+          dispatch: this.props.dispatch,
+          state: this.props.nav
+        })}
+      />
+    );
   }
-);
+}
 
-export default RootNavigator;
+const mapStateToProps = state => ({
+  nav: state.nav,
+  user: state.user
+});
+
+export default (AppWithNavigationState = connect(mapStateToProps)(
+  AppWithNavigation
+));

@@ -1,17 +1,21 @@
 import React, { Component } from "react";
 import { View, Alert } from "react-native";
+import { connect } from "react-redux";
 
 import { Input, Button } from "nachos-ui";
 import Colors from "../../Theme/colors";
+import { setUser } from "./actions";
 
-export default class Join extends Component<{}> {
+export class JoinComponent extends Component<{}> {
   static navigationOptions = {
     title: "Join"
   };
 
   state = {
-    email: "",
-    username: ""
+    user: {
+      email: "",
+      username: ""
+    }
   };
 
   validateEmail(email) {
@@ -24,12 +28,23 @@ export default class Join extends Component<{}> {
   }
 
   submit() {
-    const { email, username } = this.state;
-    if (!this.validateEmail(email)) {
+    const { user } = this.state;
+    const { onSaveUser } = this.props;
+    if (!this.validateEmail(user.email)) {
       this.showAlert();
       return;
     }
-    console.log(email, username);
+    onSaveUser(user);
+  }
+
+  onUpdateUserCredentials(value) {
+    const state = this.state;
+    this.setState(prevState => ({
+      user: {
+        username: value.username ? value.username : prevState.user.username,
+        email: value.email ? value.email : prevState.user.email
+      }
+    }));
   }
 
   render() {
@@ -41,8 +56,10 @@ export default class Join extends Component<{}> {
             inputStyle={styles.inputText}
             placeholder="Username"
             autoCorrect={false}
-            onChangeText={username => this.setState({ username })}
-            value={this.state.username}
+            onChangeText={username =>
+              this.onUpdateUserCredentials({ username })
+            }
+            value={this.state.user.username}
           />
           <Input
             style={[styles.input, styles.marginTop]}
@@ -50,8 +67,8 @@ export default class Join extends Component<{}> {
             autoCorrect={false}
             placeholder="Email"
             keyboardType="email-address"
-            onChangeText={email => this.setState({ email })}
-            value={this.state.email}
+            onChangeText={email => this.onUpdateUserCredentials({ email })}
+            value={this.state.user.email}
           />
         </View>
         <View style={styles.btnContainer}>
@@ -73,7 +90,7 @@ const styles = {
   },
   inputContainer: {
     flex: 8,
-    justifyContent: 'center',
+    justifyContent: "center"
   },
   input: {
     borderColor: Colors.primary
@@ -92,3 +109,19 @@ const styles = {
     flex: 2
   }
 };
+
+const mapStateToProps = state => {
+  return {
+    user: state
+  };
+};
+
+const mapDispatchToProps = dispatch => {
+  return {
+    onSaveUser: user => {
+      dispatch(setUser(user));
+    }
+  };
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(JoinComponent);

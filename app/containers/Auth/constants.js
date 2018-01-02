@@ -1,0 +1,1 @@
+export const SET_USER = '/app/AUTH/SET_USER';

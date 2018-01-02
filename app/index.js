@@ -1,12 +1,19 @@
 import React, { Component } from "react";
-import Router from "./Router";
+import { Provider } from "react-redux";
 
-require('./Theme/index');
+require("./Theme/index");
+
+import getStore from "./store";
+import AppWithNavigationState from "./Router";
+
+const store = getStore();
 
 export default class App extends Component<{}> {
   render() {
     return (
-      <Router />
+      <Provider store={store}>
+        <AppWithNavigationState />
+      </Provider>
     );
   }
 }
