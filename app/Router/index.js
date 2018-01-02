@@ -1,11 +1,9 @@
 import { StackNavigator } from "react-navigation";
 
-import HomeScreen from "./containers/Home/Home";
-import JoinScreen from "./containers/Auth/Auth";
+import HomeScreen from "../containers/Home";
+import JoinScreen from "../containers/Auth";
 
-import Colors from './Theme/colors';
-
-require('./Theme/index');
+import Colors from '../Theme/colors';
 
 const RootNavigator = StackNavigator(
   {
