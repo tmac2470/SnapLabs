@@ -78,7 +78,11 @@ export class JoinComponent extends Component<{}> {
           />
         </View>
         <View style={styles.btnContainer}>
-          <Button onPress={this.submit.bind(this)} style={styles.saveBtn}>
+          <Button
+            disabled={!this.validateEmail(email)}
+            onPress={this.submit.bind(this)}
+            style={styles.saveBtn}
+          >
             Save
           </Button>
         </View>

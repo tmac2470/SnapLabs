@@ -1,14 +1,16 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
 
+import { unsetUser } from "../Auth/actions";
+
 import { View, Image, Platform } from "react-native";
 import { Button, H2 } from "nachos-ui";
 
 import Colors from "../../Theme/colors";
 
 export class HomeComponent extends Component<{}> {
-  static navigationOptions = ({ navigation }) => {
-    console.log(navigation);
+  static navigationOptions = ({ navigation, isLoggedIn }) => {
+    console.log(isLoggedIn, "isLoggedIn");
     const { params = {} } = navigation.state;
 
     return {
@@ -24,17 +26,25 @@ export class HomeComponent extends Component<{}> {
     if (isLoggedIn) {
       const params = {
         headerRight: (
-          <Button type="danger" onPress={this.logout} style={[styles.button, styles.logoutButton]}>
-            Logout
-          </Button>
+          <View style={styles.logoutBtnContainer}>
+            <Button
+              uppercase={false}
+              type="danger"
+              onPress={() => this.logout(this.props)}
+              style={styles.logoutButton}
+            >
+              Logout
+            </Button>
+          </View>
         )
       };
       navigation.setParams(params);
     }
   }
 
-  logout() {
-    console.log("called logout");
+  logout(props) {
+    const { onLogoutUser, user } = props;
+    onLogoutUser(user);
   }
 
   render() {
@@ -52,6 +62,8 @@ export class HomeComponent extends Component<{}> {
         <View style={styles.btnContainer}>
           {!isLoggedIn ? (
             <Button
+              type="success"
+              uppercase={false}
               onPress={() => navigation.navigate("Join")}
               style={styles.button}
             >
@@ -60,6 +72,8 @@ export class HomeComponent extends Component<{}> {
           ) : (
             <View>
               <Button
+                type="success"
+                uppercase={false}
                 onPress={() => navigation.navigate("Join")}
                 style={styles.button}
               >
@@ -67,6 +81,8 @@ export class HomeComponent extends Component<{}> {
               </Button>
 
               <Button
+                type="success"
+                uppercase={false}
                 onPress={() => navigation.navigate("Join")}
                 style={styles.button}
               >
@@ -74,7 +90,9 @@ export class HomeComponent extends Component<{}> {
               </Button>
 
               <Button
+                type="success"
                 onPress={() => navigation.navigate("Join")}
+                uppercase={false}
                 style={styles.button}
               >
                 File handling
@@ -101,10 +119,14 @@ const styles = {
   },
   button: {
     minWidth: "100%",
-    maxHeight: 40
+    maxHeight: 35
   },
   logoutButton: {
-    maxHeight: 40
+    maxHeight: 25
+  },
+  logoutBtnContainer: {
+    margin: 5,
+    marginTop: 10
   },
   btnContainer: {
     margin: 20,
@@ -112,7 +134,7 @@ const styles = {
     flex: 1
   },
   textStyle: {
-    color: Colors.primary,
+    color: Colors.secondary,
     fontWeight: "600"
   }
 };
@@ -125,7 +147,9 @@ const mapStateToProps = state => {
 };
 
 const mapDispatchToProps = dispatch => {
-  return {};
+  return {
+    onLogoutUser: user => dispatch(unsetUser(user))
+  };
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(HomeComponent);
