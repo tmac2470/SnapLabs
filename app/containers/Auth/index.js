@@ -37,7 +37,7 @@ export class JoinComponent extends Component<{}> {
       return;
     }
     onSaveUser(user);
-    navigation.goBack();
+    navigation.navigate("Home");
   }
 
   onUpdateUserCredentials(field, value) {
@@ -47,6 +47,7 @@ export class JoinComponent extends Component<{}> {
   }
 
   render() {
+    const { username, email } = this.state.user;
     return (
       <View style={styles.container}>
         <View style={styles.inputContainer}>
@@ -54,22 +55,26 @@ export class JoinComponent extends Component<{}> {
             style={[styles.input, styles.marginTop]}
             inputStyle={styles.inputText}
             placeholder="Username"
+            status={username ? "valid" : "warn"}
             autoCorrect={false}
             autoFocus={true}
             onChangeText={username =>
               this.onUpdateUserCredentials("username", username)
             }
-            value={this.state.user.username}
+            value={username}
           />
           <Input
             style={[styles.input, styles.marginTop]}
             inputStyle={styles.inputText}
             autoCorrect={false}
             placeholder="Email"
-            autoCapitalize = 'none'
+            status={this.validateEmail(email) ? "valid" : "warn"}
+            autoCapitalize="none"
             keyboardType="email-address"
-            onChangeText={email => this.onUpdateUserCredentials("email", email.toLowerCase())}
-            value={this.state.user.email}
+            onChangeText={e =>
+              this.onUpdateUserCredentials("email", e.toLowerCase())
+            }
+            value={email}
           />
         </View>
         <View style={styles.btnContainer}>
