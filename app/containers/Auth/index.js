@@ -55,7 +55,7 @@ export class JoinComponent extends Component<{}> {
             style={[styles.input, styles.marginTop]}
             inputStyle={styles.inputText}
             placeholder="Username"
-            status={username ? "valid" : "warn"}
+            status={username ? "valid" : "normal"}
             autoCorrect={false}
             autoFocus={true}
             onChangeText={username =>
@@ -68,7 +68,11 @@ export class JoinComponent extends Component<{}> {
             inputStyle={styles.inputText}
             autoCorrect={false}
             placeholder="Email"
-            status={this.validateEmail(email) ? "valid" : "warn"}
+            status={
+              email && this.validateEmail(email)
+                ? "valid"
+                : !email ? "normal" : "warn"
+            }
             autoCapitalize="none"
             keyboardType="email-address"
             onChangeText={e =>
