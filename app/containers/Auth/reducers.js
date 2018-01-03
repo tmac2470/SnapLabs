@@ -1,16 +1,20 @@
+import { combineReducers } from "redux";
+
 import { SET_USER } from "./constants";
 
-const initialState = {
-  user: {}
-};
+const initialState = {};
 
-export default function auth(state = initialState, action) {
+function userReducer(user = initialState, action) {
   switch (action.type) {
     case SET_USER:
-      state.user = action.user;
-      return state;
+      user = action.user;
+      return user;
 
     default:
-      return state;
+      return user;
   }
 }
+
+export default combineReducers({
+  user: userReducer
+});
