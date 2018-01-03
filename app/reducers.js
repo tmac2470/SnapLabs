@@ -7,6 +7,6 @@ import navReducer from "./Router/reducer";
 export default function getRootReducer() {
   return combineReducers({
     nav: navReducer,
-    currentuser: userReducer
+    currentUser: userReducer
   });
 }

@@ -12,11 +12,13 @@ export class JoinComponent extends Component<{}> {
   };
 
   state = {
-    user: {
-      email: "",
-      username: ""
-    }
+    user: {}
   };
+
+  constructor(props) {
+    super(props);
+    this.state.user = this.props.user;
+  }
 
   validateEmail(email) {
     var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
@@ -29,22 +31,19 @@ export class JoinComponent extends Component<{}> {
 
   submit() {
     const { user } = this.state;
-    const { onSaveUser } = this.props;
+    const { onSaveUser, navigation } = this.props;
     if (!this.validateEmail(user.email)) {
       this.showAlert();
       return;
     }
     onSaveUser(user);
+    navigation.goBack();
   }
 
-  onUpdateUserCredentials(value) {
-    const state = this.state;
-    this.setState(prevState => ({
-      user: {
-        username: value.username ? value.username : prevState.user.username,
-        email: value.email ? value.email : prevState.user.email
-      }
-    }));
+  onUpdateUserCredentials(field, value) {
+    const { user } = this.state;
+    user[field] = value;
+    this.setState({ user });
   }
 
   render() {
@@ -56,8 +55,9 @@ export class JoinComponent extends Component<{}> {
             inputStyle={styles.inputText}
             placeholder="Username"
             autoCorrect={false}
+            autoFocus={true}
             onChangeText={username =>
-              this.onUpdateUserCredentials({ username })
+              this.onUpdateUserCredentials("username", username)
             }
             value={this.state.user.username}
           />
@@ -66,8 +66,9 @@ export class JoinComponent extends Component<{}> {
             inputStyle={styles.inputText}
             autoCorrect={false}
             placeholder="Email"
+            autoCapitalize = 'none'
             keyboardType="email-address"
-            onChangeText={email => this.onUpdateUserCredentials({ email })}
+            onChangeText={email => this.onUpdateUserCredentials("email", email.toLowerCase())}
             value={this.state.user.email}
           />
         </View>
@@ -112,15 +113,13 @@ const styles = {
 
 const mapStateToProps = state => {
   return {
-    user: state
+    user: state.currentUser
   };
 };
 
 const mapDispatchToProps = dispatch => {
   return {
-    onSaveUser: user => {
-      dispatch(setUser(user));
-    }
+    onSaveUser: user => dispatch(setUser(user))
   };
 };
 
