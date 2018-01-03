@@ -1,5 +1,9 @@
 export default class Colors {
-  static primary = "#1CA7FC";
-  static primaryLightBackground = "#E6F6FF";
+  static primary = "#4586FF";
+  static secondary = "#32424A";
+  static tertiary = "#01ECD5";
+  static light = "#F5F5F5";
   static grey = "#999999";
+  static danger = "#E84545";
+  static valid = "#17B978";
 }

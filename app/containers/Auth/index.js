@@ -99,10 +99,9 @@ const styles = {
     justifyContent: "center"
   },
   input: {
-    borderColor: Colors.primary
+    // borderColor: Colors.primary
   },
   inputText: {
-    color: Colors.primary,
     fontSize: 18
   },
   marginTop: {
