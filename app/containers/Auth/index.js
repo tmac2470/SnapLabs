@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import { View, Alert } from "react-native";
 import { connect } from "react-redux";
+import { NavigationActions } from "react-navigation";
 
 import { Input, Button } from "nachos-ui";
 import Colors from "../../Theme/colors";
@@ -38,7 +39,15 @@ export class JoinComponent extends Component<{}> {
       return;
     }
     onSaveUser(user);
-    navigation.navigate("Home");
+    this._navigateTo("Home");
+  }
+
+  _navigateTo(routeName) {
+    const actionToDispatch = NavigationActions.reset({
+      index: 0,
+        actions: [NavigationActions.navigate({ routeName: routeName })]
+    });
+    this.props.navigation.dispatch(actionToDispatch);
   }
 
   onUpdateUserCredentials(field, value) {

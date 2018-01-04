@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
+import { NavigationActions } from "react-navigation";
 
 import { unsetUser } from "../Auth/actions";
 
@@ -42,11 +43,19 @@ export class HomeComponent extends Component<{}> {
   logout(props) {
     const { onLogoutUser, user, navigation } = props;
     onLogoutUser(user);
-    navigation.navigate("Join");
+    this._navigateTo("Join");
+  }
+
+  _navigateTo(routeName) {
+    const actionToDispatch = NavigationActions.reset({
+      index: 0,
+        actions: [NavigationActions.navigate({ routeName: routeName })]
+    });
+    this.props.navigation.dispatch(actionToDispatch);
   }
 
   render() {
-    const { navigation, isLoggedIn } = this.props;
+    const { navigation } = this.props;
 
     const iOSpic = require("../../../data/images/ti-sensor-tag.jpeg");
     const androidPic = require("../../../data/images/ti-sensor.png");
@@ -58,45 +67,32 @@ export class HomeComponent extends Component<{}> {
         <Image source={pic} style={styles.image} />
         <H2 style={styles.textStyle}>Create. Investigate. Share.</H2>
         <View style={styles.btnContainer}>
-          {!isLoggedIn ? (
-            <Button
-              type="success"
-              uppercase={false}
-              onPress={() => navigation.navigate("Join")}
-              style={styles.button}
-            >
-              Join
-            </Button>
-          ) : (
-            <View>
-              <Button
-                type="success"
-                uppercase={false}
-                onPress={() => navigation.navigate("Join")}
-                style={styles.button}
-              >
-                Select a local investigation
-              </Button>
+          <Button
+            type="success"
+            uppercase={false}
+            onPress={() => navigation.navigate("Join")}
+            style={styles.button}
+          >
+            Select a local investigation
+          </Button>
 
-              <Button
-                type="success"
-                uppercase={false}
-                onPress={() => navigation.navigate("Join")}
-                style={styles.button}
-              >
-                Download a new investigation
-              </Button>
+          <Button
+            type="success"
+            uppercase={false}
+            onPress={() => navigation.navigate("Join")}
+            style={styles.button}
+          >
+            Download a new investigation
+          </Button>
 
-              <Button
-                type="success"
-                onPress={() => navigation.navigate("Join")}
-                uppercase={false}
-                style={styles.button}
-              >
-                File handling
-              </Button>
-            </View>
-          )}
+          <Button
+            type="success"
+            onPress={() => navigation.navigate("Join")}
+            uppercase={false}
+            style={styles.button}
+          >
+            File handling
+          </Button>
         </View>
       </View>
     );
@@ -139,8 +135,7 @@ const styles = {
 
 const mapStateToProps = state => {
   return {
-    user: state.currentUser,
-    isLoggedIn: state.currentUser.isLoggedIn
+    user: state.currentUser
   };
 };
 

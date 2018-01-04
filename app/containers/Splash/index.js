@@ -18,7 +18,7 @@ export class SplashComponent extends Component<{}> {
   componentDidMount() {
     const { isLoggedIn } = this.props;
 
-    if (isLoggedIn) {
+    if (!isLoggedIn) {
       this._navigateTo("Home");
     } else {
       this._navigateTo("Join");
@@ -28,13 +28,11 @@ export class SplashComponent extends Component<{}> {
   // To set the new page as the first page instead of leaving splashscreen as the first one.
   _navigateTo(routeName) {
     setTimeout(() => {
-      // const actionToDispatch = NavigationActions.reset({
-      //   index: 0,
-      //   actions: [NavigationActions.navigate({ routeName })]
-      // });
-      // this.props.navigation.dispatch(actionToDispatch);
-
-      this.props.navigation.navigate(routeName);
+      const actionToDispatch = NavigationActions.reset({
+        index: 0,
+        actions: [NavigationActions.navigate({ routeName: routeName })]
+      });
+      this.props.navigation.dispatch(actionToDispatch);
     }, 500);
   }
 
@@ -42,7 +40,7 @@ export class SplashComponent extends Component<{}> {
     const iOSpic = require("../../../data/images/ti-sensor-tag.jpeg");
     const androidPic = require("../../../data/images/ti-sensor.png");
 
-    const pic = Platform.OS === "ios" ? iOSpic : androidPic;
+    const pic = Platform.OS !== "ios" ? iOSpic : androidPic;
 
     return (
       <View style={styles.container}>
