@@ -8,11 +8,11 @@ import Colors from '../Theme/colors';
 
 const AppNavigator = StackNavigator(
   {
-    Home: {
-      screen: HomeScreen
-    },
     Join: {
       screen: JoinScreen
+    },
+    Home: {
+      screen: HomeScreen
     }
   },
   {

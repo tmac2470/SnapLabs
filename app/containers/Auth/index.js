@@ -8,7 +8,8 @@ import { setUser } from "./actions";
 
 export class JoinComponent extends Component<{}> {
   static navigationOptions = {
-    title: "Join"
+    title: "Join",
+    headerLeft: null
   };
 
   state = {

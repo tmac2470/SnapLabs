@@ -9,8 +9,7 @@ import { Button, H2 } from "nachos-ui";
 import Colors from "../../Theme/colors";
 
 export class HomeComponent extends Component<{}> {
-  static navigationOptions = ({ navigation, isLoggedIn }) => {
-    console.log(isLoggedIn, "isLoggedIn");
+  static navigationOptions = ({ navigation }) => {
     const { params = {} } = navigation.state;
 
     return {
@@ -21,30 +20,29 @@ export class HomeComponent extends Component<{}> {
   };
 
   componentWillMount() {
-    const { navigation, isLoggedIn } = this.props;
+    const { navigation } = this.props;
 
-    if (isLoggedIn) {
-      const params = {
-        headerRight: (
-          <View style={styles.logoutBtnContainer}>
-            <Button
-              uppercase={false}
-              type="danger"
-              onPress={() => this.logout(this.props)}
-              style={styles.logoutButton}
-            >
-              Logout
-            </Button>
-          </View>
-        )
-      };
-      navigation.setParams(params);
-    }
+    const params = {
+      headerRight: (
+        <View style={styles.logoutBtnContainer}>
+          <Button
+            uppercase={false}
+            type="danger"
+            onPress={() => this.logout(this.props)}
+            style={styles.logoutButton}
+          >
+            Logout
+          </Button>
+        </View>
+      )
+    };
+    navigation.setParams(params);
   }
 
   logout(props) {
-    const { onLogoutUser, user } = props;
+    const { onLogoutUser, user, navigation } = props;
     onLogoutUser(user);
+    navigation.navigate("Join");
   }
 
   render() {
