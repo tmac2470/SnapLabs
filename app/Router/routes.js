@@ -3,11 +3,13 @@ import { StackNavigator } from "react-navigation";
 
 import HomeScreen from "../containers/Home";
 import JoinScreen from "../containers/Auth";
+import SplashScreen from "../containers/Splash";
 
-import Colors from '../Theme/colors';
+import Colors from "../Theme/colors";
 
 const AppNavigator = StackNavigator(
   {
+    SplashScreen: { screen: SplashScreen },
     Join: {
       screen: JoinScreen
     },
