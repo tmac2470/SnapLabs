@@ -18,7 +18,7 @@ export class SplashComponent extends Component<{}> {
   componentDidMount() {
     const { isLoggedIn } = this.props;
 
-    if (!isLoggedIn) {
+    if (isLoggedIn) {
       this._navigateTo("Home");
     } else {
       this._navigateTo("Join");

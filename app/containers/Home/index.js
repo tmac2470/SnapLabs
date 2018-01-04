@@ -10,35 +10,10 @@ import { Button, H2 } from "nachos-ui";
 import Colors from "../../Theme/colors";
 
 export class HomeComponent extends Component<{}> {
-  static navigationOptions = ({ navigation }) => {
-    const { params = {} } = navigation.state;
-
-    return {
-      title: "SnapLabs",
-      headerLeft: null,
-      ...navigation.state.params
-    };
+  static navigationOptions = {
+    headerLeft: null,
+    title: "Home"
   };
-
-  componentWillMount() {
-    const { navigation } = this.props;
-
-    const params = {
-      headerRight: (
-        <View style={styles.logoutBtnContainer}>
-          <Button
-            uppercase={false}
-            type="danger"
-            onPress={() => this.logout(this.props)}
-            style={styles.logoutButton}
-          >
-            Logout
-          </Button>
-        </View>
-      )
-    };
-    navigation.setParams(params);
-  }
 
   logout(props) {
     const { onLogoutUser, user, navigation } = props;
@@ -49,7 +24,7 @@ export class HomeComponent extends Component<{}> {
   _navigateTo(routeName) {
     const actionToDispatch = NavigationActions.reset({
       index: 0,
-        actions: [NavigationActions.navigate({ routeName: routeName })]
+      actions: [NavigationActions.navigate({ routeName: routeName })]
     });
     this.props.navigation.dispatch(actionToDispatch);
   }
@@ -64,13 +39,24 @@ export class HomeComponent extends Component<{}> {
 
     return (
       <View style={styles.container}>
+        <View style={styles.logoutBtnContainer}>
+          <Button
+            iconColor={Colors.danger}
+            iconName="ios-power"
+            onPress={() => this.logout(this.props)}
+            style={styles.logoutButton}
+          />
+        </View>
+
         <Image source={pic} style={styles.image} />
+
         <H2 style={styles.textStyle}>Create. Investigate. Share.</H2>
+
         <View style={styles.btnContainer}>
           <Button
             type="success"
             uppercase={false}
-            onPress={() => navigation.navigate("Join")}
+            onPress={() => this._navigateTo("Join")}
             style={styles.button}
           >
             Select a local investigation
@@ -105,7 +91,8 @@ const styles = {
     alignItems: "center",
     flexDirection: "column",
     justifyContent: "center",
-    backgroundColor: "white"
+    backgroundColor: "white",
+    position: "relative"
   },
   image: {
     width: "100%",
@@ -116,11 +103,13 @@ const styles = {
     maxHeight: 35
   },
   logoutButton: {
-    maxHeight: 25
+    backgroundColor: "transparent"
   },
   logoutBtnContainer: {
-    margin: 5,
-    marginTop: 10
+    position: "absolute",
+    right: 0,
+    top: 0,
+    zIndex: 1
   },
   btnContainer: {
     margin: 20,
