@@ -56,7 +56,7 @@ export class HomeComponent extends Component<{}> {
           <Button
             type="success"
             uppercase={false}
-            onPress={() => this._navigateTo("Join")}
+            onPress={() => navigation.navigate("InvestigationList")}
             style={styles.button}
           >
             Select a local investigation
@@ -65,7 +65,7 @@ export class HomeComponent extends Component<{}> {
           <Button
             type="success"
             uppercase={false}
-            onPress={() => navigation.navigate("Join")}
+            onPress={() => navigation.navigate("DownloadInvestigations")}
             style={styles.button}
           >
             Download a new investigation
@@ -73,7 +73,7 @@ export class HomeComponent extends Component<{}> {
 
           <Button
             type="success"
-            onPress={() => navigation.navigate("Join")}
+            onPress={() => navigation.navigate("SavedInvestigations")}
             uppercase={false}
             style={styles.button}
           >

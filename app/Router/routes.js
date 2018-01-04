@@ -4,6 +4,9 @@ import { StackNavigator } from "react-navigation";
 import HomeScreen from "../containers/Home";
 import JoinScreen from "../containers/Auth";
 import SplashScreen from "../containers/Splash";
+import DownloadInvestigationsScreen from "../containers/Investigations/Download";
+import InvestigationListScreen from "../containers/Investigations/List";
+import SavedInvestigationsScreen from "../containers/Investigations/Saved";
 
 import Colors from "../Theme/colors";
 
@@ -15,6 +18,15 @@ const AppNavigator = StackNavigator(
     },
     Home: {
       screen: HomeScreen
+    },
+    DownloadInvestigations: {
+      screen: DownloadInvestigationsScreen
+    },
+    InvestigationList: {
+      screen: InvestigationListScreen
+    },
+    SavedInvestigations: {
+      screen: SavedInvestigationsScreen
     }
   },
   {
