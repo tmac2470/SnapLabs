@@ -1,45 +1,20 @@
-import {
-  FETCH_INVESTIGATIONS,
-  FETCH_INVESTIGATIONS_FAILED,
-  FETCH_INVESTIGATIONS_SUCCESS
-} from "./constants";
+import { FETCH_INVESTIGATIONS_SUCCESS } from "./constants";
 
-const initialInvestigationsState = {
-  investigations: [],
-  isFetching: false
-};
+const initialDownloadInvestigationsState = [];
 
 export function downloadInvestigationsReducer(
-  initial = initialInvestigationsState,
+  initial = initialDownloadInvestigationsState,
   action
 ) {
-  const { isFetching, investigations, error } = action;
+  const { investigations } = action;
 
   switch (action.type) {
-    case FETCH_INVESTIGATIONS:
-      return {
-        ...initial,
-        isFetching,
-        investigations
-      };
-
     case FETCH_INVESTIGATIONS_SUCCESS:
-      return {
-        ...initial,
-        isFetching,
-        investigations
-      };
-
-    case FETCH_INVESTIGATIONS_FAILED:
-      return {
-        ...initial,
-        isFetching,
-        error
-      };
+      return [...initial, ...investigations];
 
     default:
-      return {
+      return [
         ...initial
-      };
+      ];
   }
 }

@@ -1,17 +1,27 @@
 import axios from "axios";
-import { FETCH_INVESTIGATIONS_SUCCESS } from "./constants";
+import {
+  DOWNLOAD_INVESTIGATION_SUCCESS,
+  DELETE_INVESTIGATION_SUCCESS
+} from "./constants";
 import { API_PATH } from "../../../constants";
 import { networkBusy, networkError } from "../../../Metastores/actions";
 
-export function fetchInvestigationsSuccess(investigations) {
+export function downloadInvestigationSuccess(investigation) {
   return {
-    type: FETCH_INVESTIGATIONS_SUCCESS,
-    investigations
+    type: DOWNLOAD_INVESTIGATION_SUCCESS,
+    investigation
   };
 }
 
-export const fetchInvestigations = () => {
-  const apiUrl = `${API_PATH}/experiments`;
+export function deleteInvestigationSuccess(investigation) {
+  return {
+    type: DELETE_INVESTIGATION_SUCCESS,
+    investigation
+  };
+}
+
+export const fetchInvestigationById = Id => {
+  const apiUrl = `${API_PATH}/experiments/${Id}`;
   // Returns a dispatcher function
   // that dispatches an action at a later time
   return dispatch => {
@@ -22,7 +32,7 @@ export const fetchInvestigations = () => {
       .then(response => {
         // Dispatch another action
         // to consume data
-        dispatch(fetchInvestigationsSuccess(response.data.data));
+        dispatch(downloadInvestigationSuccess(response.data.data));
         dispatch(networkBusy(false));
       })
       .catch(error => {

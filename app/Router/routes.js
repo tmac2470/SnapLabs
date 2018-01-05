@@ -5,8 +5,8 @@ import HomeScreen from "../containers/Home";
 import JoinScreen from "../containers/Auth";
 import SplashScreen from "../containers/Splash";
 import DownloadInvestigationsScreen from "../containers/Investigations/Download";
-import InvestigationListScreen from "../containers/Investigations/List";
-import SavedInvestigationsScreen from "../containers/Investigations/Saved";
+import InvestigationListScreen from "../containers/Investigations/Local";
+import SavedInvestigationsScreen from "../containers/Investigations/CSV";
 
 import Colors from "../Theme/colors";
 
