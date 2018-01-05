@@ -5,19 +5,22 @@ import { View, Image, Platform } from "react-native";
 import { Button, H2 } from "nachos-ui";
 
 import Colors from "../../../Theme/colors";
+import { fetchInvestigations } from "./actions";
 
 export class DownloadInvestigationsComponent extends Component<{}> {
   static navigationOptions = {
     title: "Download Investigations"
   };
 
-  render() {
+  componentWillMount() {
+    const { onFetchInvestigations } = this.props;
+    onFetchInvestigations();
+  }
 
+  render() {
     return (
       <View style={styles.container}>
-
         <H2 style={styles.textStyle}>Create. Investigate. Share.</H2>
-
       </View>
     );
   }
@@ -52,7 +55,11 @@ const mapStateToProps = state => {
 };
 
 const mapDispatchToProps = dispatch => {
-  return {};
+  return {
+    onFetchInvestigations: _ => dispatch(fetchInvestigations())
+  };
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(DownloadInvestigationsComponent);
+export default connect(mapStateToProps, mapDispatchToProps)(
+  DownloadInvestigationsComponent
+);
