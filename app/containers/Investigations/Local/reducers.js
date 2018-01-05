@@ -1,9 +1,9 @@
 import {
   DOWNLOAD_INVESTIGATION_SUCCESS,
-  DELETE_INVESTIGATION_SUCCESS
+  DELETE_INVESTIGATION
 } from "./constants";
 
-const initialLocalInvestigationsState = [];
+const initialLocalInvestigationsState = {};
 
 export function localInvestigationsReducer(
   initial = initialLocalInvestigationsState,
@@ -13,11 +13,16 @@ export function localInvestigationsReducer(
 
   switch (action.type) {
     case DOWNLOAD_INVESTIGATION_SUCCESS:
-      return [...initial, investigation];
+      initial[investigation._id] = investigation;
+      return {
+        ...initial
+      };
 
-    case DELETE_INVESTIGATION_SUCCESS:
-      initial = initial.filter(i => i._id !== investigation._id);
-      return [...initial];
+    case DELETE_INVESTIGATION:
+      delete initial[investigation._id];
+      return {
+        ...initial
+      };
 
     default:
       return {

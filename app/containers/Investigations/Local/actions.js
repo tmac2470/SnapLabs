@@ -1,7 +1,7 @@
 import axios from "axios";
 import {
   DOWNLOAD_INVESTIGATION_SUCCESS,
-  DELETE_INVESTIGATION_SUCCESS
+  DELETE_INVESTIGATION
 } from "./constants";
 import { API_PATH } from "../../../constants";
 import { networkBusy, networkError } from "../../../Metastores/actions";
@@ -13,9 +13,9 @@ export function downloadInvestigationSuccess(investigation) {
   };
 }
 
-export function deleteInvestigationSuccess(investigation) {
+export function deleteInvestigation(investigation) {
   return {
-    type: DELETE_INVESTIGATION_SUCCESS,
+    type: DELETE_INVESTIGATION,
     investigation
   };
 }

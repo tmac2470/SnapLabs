@@ -6,7 +6,8 @@ const newButtonTheme = {
   ...buttonTheme,
   BUTTON_STATE_PRIMARY: Colors.primary,
   BUTTON_STATE_SUCCESS: Colors.secondary,
-  BUTTON_STATE_DANGER: Colors.danger
+  BUTTON_STATE_DANGER: Colors.danger,
+  BUTTON_ROUNDED_RADIUS: 4
 }
 
 const inputTheme = themeManager.getStyle('Input')

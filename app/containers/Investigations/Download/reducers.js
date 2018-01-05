@@ -10,11 +10,9 @@ export function downloadInvestigationsReducer(
 
   switch (action.type) {
     case FETCH_INVESTIGATIONS_SUCCESS:
-      return [...initial, ...investigations];
+      return [...investigations];
 
     default:
-      return [
-        ...initial
-      ];
+      return [...initial];
   }
 }
