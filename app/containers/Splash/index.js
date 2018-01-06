@@ -33,7 +33,7 @@ export class SplashComponent extends Component<{}> {
         actions: [NavigationActions.navigate({ routeName: routeName })]
       });
       this.props.navigation.dispatch(actionToDispatch);
-    }, 500);
+    }, 100);
   }
 
   render() {
