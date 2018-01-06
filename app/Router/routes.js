@@ -7,6 +7,7 @@ import SplashScreen from "../containers/Splash";
 import DownloadInvestigationsScreen from "../containers/Investigations/Download";
 import InvestigationListScreen from "../containers/Investigations/Local";
 import SavedInvestigationsScreen from "../containers/Investigations/CSV";
+import InvestigationDetailsScreen from "../containers/InvestigationDetails";
 
 import Colors from "../Theme/colors";
 
@@ -27,6 +28,9 @@ const AppNavigator = StackNavigator(
     },
     SavedInvestigations: {
       screen: SavedInvestigationsScreen
+    },
+    InvestigationDetails: {
+      screen: InvestigationDetailsScreen
     }
   },
   {
