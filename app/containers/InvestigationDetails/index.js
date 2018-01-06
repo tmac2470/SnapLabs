@@ -2,24 +2,36 @@ import React, { Component } from "react";
 import { connect } from "react-redux";
 
 import { View, Image, Platform } from "react-native";
-import { Button, H2 } from "nachos-ui";
+import { Button, H2, H5 } from "nachos-ui";
 
 import Colors from "../../Theme/colors";
 
 export class InvestigationDetailsComponent extends Component<{}> {
   static navigationOptions = {
-    title: "Investigation"
+    title: "Investigation Details"
   };
 
-  componentWillMount() {
-    const { navigation } = this.props;
-    console.log(navigation.state.params.investigation);
-  }
-
   render() {
+    const { navigation } = this.props;
+    const investigation = navigation.state.params.investigation;
     return (
       <View style={styles.container}>
-        <H2 style={styles.textStyle}>Details</H2>
+        <H2 style={[styles.text, styles.textBold]}>{investigation.labTitle}</H2>
+
+        <View style={styles.infoBox}>
+          <H5 style={[styles.text, styles.textBold]}>
+            Sample Interval: {investigation.sampleInterval}ms
+          </H5>
+          <H5 style={[styles.text, styles.textBold]}>Status: Not connected!</H5>
+
+          <H5 style={[styles.text, styles.textBold]}>
+            No sensors enabled to run the investigation!
+          </H5>
+          <H5 style={styles.text}>
+            Please recheck if at least one parameter (eg IR) has been enabled
+            for the chosen sensor (eg Temperature).
+          </H5>
+        </View>
       </View>
     );
   }
@@ -28,14 +40,17 @@ export class InvestigationDetailsComponent extends Component<{}> {
 const styles = {
   container: {
     flex: 1,
-    alignItems: "center",
-    flexDirection: "column",
-    justifyContent: "center",
     backgroundColor: "white",
-    padding: 15
+    paddingRight: 10,
+    paddingLeft: 10
   },
-  textStyle: {
-    color: Colors.secondary,
+  infoBox: {
+    padding: 0
+  },
+  text: {
+    color: Colors.secondary
+  },
+  textBold: {
     fontWeight: "600"
   }
 };
