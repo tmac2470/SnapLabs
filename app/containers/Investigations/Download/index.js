@@ -118,13 +118,6 @@ export class DownloadInvestigationsComponent extends Component<{}> {
           keyExtractor={this._keyExtractor}
           renderItem={this._renderInvestigation}
         />
-        <View style={styles.spinnerContainer}>
-          <Spinner
-            type="FadingCircleAlt"
-            isVisible={!!isFetching}
-            color={Colors.primary}
-          />
-        </View>
       </View>
     );
   }

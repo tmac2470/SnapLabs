@@ -134,12 +134,12 @@ const styles = {
   header: {
     color: Colors.secondary,
     fontWeight: "600",
-    padding: 15,
-    flex: 1
+    padding: 10
   },
   footerButtonContainer: {
     flex: 1,
-    maxHeight: 40
+    maxHeight: 60,
+    padding: 10
   },
   footerButton: {
     width: "100%",
