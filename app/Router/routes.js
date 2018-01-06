@@ -8,6 +8,7 @@ import DownloadInvestigationsScreen from "../containers/Investigations/Download"
 import InvestigationListScreen from "../containers/Investigations/Local";
 import SavedInvestigationsScreen from "../containers/Investigations/CSV";
 import InvestigationDetailsScreen from "../containers/InvestigationDetails";
+import BluetoothConnectScreen from "../containers/Bluetooth";
 
 import Colors from "../Theme/colors";
 
@@ -31,6 +32,9 @@ const AppNavigator = StackNavigator(
     },
     InvestigationDetails: {
       screen: InvestigationDetailsScreen
+    },
+    BluetoothConnect: {
+      screen: BluetoothConnectScreen
     }
   },
   {

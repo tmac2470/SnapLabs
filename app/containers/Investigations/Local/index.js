@@ -92,7 +92,7 @@ export class LocalInvestigationsComponent extends Component<{}> {
 
   render() {
     // https://dev-blog.apollodata.com/loading-data-into-react-natives-flatlist-9646fa9a199b
-    const { localInvestigations, isFetching } = this.props;
+    const { localInvestigations, isFetching, navigation } = this.props;
     const localInvestigationsArray = this._convertObjectToArray(
       localInvestigations
     );
@@ -101,12 +101,23 @@ export class LocalInvestigationsComponent extends Component<{}> {
       <View style={styles.container}>
         <H3 style={styles.header}>Select an investigation</H3>
         <FlatList
+          style={styles.list}
           data={localInvestigationsArray}
           refreshing={!!isFetching}
           extraData={this.state}
           keyExtractor={this._keyExtractor}
           renderItem={this._renderInvestigation}
         />
+
+        <View style={styles.footerButtonContainer}>
+          <Button
+            uppercase={false}
+            onPress={() => navigation.navigate("BluetoothConnect")}
+            style={styles.footerButton}
+          >
+            Sensor Tags
+          </Button>
+        </View>
       </View>
     );
   }
@@ -114,19 +125,33 @@ export class LocalInvestigationsComponent extends Component<{}> {
 
 const styles = {
   container: {
+    flexDirection: "column",
     flex: 1
+  },
+  list: {
+    flex: 4
+  },
+  header: {
+    color: Colors.secondary,
+    fontWeight: "600",
+    padding: 15,
+    flex: 1
+  },
+  footerButtonContainer: {
+    flex: 1,
+    maxHeight: 40
+  },
+  footerButton: {
+    width: "100%",
+    borderRadius: 0,
+    maxHeight: 40
   },
   listItem: {
     borderBottomColor: "black",
     backgroundColor: "white",
     borderBottomWidth: 0.5,
-    paddingLeft: 15,
-    paddingRight: 15
-  },
-  spinnerContainer: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center"
+    paddingLeft: 10,
+    paddingRight: 10
   },
   labTitle: {
     color: Colors.primary,
@@ -142,11 +167,6 @@ const styles = {
   button: {
     width: "100%",
     maxHeight: 30
-  },
-  header: {
-    color: Colors.secondary,
-    fontWeight: "600",
-    padding: 15
   }
 };
 
