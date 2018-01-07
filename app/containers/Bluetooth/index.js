@@ -2,11 +2,20 @@ import React, { Component } from "react";
 import { connect } from "react-redux";
 import BleManager from "react-native-ble-manager";
 
-import { View, FlatList, Platform, PermissionsAndroid } from "react-native";
-import { Button, H5, H4 } from "nachos-ui";
+import {
+  View,
+  TouchableOpacity,
+  FlatList,
+  Platform,
+  PermissionsAndroid
+} from "react-native";
+import { Button, H5, H4, Badge } from "nachos-ui";
 import Spinner from "react-native-spinkit";
 
 import Colors from "../../Theme/colors";
+
+import { bluetoothStart, deviceConnect, deviceDisconnect } from "./actions.js";
+import { networkError } from "../../Metastores/actions";
 
 export class BluetoothConnectComponent extends Component<{}> {
   static navigationOptions = {
@@ -14,36 +23,46 @@ export class BluetoothConnectComponent extends Component<{}> {
   };
 
   state = {
-    isScanning: false,
+    isBusy: false,
     peripherals: [],
     appState: ""
   };
 
   // Start with the Blemanager start method to initialise bluetooth
   componentDidMount() {
-    BleManager.start({ showAlert: false })
-      .then(e => {
-        // Start scan once initialisation complete
-        this.startScan();
-      })
-      .catch(e => {
-        console.log(e);
-      });
+    const {
+      connectedDevices,
+      bluetoothStarted,
+      onBluetoothStarted,
+      onNetworkError
+    } = this.props;
+    BleManager.checkState();
+
+    if (!bluetoothStarted) {
+      // Call .start only once
+      BleManager.start({ showAlert: false })
+        .then(e => {
+          // Start scan once initialisation complete
+          this.startScan();
+          onBluetoothStarted();
+        })
+        .catch(error => {
+          onNetworkError(error.message);
+        });
+    } else {
+      this.startScan();
+    }
 
     if (Platform.OS === "android" && Platform.Version >= 23) {
       PermissionsAndroid.check(
         PermissionsAndroid.PERMISSIONS.ACCESS_COARSE_LOCATION
       ).then(result => {
-        if (result) {
-          console.log("Permission is OK");
-        } else {
+        if (!result) {
           PermissionsAndroid.requestPermission(
             PermissionsAndroid.PERMISSIONS.ACCESS_COARSE_LOCATION
           ).then(result => {
-            if (result) {
-              console.log("User accept");
-            } else {
-              console.log("User refuse");
+            if (!result) {
+              onNetworkError("User refused bluetooth");
             }
           });
         }
@@ -52,13 +71,14 @@ export class BluetoothConnectComponent extends Component<{}> {
   }
 
   startScan() {
-    if (!this.state.isScanning) {
+    const { onNetworkError } = this.props;
+    if (!this.state.isBusy) {
       BleManager.scan([], 10, false)
         .then(_ => {
-          this.setState({ isScanning: true });
+          this.setState({ isBusy: true });
         })
-        .catch(e => {
-          console.log("error getting peripherals", e);
+        .catch(error => {
+          onNetworkError(error.message);
         });
     }
 
@@ -66,49 +86,124 @@ export class BluetoothConnectComponent extends Component<{}> {
       BleManager.stopScan()
         .then(e => {
           // Success code
-          this.setState({ isScanning: false });
+          this.setState({ isBusy: false });
 
           // Once the scan is stopped get the discovered peripherals
           BleManager.getDiscoveredPeripherals([])
             .then(peripherals => {
               // Create a set of unique peripherals
-              peripherals = [...new Set(peripherals, this.state.peripherals)];
+              const peripheralMap = new Map();
+              const allPeripherals = peripherals.concat(this.state.peripherals);
+
+              allPeripherals.map((peripheral, i) => {
+                peripheralMap.set(peripheral.id, peripheral);
+              });
+
               this.setState({
-                peripherals
+                peripherals: Array.from(peripheralMap.values())
               });
             })
-            .catch(e => {
-              console.log("error discovering", e);
+            .catch(error => {
+              onNetworkError(error.message);
             });
         })
-        .catch(e => {
-          console.log("error stopping", e);
+        .catch(error => {
+          onNetworkError(error.message);
         });
     }, 5000);
+  }
+
+  connectToDevice(device) {
+    const { onDeviceConnect, onNetworkError } = this.props;
+    this.setState({ isBusy: true });
+
+    BleManager.connect(device.id)
+      .then(_ => {
+        this.setState({
+          isBusy: false
+        });
+
+        onDeviceConnect(device);
+        // Hack to let the component know that devices have changed
+        this.forceUpdate();
+      })
+      .catch(error => {
+        this.setState({ isBusy: false });
+        onNetworkError(error.message);
+      });
+  }
+
+  disConnectDevice(device) {
+    const { onDeviceDisconnect, onNetworkError } = this.props;
+    this.setState({ isBusy: true });
+
+    BleManager.disconnect(device.id)
+      .then(e => {
+        this.setState({
+          isBusy: false
+        });
+        onDeviceDisconnect(device);
+        // Hack to let the component know that devices have changed
+        this.forceUpdate();
+      })
+      .catch(error => {
+        this.setState({ isBusy: false });
+        onNetworkError(error.message);
+      });
   }
 
   _keyExtractor = (item, index) => item.id;
 
   _renderDeviceDetails = ({ item }) => {
+    const { connectedDevices } = this.props;
+
     return (
       <View>
-        <H4 style={styles.text}>{item.name}</H4>
+        {!item.name ? null : (
+          <View>
+            {connectedDevices[item.id] ? (
+              <TouchableOpacity
+                style={styles.deviceContainer}
+                onPress={() => this.disConnectDevice(item)}
+              >
+                <H4 style={[styles.text, styles.connected]}>
+                  {!!item.advertising && !!item.advertising.kCBAdvDataLocalName
+                    ? item.advertising.kCBAdvDataLocalName
+                    : item.name}
+                </H4>
+                <Badge
+                  style={styles.badge}
+                  value={"Disconnect"}
+                  color={Colors.danger}
+                />
+              </TouchableOpacity>
+            ) : (
+              <TouchableOpacity
+                style={styles.deviceContainer}
+                onPress={() => this.connectToDevice(item)}
+              >
+                <H4 style={styles.text}>
+                  {!!item.advertising && !!item.advertising.kCBAdvDataLocalName
+                    ? item.advertising.kCBAdvDataLocalName
+                    : item.name}
+                </H4>
+                <Badge
+                  style={styles.badge}
+                  value={"Connect"}
+                  color={Colors.success}
+                />
+              </TouchableOpacity>
+            )}
+          </View>
+        )}
       </View>
     );
   };
 
   render() {
-    const { isScanning, peripherals } = this.state;
+    const { isBusy, peripherals } = this.state;
     return (
       <View style={styles.container}>
-        <H5 style={styles.text}>Status : Not connected</H5>
-        <View style={styles.spinnerContainer}>
-          <Spinner
-            type="FadingCircleAlt"
-            isVisible={!!isScanning}
-            color={Colors.primary}
-          />
-        </View>
         <FlatList
           style={styles.list}
           onRefresh={() => this.startScan}
@@ -118,9 +213,16 @@ export class BluetoothConnectComponent extends Component<{}> {
           keyExtractor={this._keyExtractor}
           renderItem={this._renderDeviceDetails}
         />
+        <View style={styles.spinnerContainer}>
+          <Spinner
+            type="FadingCircleAlt"
+            isVisible={!!isBusy}
+            color={Colors.primary}
+          />
+        </View>
         <View style={styles.footerButtonContainer}>
           <Button
-            disabled={!!isScanning}
+            disabled={!!isBusy}
             uppercase={false}
             onPress={() => this.startScan()}
             style={styles.footerButton}
@@ -136,8 +238,7 @@ export class BluetoothConnectComponent extends Component<{}> {
 const styles = {
   container: {
     flexDirection: "column",
-    flex: 1,
-    position: "relative"
+    flex: 1
   },
   list: {
     flex: 4
@@ -145,17 +246,14 @@ const styles = {
   spinnerContainer: {
     padding: 10,
     justifyContent: "center",
-    alignItems: "center",
-    position: "absolute",
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0
+    alignItems: "center"
   },
   text: {
     color: Colors.secondary,
-    fontWeight: "600",
-    padding: 10
+    fontWeight: "600"
+  },
+  connected: {
+    color: Colors.success
   },
   footerButtonContainer: {
     flex: 1,
@@ -163,18 +261,33 @@ const styles = {
     padding: 10
   },
   footerButton: {
-    width: "100%",
-    borderRadius: 0,
-    maxHeight: 40
+    width: "100%"
+  },
+  deviceContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    padding: 10
+  },
+  badge: {
+    maxHeight: 24
   }
 };
 
 const mapStateToProps = state => {
-  return {};
+  return {
+    bluetoothStarted: state.bluetooth.started,
+    connectedDevices: state.bluetooth.connectedDevices
+  };
 };
 
 const mapDispatchToProps = dispatch => {
-  return {};
+  return {
+    onBluetoothStarted: started => dispatch(bluetoothStart(true)),
+    onDeviceConnect: device => dispatch(deviceConnect(device)),
+    onDeviceDisconnect: device => dispatch(deviceDisconnect(device)),
+    onNetworkError: error => dispatch(networkError(error))
+  };
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(

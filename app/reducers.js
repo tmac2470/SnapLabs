@@ -5,6 +5,7 @@ import { userReducer } from "./containers/Auth/reducers";
 import { downloadInvestigationsReducer } from "./containers/Investigations/Download/reducers";
 import { localInvestigationsReducer } from "./containers/Investigations/Local/reducers";
 import { metaStoreReducer } from "./Metastores/reducers";
+import { bluetoothReducer } from "./containers/Bluetooth/reducers";
 
 import navReducer from "./Router/reducer";
 
@@ -14,6 +15,7 @@ export default function getRootReducer() {
     currentUser: userReducer,
     downloadInvestigations: downloadInvestigationsReducer,
     meta: metaStoreReducer,
-    localInvestigations: localInvestigationsReducer
+    localInvestigations: localInvestigationsReducer,
+    bluetooth: bluetoothReducer
   });
 }

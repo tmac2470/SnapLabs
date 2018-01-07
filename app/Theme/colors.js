@@ -6,4 +6,5 @@ export default class Colors {
   static grey = "#999999";
   static danger = "#E84545";
   static valid = "#17B978";
+  static success = "green";
 }
