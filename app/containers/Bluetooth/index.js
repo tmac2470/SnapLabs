@@ -16,6 +16,7 @@ import Colors from "../../Theme/colors";
 
 import { bluetoothStart, deviceConnect, deviceDisconnect } from "./actions.js";
 import { networkError } from "../../Metastores/actions";
+import * as SERVICES from "./services";
 
 export class BluetoothConnectComponent extends Component<{}> {
   static navigationOptions = {
@@ -91,16 +92,8 @@ export class BluetoothConnectComponent extends Component<{}> {
           // Once the scan is stopped get the discovered peripherals
           BleManager.getDiscoveredPeripherals([])
             .then(peripherals => {
-              // Create a set of unique peripherals
-              const peripheralMap = new Map();
-              const allPeripherals = peripherals.concat(this.state.peripherals);
-
-              allPeripherals.map((peripheral, i) => {
-                peripheralMap.set(peripheral.id, peripheral);
-              });
-
               this.setState({
-                peripherals: Array.from(peripheralMap.values())
+                peripherals
               });
             })
             .catch(error => {
@@ -113,6 +106,37 @@ export class BluetoothConnectComponent extends Component<{}> {
     }, 5000);
   }
 
+  _pingDevice(device) {
+    const service = SERVICES.IOBUTTON;
+    const { onNetworkError } = this.props;
+    console.log("pinging device", device, service);
+
+    BleManager.startNotification(device.id, service.UUID, service.DATA)
+      .then(e => {
+        console.log(device, e);
+      })
+      .catch(error => {
+        console.log(error);
+        onNetworkError(error.message);
+      });
+  }
+
+  _getDeviceBatteryInfo(device) {
+    const service = SERVICES.BATTERY;
+    const { onNetworkError } = this.props;
+    console.log("battery of device", device, service);
+
+    BleManager.read(device.id, "AA80", service.DATA)
+      .then(e => {
+        console.log(device, e);
+      })
+      .catch(error => {
+        console.log(error);
+        onNetworkError(error.message);
+      });
+  }
+
+  // When the device has been connected ping it and then get its battery status
   connectToDevice(device) {
     const { onDeviceConnect, onNetworkError } = this.props;
     this.setState({ isBusy: true });
@@ -124,6 +148,8 @@ export class BluetoothConnectComponent extends Component<{}> {
         });
 
         onDeviceConnect(device);
+        this._pingDevice(device);
+        this._getDeviceBatteryInfo(device);
         // Hack to let the component know that devices have changed
         this.forceUpdate();
       })
