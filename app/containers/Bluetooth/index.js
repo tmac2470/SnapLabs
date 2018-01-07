@@ -1,22 +1,32 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
 import BleManager from "react-native-ble-manager";
-
 import {
   View,
   TouchableOpacity,
   FlatList,
   Platform,
+  Text,
+  NativeModules,
+  NativeEventEmitter,
   PermissionsAndroid
 } from "react-native";
-import { Button, H5, H4, Badge } from "nachos-ui";
+import { Button, H5, H4, H6, Badge } from "nachos-ui";
 import Spinner from "react-native-spinkit";
 
 import Colors from "../../Theme/colors";
 
-import { bluetoothStart, deviceConnect, deviceDisconnect } from "./actions.js";
+import {
+  bluetoothStart,
+  deviceConnect,
+  deviceDisconnect,
+  updateConnectedDevice
+} from "./actions.js";
 import { networkError } from "../../Metastores/actions";
 import * as SERVICES from "./services";
+
+const BleManagerModule = NativeModules.BleManager;
+const bleManagerEmitter = new NativeEventEmitter(BleManagerModule);
 
 export class BluetoothConnectComponent extends Component<{}> {
   static navigationOptions = {
@@ -26,7 +36,7 @@ export class BluetoothConnectComponent extends Component<{}> {
   state = {
     isBusy: false,
     peripherals: [],
-    appState: ""
+    connectedDeviceKeyPressed: {}
   };
 
   // Start with the Blemanager start method to initialise bluetooth
@@ -52,7 +62,12 @@ export class BluetoothConnectComponent extends Component<{}> {
         });
     } else {
       this.startScan();
+      this._pingAllConnectedDevices();
     }
+    this._bleEmitterEvent = bleManagerEmitter.addListener(
+      "BleManagerDidUpdateValueForCharacteristic",
+      this._subscribeToBleData.bind(this)
+    );
 
     if (Platform.OS === "android" && Platform.Version >= 23) {
       PermissionsAndroid.check(
@@ -69,6 +84,63 @@ export class BluetoothConnectComponent extends Component<{}> {
         }
       });
     }
+  }
+
+  componentWillUnmount() {
+    this._unpingAllConnectedDevices();
+    this._bleEmitterEvent.remove();
+  }
+
+  _highlightConnectedDevice(deviceId, value) {
+    const { connectedDeviceKeyPressed } = this.state;
+    if (value.length > 0 && !!value[0]) {
+      if (value[0] > 0) {
+        connectedDeviceKeyPressed[deviceId] = true;
+      } else {
+        connectedDeviceKeyPressed[deviceId] = false;
+      }
+    } else {
+      connectedDeviceKeyPressed[deviceId] = false;
+    }
+    this.forceUpdate();
+  }
+  // Subscribes to the data emitted by ble module
+  // Will work only when notifications have been started
+  // Parameter: data => contains the peripheral(deviceID), characteristicUUID  and its value
+  // Need tp segregate the data based on peripheral(deviceID) and characteristicUUID
+  _subscribeToBleData(data) {
+    const { peripheral, characteristic, value } = data;
+    const state = new Uint8Array(value);
+    this._highlightConnectedDevice(peripheral, state);
+  }
+
+  _pingAllConnectedDevices() {
+    const { connectedDevices, onNetworkError } = this.props;
+    Object.keys(connectedDevices).map(Id => {
+      BleManager.retrieveServices(Id)
+        .then(_ => {
+          this._pingDevice(connectedDevices[Id]);
+        })
+        .catch(error => {
+          onNetworkError(error.message);
+        });
+    });
+  }
+
+  _unpingAllConnectedDevices() {
+    const service = SERVICES.IOBUTTON;
+    const { onNetworkError, connectedDevices } = this.props;
+
+    Object.keys(connectedDevices).map(key => {
+      const device = connectedDevices[key];
+      BleManager.stopNotification(device.id, service.UUID, service.DATA)
+        .then(e => {
+          // Success
+        })
+        .catch(error => {
+          onNetworkError(error.message);
+        });
+    });
   }
 
   startScan() {
@@ -109,29 +181,28 @@ export class BluetoothConnectComponent extends Component<{}> {
   _pingDevice(device) {
     const service = SERVICES.IOBUTTON;
     const { onNetworkError } = this.props;
-    console.log("pinging device", device, service);
 
     BleManager.startNotification(device.id, service.UUID, service.DATA)
       .then(e => {
-        console.log(device, e);
+        // Once the notifications have been started, listen to the handlerUpdate event
       })
       .catch(error => {
-        console.log(error);
         onNetworkError(error.message);
       });
   }
 
   _getDeviceBatteryInfo(device) {
     const service = SERVICES.BATTERY;
-    const { onNetworkError } = this.props;
-    console.log("battery of device", device, service);
+    const { onNetworkError, onUpdateConnectedDevice } = this.props;
 
-    BleManager.read(device.id, "AA80", service.DATA)
-      .then(e => {
-        console.log(device, e);
+    BleManager.read(device.id, service.UUID, service.DATA)
+      .then(data => {
+        const state = new Uint8Array(data);
+        device.batteryLevel = state[0];
+        onUpdateConnectedDevice(device);
+        this.forceUpdate();
       })
       .catch(error => {
-        console.log(error);
         onNetworkError(error.message);
       });
   }
@@ -148,10 +219,16 @@ export class BluetoothConnectComponent extends Component<{}> {
         });
 
         onDeviceConnect(device);
-        this._pingDevice(device);
-        this._getDeviceBatteryInfo(device);
-        // Hack to let the component know that devices have changed
-        this.forceUpdate();
+        BleManager.retrieveServices(device.id)
+          .then(device => {
+            this._pingDevice(device);
+            this._getDeviceBatteryInfo(device);
+            // Hack to let the component know that devices have changed
+            this.forceUpdate();
+          })
+          .catch(error => {
+            onNetworkError(error.message);
+          });
       })
       .catch(error => {
         this.setState({ isBusy: false });
@@ -182,21 +259,42 @@ export class BluetoothConnectComponent extends Component<{}> {
 
   _renderDeviceDetails = ({ item }) => {
     const { connectedDevices } = this.props;
+    const { connectedDeviceKeyPressed } = this.state;
+    const connectedDevice = connectedDevices[item.id];
+
+    const getHighlightedDeviceContainerStyle = deviceId => {
+      if (connectedDeviceKeyPressed[deviceId]) {
+        return styles.highlightDeviceContainer;
+      } else {
+        return {};
+      }
+    };
 
     return (
       <View>
         {!item.name ? null : (
           <View>
-            {connectedDevices[item.id] ? (
+            {connectedDevice ? (
               <TouchableOpacity
-                style={styles.deviceContainer}
+                style={[
+                  styles.deviceContainer,
+                  getHighlightedDeviceContainerStyle(item.id)
+                ]}
                 onPress={() => this.disConnectDevice(item)}
               >
                 <H4 style={[styles.text, styles.connected]}>
-                  {!!item.advertising && !!item.advertising.kCBAdvDataLocalName
-                    ? item.advertising.kCBAdvDataLocalName
-                    : item.name}
+                  {!!connectedDevice.advertising &&
+                  !!connectedDevice.advertising.kCBAdvDataLocalName
+                    ? connectedDevice.advertising.kCBAdvDataLocalName
+                    : connectedDevice.name}
                 </H4>
+                <Text style={styles.deviceInfo}>{connectedDevice.id}</Text>
+                {!connectedDevice.batteryLevel ? null : (
+                  <Text style={styles.deviceInfo}>
+                    Battery level : {connectedDevice.batteryLevel}%
+                  </Text>
+                )}
+
                 <Badge
                   style={styles.badge}
                   value={"Disconnect"}
@@ -213,6 +311,7 @@ export class BluetoothConnectComponent extends Component<{}> {
                     ? item.advertising.kCBAdvDataLocalName
                     : item.name}
                 </H4>
+                <Text style={styles.deviceInfo}>{item.id}</Text>
                 <Badge
                   style={styles.badge}
                   value={"Connect"}
@@ -228,8 +327,17 @@ export class BluetoothConnectComponent extends Component<{}> {
 
   render() {
     const { isBusy, peripherals } = this.state;
+    const { connectedDevices } = this.props;
+    const numOfConnectedDevices = Object.keys(connectedDevices).length;
     return (
       <View style={styles.container}>
+        {numOfConnectedDevices > 0 && peripherals.length > 0 ? (
+          <View style={styles.connectedInfoContainer}>
+            <H6 style={styles.text}>
+              Press any button on the device to highlight the device name
+            </H6>
+          </View>
+        ) : null}
         <FlatList
           style={styles.list}
           onRefresh={() => this.startScan}
@@ -274,9 +382,15 @@ const styles = {
     justifyContent: "center",
     alignItems: "center"
   },
+  connectedInfoContainer: {
+    padding: 10
+  },
   text: {
     color: Colors.secondary,
     fontWeight: "600"
+  },
+  deviceInfo: {
+    color: Colors.secondary
   },
   connected: {
     color: Colors.success
@@ -290,13 +404,29 @@ const styles = {
     width: "100%"
   },
   deviceContainer: {
-    flexDirection: "row",
+    flexDirection: "column",
     justifyContent: "space-between",
-    alignItems: "center",
-    padding: 10
+    alignItems: "flex-start",
+    padding: 2,
+    paddingBottom: 10,
+    backgroundColor: "white",
+    borderColor: "transparent",
+
+    borderLeftWidth: 8,
+    borderRightWidth: 8,
+    borderLeftColor: "transparent",
+    borderRightColor: "transparent",
+
+    borderBottomColor: "black",
+    borderBottomWidth: 0.5
+  },
+  highlightDeviceContainer: {
+    borderLeftColor: Colors.primary,
+    borderRightColor: Colors.primary
   },
   badge: {
-    maxHeight: 24
+    maxHeight: 24,
+    marginTop: 5
   }
 };
 
@@ -312,7 +442,8 @@ const mapDispatchToProps = dispatch => {
     onBluetoothStarted: started => dispatch(bluetoothStart(true)),
     onDeviceConnect: device => dispatch(deviceConnect(device)),
     onDeviceDisconnect: device => dispatch(deviceDisconnect(device)),
-    onNetworkError: error => dispatch(networkError(error))
+    onNetworkError: error => dispatch(networkError(error)),
+    onUpdateConnectedDevice: device => dispatch(updateConnectedDevice(device))
   };
 };
 

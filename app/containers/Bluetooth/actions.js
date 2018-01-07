@@ -1,8 +1,16 @@
 import {
   BLUETOOTH_STARTED,
+  CONNECT_DEVICE_SUCCESS,
   DISCONNECT_DEVICE_SUCCESS,
-  CONNECT_DEVICE_SUCCESS
+  UPDATE_DEVICE_SUCCESS
 } from "./constants";
+
+export function updateConnectedDevice(device) {
+  return {
+    type: UPDATE_DEVICE_SUCCESS,
+    device
+  };
+}
 
 export function bluetoothStart(started) {
   return {

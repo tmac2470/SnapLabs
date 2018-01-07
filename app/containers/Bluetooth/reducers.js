@@ -1,7 +1,8 @@
 import {
   BLUETOOTH_STARTED,
+  CONNECT_DEVICE_SUCCESS,
   DISCONNECT_DEVICE_SUCCESS,
-  CONNECT_DEVICE_SUCCESS
+  UPDATE_DEVICE_SUCCESS
 } from "./constants";
 
 const initialBluetoothState = {
@@ -13,6 +14,16 @@ export function bluetoothReducer(initial = initialBluetoothState, action) {
   const { device, started } = action;
   const connectedDevices = initial.connectedDevices;
   switch (action.type) {
+    case UPDATE_DEVICE_SUCCESS:
+      connectedDevices[device.id] = {
+        ...connectedDevices[device.id],
+        ...device
+      };
+      return {
+        ...initial,
+        connectedDevices
+      };
+
     case BLUETOOTH_STARTED:
       return {
         ...initial,
