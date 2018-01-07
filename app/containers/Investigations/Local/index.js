@@ -143,8 +143,7 @@ const styles = {
   },
   footerButton: {
     width: "100%",
-    borderRadius: 0,
-    maxHeight: 40
+    borderRadius: 0
   },
   listItem: {
     borderBottomColor: "black",

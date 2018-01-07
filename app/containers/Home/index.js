@@ -99,8 +99,7 @@ const styles = {
     height: "60%"
   },
   button: {
-    minWidth: "100%",
-    maxHeight: 35
+    minWidth: "100%"
   },
   logoutButton: {
     backgroundColor: "transparent"

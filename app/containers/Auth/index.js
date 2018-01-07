@@ -45,7 +45,7 @@ export class JoinComponent extends Component<{}> {
   _navigateTo(routeName) {
     const actionToDispatch = NavigationActions.reset({
       index: 0,
-        actions: [NavigationActions.navigate({ routeName: routeName })]
+      actions: [NavigationActions.navigate({ routeName: routeName })]
     });
     this.props.navigation.dispatch(actionToDispatch);
   }
@@ -91,11 +91,11 @@ export class JoinComponent extends Component<{}> {
             value={email}
           />
         </View>
-        <View style={styles.btnContainer}>
+        <View style={styles.footerButtonContainer}>
           <Button
             disabled={!this.validateEmail(email)}
             onPress={this.submit.bind(this)}
-            style={styles.saveBtn}
+            style={styles.footerButton}
           >
             Save
           </Button>
@@ -125,11 +125,14 @@ const styles = {
   marginTop: {
     marginTop: 15
   },
-  saveBtn: {
-    minWidth: "100%"
+  footerButtonContainer: {
+    flex: 1,
+    maxHeight: 60,
+    padding: 10
   },
-  btnContainer: {
-    flex: 2
+  footerButton: {
+    width: "100%",
+    borderRadius: 0
   }
 };
 
