@@ -1,15 +1,7 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
-
-import {
-  View,
-  TouchableOpacity,
-  Image,
-  Platform,
-  FlatList
-} from "react-native";
-import { Button, H3, H4, H5 } from "nachos-ui";
-import Spinner from "react-native-spinkit";
+import { View } from "react-native";
+import InvestigationList from "../../../components/InvestigationList";
 
 import Colors from "../../../Theme/colors";
 import { fetchInvestigations } from "./actions";
@@ -24,99 +16,40 @@ export class DownloadInvestigationsComponent extends Component<{}> {
     expand: {}
   };
 
+  _onExpandInvestigation(investigation) {
+    const { expand } = this.state;
+    this.setState({
+      expand: { [investigation._id]: !expand[investigation._id] }
+    });
+  }
+
   componentWillMount() {
     const { onFetchInvestigations } = this.props;
     onFetchInvestigations();
   }
 
-  _renderInvestigation = ({ item }) => {
-    const { expand } = this.state;
+  render() {
     const {
-      onDownloadInvestigation,
+      investigations,
+      isFetching,
       localInvestigations,
+      navigation,
       onDeleteInvestigation,
-      navigation
+      onDownloadInvestigation,
+      onFetchInvestigations
     } = this.props;
     return (
-      <TouchableOpacity
-        style={styles.listItem}
-        onPress={() =>
-          this.setState({ expand: { [item._id]: !expand[item._id] } })
-        }
-      >
-        <H4 style={styles.labTitle}>{item.labTitle}</H4>
-        <H5 style={styles.createdBy}>Created by: {item.createdBy.name}</H5>
-
-        {!expand[item._id] ? null : (
-          <View>
-            <H5 style={styles.info}>Creater's Email: {item.createdBy.email}</H5>
-            <H5 style={styles.info}>Updated At: {item.lastUpdatedAt}</H5>
-            <H5 style={styles.info}>Description: {item.description}</H5>
-
-            {!localInvestigations[item._id] ? (
-              <Button
-                type="success"
-                uppercase={false}
-                onPress={() => onDownloadInvestigation(item._id)}
-                style={styles.button}
-              >
-                Download
-              </Button>
-            ) : (
-              <View>
-                <Button
-                  type="success"
-                  uppercase={false}
-                  onPress={() =>
-                    navigation.navigate("InvestigationDetails", {
-                      investigation: localInvestigations[item._id]
-                    })
-                  }
-                  style={styles.button}
-                >
-                  Open
-                </Button>
-
-                <Button
-                  type="success"
-                  uppercase={false}
-                  onPress={() => onDownloadInvestigation(item._id)}
-                  style={styles.button}
-                >
-                  Update
-                </Button>
-
-                <Button
-                  type="danger"
-                  uppercase={false}
-                  onPress={() => onDeleteInvestigation(item)}
-                  style={styles.button}
-                >
-                  Delete
-                </Button>
-              </View>
-            )}
-          </View>
-        )}
-      </TouchableOpacity>
-    );
-  };
-
-  _keyExtractor = (item, index) => item._id;
-
-  render() {
-    // https://dev-blog.apollodata.com/loading-data-into-react-natives-flatlist-9646fa9a199b
-    const { investigations, isFetching, onFetchInvestigations } = this.props;
-    return (
       <View style={styles.container}>
-        <H3 style={styles.header}>Select an investigation to download</H3>
-        <FlatList
-          data={investigations}
+        <InvestigationList
+          investigations={investigations}
+          localInvestigations={localInvestigations}
           onRefresh={onFetchInvestigations}
-          refreshing={!!isFetching}
           extraData={this.state}
-          keyExtractor={this._keyExtractor}
-          renderItem={this._renderInvestigation}
+          refreshing={isFetching}
+          onDownloadInvestigation={onDownloadInvestigation}
+          navigation={navigation}
+          onDeleteInvestigation={onDeleteInvestigation}
+          expandInvestigation={this._onExpandInvestigation.bind(this)}
         />
       </View>
     );
@@ -126,38 +59,6 @@ export class DownloadInvestigationsComponent extends Component<{}> {
 const styles = {
   container: {
     flex: 1
-  },
-  listItem: {
-    borderBottomColor: "black",
-    backgroundColor: "white",
-    borderBottomWidth: 0.5,
-    paddingLeft: 15,
-    paddingRight: 15
-  },
-  spinnerContainer: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center"
-  },
-  labTitle: {
-    color: Colors.primary,
-    fontWeight: "600"
-  },
-  createdBy: {
-    color: Colors.secondary
-  },
-  info: {
-    color: Colors.secondary,
-    fontWeight: "500"
-  },
-  button: {
-    width: "100%",
-    maxHeight: 30
-  },
-  header: {
-    color: Colors.secondary,
-    fontWeight: "600",
-    padding: 15
   }
 };
 

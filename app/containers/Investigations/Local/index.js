@@ -1,18 +1,10 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
-
-import {
-  View,
-  TouchableOpacity,
-  Image,
-  Platform,
-  FlatList
-} from "react-native";
-import { Button, H3, H4, H5 } from "nachos-ui";
-import Spinner from "react-native-spinkit";
+import { View } from "react-native";
+import { Button } from "nachos-ui";
+import InvestigationList from "../../../components/InvestigationList";
 
 import Colors from "../../../Theme/colors";
-import { fetchInvestigations } from "./actions";
 import { fetchInvestigationById, deleteInvestigation } from "../Local/actions";
 
 export class LocalInvestigationsComponent extends Component<{}> {
@@ -24,65 +16,12 @@ export class LocalInvestigationsComponent extends Component<{}> {
     expand: {}
   };
 
-  _renderInvestigation = ({ item }) => {
+  _onExpandInvestigation(investigation) {
     const { expand } = this.state;
-    const {
-      onDownloadInvestigation,
-      localInvestigations,
-      onDeleteInvestigation,
-      navigation
-    } = this.props;
-    return (
-      <TouchableOpacity
-        style={styles.listItem}
-        onPress={() =>
-          this.setState({ expand: { [item._id]: !expand[item._id] } })
-        }
-      >
-        <H4 style={styles.labTitle}>{item.labTitle}</H4>
-
-        {!expand[item._id] ? null : (
-          <View>
-            <H5 style={styles.info}>Description: {item.description}</H5>
-            <H5 style={styles.info}>Updated At: {item.lastUpdatedAt}</H5>
-
-            <Button
-              type="success"
-              uppercase={false}
-              onPress={() =>
-                navigation.navigate("InvestigationDetails", {
-                  investigation: localInvestigations[item._id]
-                })
-              }
-              style={styles.button}
-            >
-              Open
-            </Button>
-
-            <Button
-              type="success"
-              uppercase={false}
-              onPress={() => onDownloadInvestigation(item._id)}
-              style={styles.button}
-            >
-              Update
-            </Button>
-
-            <Button
-              type="danger"
-              uppercase={false}
-              onPress={() => onDeleteInvestigation(item)}
-              style={styles.button}
-            >
-              Delete
-            </Button>
-          </View>
-        )}
-      </TouchableOpacity>
-    );
-  };
-
-  _keyExtractor = (item, index) => item._id;
+    this.setState({
+      expand: { [investigation._id]: !expand[investigation._id] }
+    });
+  }
 
   _convertObjectToArray = obj => {
     return Object.keys(obj).map(function(key) {
@@ -91,22 +30,29 @@ export class LocalInvestigationsComponent extends Component<{}> {
   };
 
   render() {
-    // https://dev-blog.apollodata.com/loading-data-into-react-natives-flatlist-9646fa9a199b
-    const { localInvestigations, isFetching, navigation } = this.props;
+    const {
+      isFetching,
+      localInvestigations,
+      navigation,
+      onDeleteInvestigation,
+      onDownloadInvestigation
+    } = this.props;
     const localInvestigationsArray = this._convertObjectToArray(
       localInvestigations
     );
 
     return (
       <View style={styles.container}>
-        <H3 style={styles.header}>Select an investigation</H3>
-        <FlatList
-          style={styles.list}
-          data={localInvestigationsArray}
-          refreshing={!!isFetching}
+        <InvestigationList
+          investigations={localInvestigationsArray}
+          localInvestigations={localInvestigationsArray}
+          onRefresh={() => {}}
           extraData={this.state}
-          keyExtractor={this._keyExtractor}
-          renderItem={this._renderInvestigation}
+          refreshing={isFetching}
+          onDownloadInvestigation={onDownloadInvestigation}
+          navigation={navigation}
+          onDeleteInvestigation={onDeleteInvestigation}
+          expandInvestigation={this._onExpandInvestigation.bind(this)}
         />
 
         <View style={styles.footerButtonContainer}>
@@ -128,14 +74,6 @@ const styles = {
     flexDirection: "column",
     flex: 1
   },
-  list: {
-    flex: 4
-  },
-  header: {
-    color: Colors.secondary,
-    fontWeight: "600",
-    padding: 10
-  },
   footerButtonContainer: {
     flex: 1,
     maxHeight: 60,
@@ -144,28 +82,6 @@ const styles = {
   footerButton: {
     width: "100%",
     borderRadius: 0
-  },
-  listItem: {
-    borderBottomColor: "black",
-    backgroundColor: "white",
-    borderBottomWidth: 0.5,
-    paddingLeft: 10,
-    paddingRight: 10
-  },
-  labTitle: {
-    color: Colors.primary,
-    fontWeight: "600"
-  },
-  createdBy: {
-    color: Colors.secondary
-  },
-  info: {
-    color: Colors.secondary,
-    fontWeight: "500"
-  },
-  button: {
-    width: "100%",
-    maxHeight: 30
   }
 };
 
