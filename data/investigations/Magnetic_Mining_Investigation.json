@@ -1,0 +1,293 @@
+{
+  "_id": "4",
+  "labTitle": "Magnetism Investigation",
+  "sampleInterval": "1000",
+  "sensorTags": {
+    "0": {
+      "connect": true,
+      "sensors": {
+        "Gyroscope": {
+          "grid": {
+            "griddisplay": false,
+            "columns": "4",
+            "rows": "4"
+          },
+          "data": {
+            "display": false,
+            "label": "Gyroscope"
+          },
+          "graph": {
+            "graphType": "spline",
+            "graphTitle": "Gyroscope Graph",
+            "graphXAxis": "Time (s)",
+            "graphYAxis": "Gyroscope"
+          },
+          "captureOnClick": false
+        },
+        "Temperature": {
+          "data": {
+            "display": false,
+            "label": "Temperature"
+          },
+          "graph": {
+            "graphType": "spline",
+            "graphTitle": "Temperature Graph",
+            "graphXAxis": "Time (s)",
+            "graphYAxis": "Temperature"
+          },
+          "captureOnClick": false,
+          "grid": {
+            "griddisplay": false,
+            "columns": "4",
+            "rows": "4"
+          },
+          "parameters": {
+            "ambient": true,
+            "IR": true
+          }
+        },
+        "Humidity": {
+          "data": {
+            "display": false,
+            "label": "Humidity"
+          },
+          "graph": {
+            "graphType": "spline",
+            "graphTitle": "Humidity Graph",
+            "graphXAxis": "Time (s)",
+            "graphYAxis": "Humidity"
+          },
+          "captureOnClick": false,
+          "grid": {
+            "griddisplay": false,
+            "columns": "4",
+            "rows": "4"
+          }
+        },
+        "Barometer": {
+          "data": {
+            "display": false,
+            "label": "Barometer"
+          },
+          "graph": {
+            "graphType": "spline",
+            "graphTitle": "Barometer Graph",
+            "graphXAxis": "Time (s)",
+            "graphYAxis": "Barometer"
+          },
+          "captureOnClick": false,
+          "grid": {
+            "griddisplay": false,
+            "columns": "4",
+            "rows": "4"
+          }
+        },
+        "Accelerometer": {
+          "data": {
+            "display": false,
+            "label": "Accelerometer"
+          },
+          "graph": {
+            "graphType": "spline",
+            "graphTitle": "Accelerometer Graph",
+            "graphXAxis": "Time (s)",
+            "graphYAxis": "Accelerometer"
+          },
+          "captureOnClick": false,
+          "grid": {
+            "griddisplay": false,
+            "columns": "4",
+            "rows": "4"
+          }
+        },
+        "Magnetometer": {
+          "data": {
+            "display": true,
+            "label": "Magnetometer"
+          },
+          "graph": {
+            "graphdisplay": false,
+            "graphType": "spline",
+            "graphTitle": "Magnetometer Graph",
+            "graphXAxis": "Time (s)",
+            "graphYAxis": "Magnetic Flux (microT)"
+          },
+          "captureOnClick": false,
+          "grid": {
+            "griddisplay": true,
+            "columns": "5",
+            "rows": "5"
+          },
+          "parameters": {
+            "xyz": false,
+            "scalar": true
+          }
+        },
+        "Luxometer": {
+          "data": {
+            "display": false,
+            "label": "Luxometer"
+          },
+          "graph": {
+            "graphType": "spline",
+            "graphTitle": "Luxometer Graph",
+            "graphXAxis": "Time (s)",
+            "graphYAxis": "Luxometer"
+          },
+          "captureOnClick": false,
+          "grid": {
+            "griddisplay": false,
+            "columns": "4",
+            "rows": "4"
+          }
+        }
+      },
+      "title": "SensorTag"
+    },
+    "1": {
+      "connect": false,
+      "title": "SensorTag",
+      "sensors": {
+        "Temperature": {
+          "data": {
+            "display": false,
+            "label": "Temperature"
+          },
+          "graph": {
+            "graphType": "spline",
+            "graphTitle": "Temperature Graph",
+            "graphXAxis": "Time (s)",
+            "graphYAxis": "Temperature"
+          },
+          "captureOnClick": false,
+          "grid": {
+            "griddisplay": false,
+            "columns": "4",
+            "rows": "4"
+          },
+          "parameters": {
+            "ambient": true,
+            "IR": true
+          }
+        },
+        "Humidity": {
+          "data": {
+            "display": false,
+            "label": "Humidity"
+          },
+          "graph": {
+            "graphType": "spline",
+            "graphTitle": "Humidity Graph",
+            "graphXAxis": "Time (s)",
+            "graphYAxis": "Humidity"
+          },
+          "captureOnClick": false,
+          "grid": {
+            "griddisplay": false,
+            "columns": "4",
+            "rows": "4"
+          }
+        },
+        "Barometer": {
+          "data": {
+            "display": false,
+            "label": "Barometer"
+          },
+          "graph": {
+            "graphType": "spline",
+            "graphTitle": "Barometer Graph",
+            "graphXAxis": "Time (s)",
+            "graphYAxis": "Barometer"
+          },
+          "captureOnClick": false,
+          "grid": {
+            "griddisplay": false,
+            "columns": "4",
+            "rows": "4"
+          }
+        },
+        "Accelerometer": {
+          "data": {
+            "display": false,
+            "label": "Accelerometer"
+          },
+          "graph": {
+            "graphType": "spline",
+            "graphTitle": "Accelerometer Graph",
+            "graphXAxis": "Time (s)",
+            "graphYAxis": "Accelerometer"
+          },
+          "captureOnClick": false,
+          "grid": {
+            "griddisplay": false,
+            "columns": "4",
+            "rows": "4"
+          }
+        },
+        "Gyroscope": {
+          "data": {
+            "display": false,
+            "label": "Gyroscope"
+          },
+          "graph": {
+            "graphType": "spline",
+            "graphTitle": "Gyroscope Graph",
+            "graphXAxis": "Time (s)",
+            "graphYAxis": "Gyroscope"
+          },
+          "captureOnClick": false,
+          "grid": {
+            "griddisplay": false,
+            "columns": "4",
+            "rows": "4"
+          }
+        },
+        "Magnetometer": {
+          "data": {
+            "display": false,
+            "label": "Magnetometer"
+          },
+          "graph": {
+            "graphdisplay": false,
+            "graphType": "spline",
+            "graphTitle": "Magnetometer Graph",
+            "graphXAxis": "Time (s)",
+            "graphYAxis": "Magnetometer"
+          },
+          "parameters": {
+            "xyz": false,
+            "scalar": true
+          },
+          "captureOnClick": false,
+          "grid": {
+            "griddisplay": true,
+            "columns": "5",
+            "rows": "5"
+          }
+        },
+        "Luxometer": {
+          "data": {
+            "display": false,
+            "label": "Luxometer"
+          },
+          "graph": {
+            "graphType": "spline",
+            "graphTitle": "Luxometer Graph",
+            "graphXAxis": "Time (s)",
+            "graphYAxis": "Luxometer"
+          },
+          "captureOnClick": false,
+          "grid": {
+            "griddisplay": false,
+            "columns": "4",
+            "rows": "4"
+          }
+        }
+      }
+    }
+  },
+  "dataStorageAllowed": true,
+  "dataStoragePrefix": "MagnetismInvestigation",
+  "videoPrefix": "Magnetism Investigation",
+  "graphAutoStart": false
+}

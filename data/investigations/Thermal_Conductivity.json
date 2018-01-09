@@ -1,0 +1,146 @@
+{
+  "_id": "5a0114ae8e8d263969497c57",
+  "serialNumber": 21,
+  "createdAt": "2017-11-07T02:04:30.597Z",
+  "lastUpdatedAt": "2017-11-07T02:27:28.597Z",
+  "dataStorageAllowed": true,
+  "dataStoragePrefix": "Thermal Conductivity and Insulation InvestigationData",
+  "graphAutoStart": false,
+  "labTitle": "Thermal Conductivity and Insulation Investigation",
+  "sampleInterval": "1000",
+  "description": "This investigation collects IR temperature data",
+  "isPublished": true,
+  "sensorTags": {
+    "0": {
+      "connect": true,
+      "title": "SensorTag",
+      "sensors": {
+        "Gyroscope": {
+          "grid": {
+            "gridTitle": "Gyroscope Grid",
+            "display": false,
+            "columns": "4",
+            "rows": "4"
+          },
+          "data": { "display": false, "label": "Gyroscope" },
+          "graph": {
+            "display": false,
+            "graphType": "spline",
+            "graphTitle": "Gyroscope Graph",
+            "graphXAxis": "Time (s)",
+            "graphYAxis": "Gyroscope"
+          },
+          "captureOnClick": false
+        },
+        "Temperature": {
+          "data": { "display": true, "label": "Temperature" },
+          "graph": {
+            "display": true,
+            "graphType": "spline",
+            "graphTitle": "Temperature Graph",
+            "graphXAxis": "Time (s)",
+            "graphYAxis": "Temperature"
+          },
+          "captureOnClick": false,
+          "grid": {
+            "gridTitle": "Temperature Grid",
+            "display": false,
+            "columns": "4",
+            "rows": "4"
+          },
+          "parameters": { "ambient": false, "IR": true }
+        },
+        "Humidity": {
+          "data": { "display": false, "label": "Humidity" },
+          "graph": {
+            "display": false,
+            "graphType": "spline",
+            "graphTitle": "Humidity Graph",
+            "graphXAxis": "Time (s)",
+            "graphYAxis": "Humidity"
+          },
+          "captureOnClick": false,
+          "grid": {
+            "gridTitle": "Humidity Grid",
+            "display": false,
+            "columns": "4",
+            "rows": "4"
+          }
+        },
+        "Barometer": {
+          "data": { "display": false, "label": "Barometer" },
+          "graph": {
+            "display": false,
+            "graphType": "spline",
+            "graphTitle": "Barometer Graph",
+            "graphXAxis": "Time (s)",
+            "graphYAxis": "Barometer"
+          },
+          "captureOnClick": false,
+          "grid": {
+            "gridTitle": "Barometer Grid",
+            "display": false,
+            "columns": "4",
+            "rows": "4"
+          }
+        },
+        "Accelerometer": {
+          "data": { "display": false, "label": "Accelerometer" },
+          "graph": {
+            "display": false,
+            "graphType": "spline",
+            "graphTitle": "Accelerometer Graph",
+            "graphXAxis": "Time (s)",
+            "graphYAxis": "Accelerometer"
+          },
+          "captureOnClick": false,
+          "grid": {
+            "gridTitle": "Accelerometer Grid",
+            "display": false,
+            "columns": "4",
+            "rows": "4"
+          },
+          "parameters": { "xyz": false, "scalar": false }
+        },
+        "Magnetometer": {
+          "data": { "display": false, "label": "Magnetometer" },
+          "graph": {
+            "display": false,
+            "graphType": "spline",
+            "graphTitle": "Magnetometer Graph",
+            "graphXAxis": "Time (s)",
+            "graphYAxis": "Magnetic Flux (microT)"
+          },
+          "captureOnClick": false,
+          "grid": {
+            "gridTitle": "Magnetometer Grid",
+            "display": false,
+            "columns": "4",
+            "rows": "4"
+          },
+          "parameters": { "xyz": false, "scalar": false }
+        },
+        "Luxometer": {
+          "data": { "display": false, "label": "Luxometer" },
+          "graph": {
+            "display": false,
+            "graphType": "spline",
+            "graphTitle": "Luxometer Graph",
+            "graphXAxis": "Time (s)",
+            "graphYAxis": "Luxometer"
+          },
+          "captureOnClick": false,
+          "grid": {
+            "gridTitle": "Luxometer Grid",
+            "display": false,
+            "columns": "4",
+            "rows": "4"
+          }
+        }
+      }
+    }
+  },
+  "createdBy": "5990f46b60f03b7f14db75c5",
+  "__v": 0,
+  "tags": ["Temperature"]
+}
