@@ -7,4 +7,5 @@ export default class Colors {
   static danger = "#E84545";
   static valid = "#17B978";
   static success = "green";
+  static white = "#fff";
 }
