@@ -45,7 +45,7 @@ export class LocalInvestigationsComponent extends Component<{}> {
       <View style={styles.container}>
         <InvestigationList
           investigations={localInvestigationsArray}
-          localInvestigations={localInvestigationsArray}
+          localInvestigations={localInvestigations}
           onRefresh={() => {}}
           extraData={this.state}
           refreshing={isFetching}
