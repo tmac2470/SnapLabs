@@ -1,20 +1,28 @@
 import React, { Component } from 'react';
 import { connect, connectAdvanced } from 'react-redux';
+import BleManager from 'react-native-ble-manager';
 
 import * as _ from 'lodash';
+import * as SERVICES from '../Bluetooth/services';
 
 import {
-  View,
+  Alert,
   Image,
+  NativeEventEmitter,
+  NativeModules,
   Platform,
   ScrollView,
-  Alert,
-  TouchableOpacity
+  TouchableOpacity,
+  View
 } from 'react-native';
 import { Button, H2, H4, H5, H6 } from 'nachos-ui';
 
 import Colors from '../../Theme/colors';
 import * as utils from './utils';
+import { networkError } from '../../Metastores/actions';
+
+const BleManagerModule = NativeModules.BleManager;
+const bleManagerEmitter = new NativeEventEmitter(BleManagerModule);
 
 export class InvestigationDetailsComponent extends Component<{}> {
   static navigationOptions = {
@@ -67,14 +75,288 @@ export class InvestigationDetailsComponent extends Component<{}> {
     _assignState(investigation.sensorTags);
   }
 
-  initialiseSensorTags(sensors) {
+  componentDidMount() {
+    BleManager.checkState();
+    this._bleEmitterEvent = bleManagerEmitter.addListener(
+      'BleManagerDidUpdateValueForCharacteristic',
+      this._subscribeToBleData.bind(this)
+    );
+  }
+
+  _subscribeToBleData(data) {
+    const { peripheral, characteristic, value } = data;
+    switch (characteristic.toLowerCase()) {
+      case SERVICES.Luxometer.DATA:
+        this._readLuxometerNotifications(peripheral, value);
+        break;
+      case SERVICES.Temperature.DATA:
+        this._readTemperatureNotifications(peripheral, value);
+        break;
+      case SERVICES.Barometer.DATA:
+        this._readBarometerNotifications(peripheral, value);
+        break;
+      case SERVICES.Humidity.DATA:
+        this._readHumidityNotifications(peripheral, value);
+        break;
+      case SERVICES.Accelerometer.DATA:
+        this._readMovementNotifications(peripheral, value);
+      default:
+        break;
+    }
+  }
+
+  componentWillUnmount() {
+    this._unpingAllConnectedDevices();
+    this._bleEmitterEvent.remove();
+  }
+
+  _unpingAllConnectedDevices() {
     const { connectedDevices } = this.props;
 
-    Object.keys(connectedDevices).map(device => {
-      // this.startNotifications(device);
-      // // Start the capture on click
-      // this.captureOnClick(device);
+    Object.keys(connectedDevices).map(key => {
+      const device = connectedDevices[key];
+      this._stopNotifications(device);
     });
+  }
+
+  _startNotificationForService(device, service) {
+    const { onNetworkError } = this.props;
+
+    BleManager.startNotification(device.id, service.UUID, service.DATA)
+      .then(e => {
+        // Once the notifications have been started, listen to the handlerUpdate event
+      })
+      .catch(error => {
+        onNetworkError(error.message);
+      });
+  }
+
+  _writeToDevice(device, service, data) {
+    const { onNetworkError } = this.props;
+
+    BleManager.write(device.id, service.UUID, service.CONFIG, data)
+      .then(e => {
+        console.log('success', e);
+        // Success
+      })
+      .catch(e => {
+        console.log('failure', e);
+        // onNetworkError('Unable to write to device! Please reconnect device');
+      });
+  }
+
+  _stopNotifications(device) {
+    const { sensors } = this.state;
+    const { onNetworkError } = this.props;
+
+    sensors.map(sensorTag => {
+      const config = sensorTag.config;
+      let service = {};
+
+      // if the displays are off, do not start notifications
+      if (
+        !!config.graph.display ||
+        !!config.graph.graphdisplay ||
+        !!config.grid.display ||
+        !!config.grid.griddisplay
+      ) {
+        switch (sensorTag.name.toLowerCase()) {
+          case 'temperature':
+            service = SERVICES.Temperature;
+            break;
+          case 'barometer':
+            service = SERVICES.Barometer;
+            break;
+          case 'accelerometer':
+          case 'gyroscope':
+          case 'magnetometer':
+            service = SERVICES.Accelerometer;
+            break;
+          case 'humidity':
+            service = SERVICES.Humidity;
+            break;
+          case 'luxometer':
+            service = SERVICES.Luxometer;
+            break;
+
+          default:
+            break;
+        }
+        if (!service.UUID) {
+          return;
+        }
+        BleManager.stopNotification(device.id, service.UUID, service.DATA)
+          .then(e => {
+            // Success
+          })
+          .catch(error => {
+            onNetworkError(error.message);
+          });
+      }
+    });
+  }
+
+  startNotifications(device) {
+    const { sensors } = this.state;
+    sensors.map(sensorTag => {
+      const config = sensorTag.config;
+
+      // if the displays are off, do not start notifications
+      if (
+        !!config.graph.display ||
+        !!config.graph.graphdisplay ||
+        !!config.grid.display ||
+        !!config.grid.griddisplay
+      ) {
+        switch (sensorTag.name.toLowerCase()) {
+          case 'temperature':
+            // this._startTemperatureNotifications(device, 'Temperature');
+            break;
+          case 'barometer':
+            // this._startBarometerNotifications(device, 'Barometer');
+            break;
+          case 'accelerometer':
+          case 'gyroscope':
+          case 'magnetometer':
+            this._startMovementNotifications(
+              device,
+              'Accelerometer',
+              'Gyroscope',
+              'Magnetometer'
+            );
+            break;
+          case 'humidity':
+            // this._startHumidityNotifications(device, 'Humidity');
+            break;
+          case 'luxometer':
+            // this._startLuxometerNotifications(device, 'Luxometer');
+            break;
+
+          default:
+            break;
+        }
+      }
+    });
+  }
+
+  _readMovementNotifications(device, data) {
+    // Movement DATA
+    // GXLSB:GXMSB:GYLSB:GYMSB:GZLSB:GZMSB,
+    // AXLSB:AXMSB:AYLSB:AYMSB:AZLSB:AZMSB
+    console.log('Movement', data);
+  }
+
+  _startMovementNotifications(
+    device,
+    accelerometerChartId,
+    gyroscopeChartId,
+    magnetometerChartId
+  ) {
+    const service = SERVICES.Accelerometer;
+    const { sampleIntervalTime } = this.state;
+
+    this._startNotificationForService(device, service);
+    // Axis enable bits:gyro-z=0,gyro-y,gyro-x,acc-z=3,acc-y,acc-x,mag=6 Range: bit 8,9
+    // Write the delay time
+    // this._writeToDevice(device, service, [sampleIntervalTime * 10]);
+    // Switch on the sensor
+    this._writeToDevice(device, service, '0x3A');
+  }
+
+  _readHumidityNotifications(device, data) {
+    // Humidity DATA
+    // TempLSB:TempMSB:HumidityLSB:HumidityMSB
+    const humidityValues = {
+      RH: data[3],
+      TEMP: data[1]
+    };
+    console.log('Humidity', humidityValues);
+  }
+
+  _startHumidityNotifications(device, humidityChartId) {
+    const service = SERVICES.Humidity;
+    const { sampleIntervalTime } = this.state;
+
+    this._startNotificationForService(device, service);
+
+    // Write the delay time
+    this._writeToDevice(device, service, [sampleIntervalTime * 10]);
+    // Switch on the sensor
+    this._writeToDevice(device, service, [1]);
+  }
+
+  _readBarometerNotifications(device, data) {
+    // Barometer DATA
+    // TempLSB:TempMSB(:TempEXt):PressureLSB:PressureMSB(:PressureExt)
+    console.log('barometer', data);
+  }
+
+  _startBarometerNotifications(device, barometerChartId) {
+    const service = SERVICES.Barometer;
+    const { sampleIntervalTime } = this.state;
+    console.log(barometerChartId);
+    this._startNotificationForService(device, service);
+
+    // Write the delay time
+    // this._writeToDevice(device, service, [sampleIntervalTime * 10]);
+    // Switch on the sensor
+    this._writeToDevice(device, service, '01:00');
+  }
+
+  _readTemperatureNotifications(device, data) {
+    // Temperature DATA
+    // ObjectLSB:ObjectMSB:AmbientLSB:AmbientMSB
+    const temperatureValues = {
+      'Ambient Temperature (C)': data[2],
+      'Target (IR) Temperature (C)': data[3]
+    };
+    console.log('temperature', temperatureValues);
+  }
+
+  _startTemperatureNotifications(device, temperatureChartId) {
+    const service = SERVICES.Temperature;
+    const { sampleIntervalTime } = this.state;
+
+    this._startNotificationForService(device, service);
+
+    // Write the delay time
+    this._writeToDevice(device, service, [sampleIntervalTime * 10]);
+    // Switch on the sensor
+    this._writeToDevice(device, service, [1]);
+  }
+
+  _readLuxometerNotifications(device, data) {
+    // Luxometer DATA
+    const luxValue = data[0];
+    console.log('luxValue', luxValue, 'lux');
+  }
+
+  _startLuxometerNotifications(device, luxometerChartId) {
+    const service = SERVICES.Luxometer;
+    const { sampleIntervalTime } = this.state;
+
+    this._startNotificationForService(device, service);
+
+    // Write the delay time
+    this._writeToDevice(device, service, [sampleIntervalTime * 10]);
+    // Switch on the sensor
+    this._writeToDevice(device, service, [1]);
+  }
+
+  initialiseSensorTags(sensors) {
+    const { connectedDevices, onNetworkError } = this.props;
+
+    Object.keys(connectedDevices).map(Id => {
+      BleManager.retrieveServices(Id)
+        .then(_ => {
+          this.startNotifications(connectedDevices[Id]);
+          // this.captureOnClick(device);
+        })
+        .catch(error => {
+          onNetworkError(error.message);
+        });
+    });
+
     sensors.map(sensorTag => {
       sensorTag = this.initialiseChart(sensorTag, connectedDevices);
       sensorTag = this.initialiseGrid(sensorTag, connectedDevices);
@@ -379,7 +661,6 @@ export class InvestigationDetailsComponent extends Component<{}> {
       sampleIntervalTime,
       sensors
     } = this.state;
-    console.log(sensors);
     const isConnectedToDevices = Object.keys(connectedDevices);
     const connectedText =
       Object.keys(connectedDevices).length > 0
@@ -661,7 +942,9 @@ const mapStateToProps = state => {
 };
 
 const mapDispatchToProps = dispatch => {
-  return {};
+  return {
+    onNetworkError: error => dispatch(networkError(error))
+  };
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(
