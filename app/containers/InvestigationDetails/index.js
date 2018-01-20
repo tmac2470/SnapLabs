@@ -8,7 +8,7 @@ import {
 import BleManager from 'react-native-ble-manager';
 import * as _ from 'lodash';
 import * as SERVICES from '../Bluetooth/services';
-
+import moment from 'moment';
 import {
   Alert,
   Image,
@@ -119,6 +119,8 @@ export class InvestigationDetailsComponent extends Component < {} > {
         break;
       case SERVICES.Accelerometer.DATA:
         this._readMovementNotifications(peripheral, value);
+      case SERVICES.IOBUTTON.DATA:
+        this._readSensorBtnNotifications(peripheral, value);
       default:
         break;
     }
@@ -163,7 +165,7 @@ export class InvestigationDetailsComponent extends Component < {} > {
 
     BleManager.write(device.id, service.UUID, service.PERIOD, period)
       .then(e => {
-        console.log('success', e);
+        // console.log('success', e);
         // Success
       })
       .catch(e => {
@@ -178,7 +180,7 @@ export class InvestigationDetailsComponent extends Component < {} > {
 
     BleManager.write(device.id, service.UUID, service.CONFIG, data)
       .then(e => {
-        console.log('success', e);
+        // console.log('success', e);
         // Success
       })
       .catch(e => {
@@ -224,6 +226,7 @@ export class InvestigationDetailsComponent extends Component < {} > {
             break;
 
           default:
+            service = SERVICES.IOBUTTON;
             break;
         }
         if (!service.UUID) {
@@ -244,6 +247,9 @@ export class InvestigationDetailsComponent extends Component < {} > {
     const {
       sensors
     } = this.state;
+    // captureOnClick enabled
+    this._startSensorBtnNotifications(device);
+
     sensors.map(sensorTag => {
       const config = sensorTag.config;
 
@@ -255,7 +261,7 @@ export class InvestigationDetailsComponent extends Component < {} > {
       ) {
         switch (sensorTag.name.toLowerCase()) {
           case 'temperature':
-            // this._startTemperatureNotifications(device, 'Temperature');
+            this._startTemperatureNotifications(device, 'Temperature');
             break;
           case 'barometer':
             this._startBarometerNotifications(device, 'Barometer');
@@ -409,14 +415,26 @@ export class InvestigationDetailsComponent extends Component < {} > {
     this._writeToDevice(device, service, [0]);
   }
 
-  _readTemperatureNotifications(device, data) {
+  _readTemperatureNotifications(deviceId, data) {
+    const sensorName = 'Temperature';
     // Temperature DATA
     // ObjectLSB:ObjectMSB:AmbientLSB:AmbientMSB
     const values = {
-      'Ambient Temperature (C)': data[1],
-      'Target (IR) Temperature (C)': data[3]
+      amb: {
+        key: 'Ambient Temperature (C)',
+        value : data[1]
+      },
+      ir: {
+        key: 'Target (IR) Temperature (C)',
+        value: data[2]
+      }
     };
-    console.log(values);
+    const displayVal = `${values.amb.key} - ${values.amb.value}°C [Amb] ${values.ir.key} - ${values.ir.value}°C [IR]`;
+    const dataValueMap = {
+      [values.amb.key]: values.amb.value,
+      [values.ir.key]: values.ir.value
+    };
+    this._updateSensorValue(sensorName, deviceId, displayVal, dataValueMap);
   }
 
   _startTemperatureNotifications(device, temperatureChartId) {
@@ -433,19 +451,15 @@ export class InvestigationDetailsComponent extends Component < {} > {
     this._writeToDevice(device, service, [1]);
   }
 
-  _readLuxometerNotifications(device, data) {
+  _readLuxometerNotifications(deviceId, data) {
+    const sensorName = 'Luxometer';
     // Luxometer DATA
-    const value = data[1];
-    // console.log('luxValue', luxValue, 'lux');
-
-    const mantissa = value & 0x0fff;
-    const exponent = value >> 12;
-    const magnitude = Math.pow(2, exponent);
-    const output = mantissa * magnitude;
-
-    const luxValue = output / 100.0;
-    console.log(data);
-    console.log(luxValue);
+    const value = data[0];
+    const displayVal = `${value} lux`;
+    const dataValueMap = {
+      lux: value
+    };
+    this._updateSensorValue(sensorName, deviceId, displayVal, dataValueMap);
   }
 
   _startLuxometerNotifications(device, luxometerChartId) {
@@ -462,6 +476,115 @@ export class InvestigationDetailsComponent extends Component < {} > {
     this._writeToDevice(device, service, [1]);
   }
 
+  _readSensorBtnNotifications(deviceId, data) {
+    const state = new Uint8Array(data);
+    if (state.length > 0 && !!state[0]) {
+      this.captureDeviceDataForGrid();
+    }
+  }
+
+  _startSensorBtnNotifications(device) {
+    const service = SERVICES.IOBUTTON;
+    this._startNotificationForService(device, service);
+  }
+
+  resetGrids() {
+    const { sensors } = this.state;
+    sensors.map(sensor => {
+      return sensor.config.grids.map(grid => {
+        grid.value = {};
+        grid.rawValue = {};
+        return grid;
+      });
+    });
+
+    this.setState({
+      sensors
+    });
+  }
+
+      // Capture data for grid
+  _captureData(grid, deviceId, sensor) {
+    const { sensors } = this.state;
+    if (!sensor.value || !sensor.value[deviceId]) {
+      return grid;
+    }
+
+    if (!grid.value) {
+      grid.value = {};
+    }
+    if (!grid.value[deviceId]) {
+      grid.value[deviceId] = {};
+    }
+
+    if (!grid.rawValue) {
+      grid.rawValue = {};
+    }
+    if (!grid.rawValue[deviceId]) {
+      grid.rawValue[deviceId] = {};
+    }
+
+    const sensorValue = sensor.value[deviceId];
+    const sensorRawValue = sensor.rawValue[deviceId];
+    grid.rawValue[deviceId] = sensorRawValue;
+
+    grid.value[deviceId] = {
+      value: sensorValue
+    };
+
+    sensors.map(sensor => {
+      return sensor.config.grids.map(g => {
+        if (g.id === grid.id) {
+          g = grid;
+        }
+        return grid;
+      });
+    });
+
+    this.setState({
+      sensors
+    });
+  }
+
+  captureDeviceDataForGrid(currentGrid = {}, currentSensor = {}) {
+    const { connectedDevices, sensors } = this.state;
+
+    Object.keys(connectedDevices).map(key => {
+      const device = connectedDevices[key];
+      if (currentGrid && currentGrid.id && currentSensor && currentSensor) {
+        this._captureData(currentGrid, device.id, currentSensor);
+      } else {
+        sensors.map(sensor => {
+          if (sensor.value) {
+            let grids = [];
+            grids = sensor.config.grids;
+            if (!grids) {
+              return;
+            }
+            // Filter out the grids who've had values from all the devices
+            grids = grids.filter(grid => {
+              const keys = _.keys(grid.value);
+              if (
+                keys &&
+                keys.length &&
+                keys.length >= Object.keys(connectedDevices).length
+              ) {
+                return false;
+              } else {
+                return true;
+              }
+              // return !grid.value;
+            });
+
+            if (grids.length > 0) {
+              this._captureData(grids[0], device.id, sensor);
+            }
+          }
+        });
+      }
+    });
+  }
+
   initialiseSensorTags(sensors) {
     const {
       connectedDevices,
@@ -472,7 +595,6 @@ export class InvestigationDetailsComponent extends Component < {} > {
       BleManager.retrieveServices(Id)
         .then(_ => {
           this.startNotifications(connectedDevices[Id]);
-          // this.captureOnClick(device);
         })
         .catch(error => {
           onNetworkError(error.message);
@@ -719,14 +841,55 @@ export class InvestigationDetailsComponent extends Component < {} > {
     }
   }
 
-  _getGridStyle() {
+  _getInnerGridStyle(grid) {
+    const style = {};
+    if (grid && grid.value && Object.keys(grid.value).length > 0) {
+      style['backgroundColor'] = Colors.danger;
+    }
+    return style;
+  }
+
+  _getGridStyle(grid) {
     const {
       display
     } = this.state;
-    return {
+
+    const style = {
       width: `${display.maxGridWidth}%`,
       height: `${display.maxGridWidth}%`
     };
+
+    return style;
+  }
+
+  _addTimeStampValues(dataValueMap) {
+    const timestamp = new Date();
+    dataValueMap["Unix Timestamp"] = moment(timestamp).valueOf();
+    dataValueMap["Timestamp"] = moment(timestamp).format(
+      "d/MM/YYYY, hh:mm:ss:SSS"
+    );
+    return dataValueMap;
+  }
+
+  _updateSensorValue(sensorName, deviceId, value, dataValueMap) {
+    const { sensors } = this.state;
+    sensors.map(sensor => {
+      if (sensor.name === sensorName) {
+        if (!sensor.value) {
+          sensor.value = {};
+        }
+        if (!sensor.rawValue) {
+          sensor.rawValue = {};
+        }
+        dataValueMap = this._addTimeStampValues(dataValueMap);
+        sensor.value[deviceId] = value;
+        sensor.rawValue[deviceId] = dataValueMap;
+        return sensor;
+      }
+    });
+    this.setState({
+      sensors
+    });
   }
 
   initialiseGrid(sensor, devices) {
@@ -864,10 +1027,9 @@ export class InvestigationDetailsComponent extends Component < {} > {
                             key={`sensor-tag-value-${deviceId}`}
                             style={styles.twoColBox}
                           >
-                            <H6 style={styles.text}> Device {deviceId} </H6>
+                            <H6 style={styles.text}>Sensor {deviceId}</H6>
                             <H6 style={[styles.text, styles.textBold]}>
-
-                              {connectedDevices[deviceId].value}
+                              {sensor.value[deviceId]}
                             </H6>
                           </View>
                         ))}
@@ -899,10 +1061,10 @@ export class InvestigationDetailsComponent extends Component < {} > {
                                 <TouchableOpacity
                                   key={grid.id}
                                   id={grid.id}
-                                  style={this._getGridStyle()}
-                                  onPress={() => {}}
+                                  style={this._getGridStyle(grid)}
+                                  onPress={() => this.captureDeviceDataForGrid(grid, sensor)}
                                 >
-                                  <View style={styles.gridData}>
+                                  <View style={[styles.gridData, this._getInnerGridStyle(grid)]}>
                                     <H6 style={styles.gridText}> {grid.number} </H6>
                                   </View>
                                 </TouchableOpacity>
@@ -982,7 +1144,7 @@ export class InvestigationDetailsComponent extends Component < {} > {
               <Button
                 type="danger"
                 uppercase={false}
-                onPress={() => {}}
+                onPress={() => this.resetGrids()}
                 style={styles.footerButton}
               >
                 Reset grids
@@ -1017,14 +1179,16 @@ const styles = {
     margin: 10,
     marginTop: 5,
     marginBottom: 5,
-    paddingRight: 10,
-    paddingLeft: 10
+    paddingRight: 5,
+    paddingLeft: 5
   },
   twoColBox: {
-    flexDirection: 'row',
-    alignItems: 'stretch',
-    justifyContent: 'space-between',
-    maxWidth: '80%'
+    flexDirection: 'column',
+    // alignItems: 'stretch',
+    // justifyContent: 'space-between',
+    width: '80%',
+    paddingLeft: 5,
+    paddingRight: 5
   },
   text: {
     color: Colors.secondary

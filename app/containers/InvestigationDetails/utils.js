@@ -30,6 +30,8 @@ export function _getSensorTags(sensorTags) {
           tags.push({
             name: iSensor,
             config: sensor,
+            value: {},
+            rawValue: {},
             parameters
           });
         }
