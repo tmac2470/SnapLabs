@@ -13,6 +13,7 @@
     "lodash": "^4.17.4",
     "moment": "^2.20.1",
     "nachos-ui": "^0.1.2",
+    "papaparse": "^4.3.6",
     "react": "16.0.0",
     "react-native": "0.51.0",
     "react-native-ble-manager": "^6.2.4",

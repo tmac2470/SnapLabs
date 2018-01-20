@@ -942,6 +942,12 @@ export class InvestigationDetailsComponent extends Component < {} > {
     }
   }
 
+  saveGridData() {
+    const { connectedDevices, sensors, sampleIntervalTime, investigation } = this.state;
+    const { user } = this.props;
+    utils._saveGridData(connectedDevices, sensors, sampleIntervalTime, investigation, user);
+  }
+
   render() {
     const {
       navigation
@@ -1136,7 +1142,7 @@ export class InvestigationDetailsComponent extends Component < {} > {
             <View>
               <Button
                 uppercase={false}
-                onPress={() => {}}
+                onPress={() => this.saveGridData()}
                 style={styles.footerButton}
               >
                 Save grid data
@@ -1231,7 +1237,8 @@ const styles = {
 
 const mapStateToProps = state => {
   return {
-    connectedDevices: state.bluetooth.connectedDevices
+    connectedDevices: state.bluetooth.connectedDevices,
+    user: state.currentUser
   };
 };
 
