@@ -1,7 +1,11 @@
-import React, { Component } from 'react';
-import { connect, connectAdvanced } from 'react-redux';
+import React, {
+  Component
+} from 'react';
+import {
+  connect,
+  connectAdvanced
+} from 'react-redux';
 import BleManager from 'react-native-ble-manager';
-
 import * as _ from 'lodash';
 import * as SERVICES from '../Bluetooth/services';
 
@@ -15,16 +19,24 @@ import {
   TouchableOpacity,
   View
 } from 'react-native';
-import { Button, H2, H4, H5, H6 } from 'nachos-ui';
+import {
+  Button,
+  H2,
+  H4,
+  H5,
+  H6
+} from 'nachos-ui';
 
 import Colors from '../../Theme/colors';
 import * as utils from './utils';
-import { networkError } from '../../Metastores/actions';
+import {
+  networkError
+} from '../../Metastores/actions';
 
 const BleManagerModule = NativeModules.BleManager;
 const bleManagerEmitter = new NativeEventEmitter(BleManagerModule);
 
-export class InvestigationDetailsComponent extends Component<{}> {
+export class InvestigationDetailsComponent extends Component < {} > {
   static navigationOptions = {
     title: 'Investigation Details'
   };
@@ -57,7 +69,10 @@ export class InvestigationDetailsComponent extends Component<{}> {
   };
 
   componentWillMount() {
-    const { navigation, connectedDevices } = this.props;
+    const {
+      navigation,
+      connectedDevices
+    } = this.props;
     const investigation = navigation.state.params.investigation;
 
     const _assignState = async tags => {
@@ -84,7 +99,11 @@ export class InvestigationDetailsComponent extends Component<{}> {
   }
 
   _subscribeToBleData(data) {
-    const { peripheral, characteristic, value } = data;
+    const {
+      peripheral,
+      characteristic,
+      value
+    } = data;
     switch (characteristic.toLowerCase()) {
       case SERVICES.Luxometer.DATA:
         this._readLuxometerNotifications(peripheral, value);
@@ -111,7 +130,9 @@ export class InvestigationDetailsComponent extends Component<{}> {
   }
 
   _unpingAllConnectedDevices() {
-    const { connectedDevices } = this.props;
+    const {
+      connectedDevices
+    } = this.props;
 
     Object.keys(connectedDevices).map(key => {
       const device = connectedDevices[key];
@@ -120,7 +141,9 @@ export class InvestigationDetailsComponent extends Component<{}> {
   }
 
   _startNotificationForService(device, service) {
-    const { onNetworkError } = this.props;
+    const {
+      onNetworkError
+    } = this.props;
 
     BleManager.startNotification(device.id, service.UUID, service.DATA)
       .then(e => {
@@ -131,8 +154,27 @@ export class InvestigationDetailsComponent extends Component<{}> {
       });
   }
 
+  _writePeriodToDevice(device, service, sampleIntervalTime) {
+    const {
+      onNetworkError
+    } = this.props;
+
+    const period = [sampleIntervalTime / 10];
+
+    BleManager.write(device.id, service.UUID, service.PERIOD, period)
+      .then(e => {
+        console.log('success', e);
+        // Success
+      })
+      .catch(e => {
+        onNetworkError('Unable to write period to device! Please reconnect device', e);
+      });
+  }
+
   _writeToDevice(device, service, data) {
-    const { onNetworkError } = this.props;
+    const {
+      onNetworkError
+    } = this.props;
 
     BleManager.write(device.id, service.UUID, service.CONFIG, data)
       .then(e => {
@@ -140,22 +182,24 @@ export class InvestigationDetailsComponent extends Component<{}> {
         // Success
       })
       .catch(e => {
-        console.log('failure', e);
-        // onNetworkError('Unable to write to device! Please reconnect device');
+        onNetworkError('Unable to write to device! Please reconnect device', e);
       });
   }
 
   _stopNotifications(device) {
-    const { sensors } = this.state;
-    const { onNetworkError } = this.props;
+    const {
+      sensors
+    } = this.state;
+    const {
+      onNetworkError
+    } = this.props;
 
     sensors.map(sensorTag => {
       const config = sensorTag.config;
       let service = {};
 
       // if the displays are off, do not start notifications
-      if (
-        !!config.graph.display ||
+      if (!!config.graph.display ||
         !!config.graph.graphdisplay ||
         !!config.grid.display ||
         !!config.grid.griddisplay
@@ -197,13 +241,14 @@ export class InvestigationDetailsComponent extends Component<{}> {
   }
 
   startNotifications(device) {
-    const { sensors } = this.state;
+    const {
+      sensors
+    } = this.state;
     sensors.map(sensorTag => {
       const config = sensorTag.config;
 
       // if the displays are off, do not start notifications
-      if (
-        !!config.graph.display ||
+      if (!!config.graph.display ||
         !!config.graph.graphdisplay ||
         !!config.grid.display ||
         !!config.grid.griddisplay
@@ -213,7 +258,7 @@ export class InvestigationDetailsComponent extends Component<{}> {
             // this._startTemperatureNotifications(device, 'Temperature');
             break;
           case 'barometer':
-            // this._startBarometerNotifications(device, 'Barometer');
+            this._startBarometerNotifications(device, 'Barometer');
             break;
           case 'accelerometer':
           case 'gyroscope':
@@ -226,10 +271,10 @@ export class InvestigationDetailsComponent extends Component<{}> {
             );
             break;
           case 'humidity':
-            // this._startHumidityNotifications(device, 'Humidity');
+            this._startHumidityNotifications(device, 'Humidity');
             break;
           case 'luxometer':
-            // this._startLuxometerNotifications(device, 'Luxometer');
+            this._startLuxometerNotifications(device, 'Luxometer');
             break;
 
           default:
@@ -243,9 +288,55 @@ export class InvestigationDetailsComponent extends Component<{}> {
     // Movement DATA
     // GXLSB:GXMSB:GYLSB:GYMSB:GZLSB:GZMSB,
     // AXLSB:AXMSB:AYLSB:AYMSB:AZLSB:AZMSB
-    console.log('Movement', data);
+    const accX = data[6];
+    // ax_temp / accDivisors.x;
+    const accY = data[7] ;
+    // ay_temp / accDivisors.y;
+    const accZ = data[8];
+    // az_temp / accDivisors.z;
+    const accScalar = Math.sqrt(accX * accX + accY * accY + accZ * accZ);
+
+    // Gyrometer calculations
+    var gyroVal = 500 / 65536.0;
+    var gyroX = data[0];
+    // new DataView(data).getInt16(0, true) * gyroVal;
+    var gyroY = data[1];
+    // new DataView(data).getInt16(2, true) * gyroVal;
+    var gyroZ = data[2];
+    // new DataView(data).getInt16(4, true) * gyroVal;
+
+    // Magnetometer calculations
+    var magX = data[0];
+    // new DataView(data).getInt16(12, true);
+    var magY = data[0];
+    // new DataView(data).getInt16(14, true);
+    var magZ = data[0];
+    // new DataView(data).getInt16(16, true);
+    var magScalar = Math.sqrt(magX * magX + magY * magY + magZ * magZ);
+
+
+    const gyroscopeValues = {
+      X: gyroX,
+      Y: gyroY,
+      Z: gyroZ
+    };
+
+    const accelerometerValues = {
+      X: accX,
+      Y: accY,
+      Z: accZ,
+      "Scalar Value": accScalar
+    };
+
+    const magnetometerValues = {
+      X: magX,
+      Y: magY,
+      Z: magZ,
+      "Scalar Value": magScalar
+    };
   }
 
+  // file:///Users/shailendrapal/Downloads/attr_cc2650%20sensortag.html
   _startMovementNotifications(
     device,
     accelerometerChartId,
@@ -253,14 +344,16 @@ export class InvestigationDetailsComponent extends Component<{}> {
     magnetometerChartId
   ) {
     const service = SERVICES.Accelerometer;
-    const { sampleIntervalTime } = this.state;
+    const {
+      sampleIntervalTime
+    } = this.state;
 
     this._startNotificationForService(device, service);
     // Axis enable bits:gyro-z=0,gyro-y,gyro-x,acc-z=3,acc-y,acc-x,mag=6 Range: bit 8,9
     // Write the delay time
-    // this._writeToDevice(device, service, [sampleIntervalTime * 10]);
+    this._writePeriodToDevice(device, service, sampleIntervalTime);
     // Switch on the sensor
-    this._writeToDevice(device, service, '0x3A');
+    this._writeToDevice(device, service, [1]);
   }
 
   _readHumidityNotifications(device, data) {
@@ -270,17 +363,25 @@ export class InvestigationDetailsComponent extends Component<{}> {
       RH: data[3],
       TEMP: data[1]
     };
+
+    const values = {
+      "% RH": humidityValues.RH.toFixed(3),
+      "°C": humidityValues.TEMP.toFixed(3)
+    };
+    // % RH at ${humidityValues.TEMP.toFixed(3)} °C
     console.log('Humidity', humidityValues);
   }
 
   _startHumidityNotifications(device, humidityChartId) {
     const service = SERVICES.Humidity;
-    const { sampleIntervalTime } = this.state;
+    const {
+      sampleIntervalTime
+    } = this.state;
 
     this._startNotificationForService(device, service);
 
     // Write the delay time
-    this._writeToDevice(device, service, [sampleIntervalTime * 10]);
+    this._writePeriodToDevice(device, service, sampleIntervalTime);
     // Switch on the sensor
     this._writeToDevice(device, service, [1]);
   }
@@ -288,63 +389,84 @@ export class InvestigationDetailsComponent extends Component<{}> {
   _readBarometerNotifications(device, data) {
     // Barometer DATA
     // TempLSB:TempMSB(:TempEXt):PressureLSB:PressureMSB(:PressureExt)
-    console.log('barometer', data);
+    const values = {
+      hPa: data[1],
+      "°C": data[2]
+    };
+    // `${pressureValue} hPa at ${tempValue} °C`
+    console.log(values);
   }
 
   _startBarometerNotifications(device, barometerChartId) {
     const service = SERVICES.Barometer;
-    const { sampleIntervalTime } = this.state;
-    console.log(barometerChartId);
+    const {
+      sampleIntervalTime
+    } = this.state;
     this._startNotificationForService(device, service);
-
     // Write the delay time
-    // this._writeToDevice(device, service, [sampleIntervalTime * 10]);
+    this._writePeriodToDevice(device, service, [sampleIntervalTime * 10]);
     // Switch on the sensor
-    this._writeToDevice(device, service, '01:00');
+    this._writeToDevice(device, service, [0]);
   }
 
   _readTemperatureNotifications(device, data) {
     // Temperature DATA
     // ObjectLSB:ObjectMSB:AmbientLSB:AmbientMSB
-    const temperatureValues = {
-      'Ambient Temperature (C)': data[2],
+    const values = {
+      'Ambient Temperature (C)': data[1],
       'Target (IR) Temperature (C)': data[3]
     };
-    console.log('temperature', temperatureValues);
+    console.log(values);
   }
 
   _startTemperatureNotifications(device, temperatureChartId) {
     const service = SERVICES.Temperature;
-    const { sampleIntervalTime } = this.state;
+    const {
+      sampleIntervalTime
+    } = this.state;
 
     this._startNotificationForService(device, service);
 
     // Write the delay time
-    this._writeToDevice(device, service, [sampleIntervalTime * 10]);
+    this._writePeriodToDevice(device, service, sampleIntervalTime);
     // Switch on the sensor
     this._writeToDevice(device, service, [1]);
   }
 
   _readLuxometerNotifications(device, data) {
     // Luxometer DATA
-    const luxValue = data[0];
-    console.log('luxValue', luxValue, 'lux');
+    const value = data[1];
+    // console.log('luxValue', luxValue, 'lux');
+
+    const mantissa = value & 0x0fff;
+    const exponent = value >> 12;
+    const magnitude = Math.pow(2, exponent);
+    const output = mantissa * magnitude;
+
+    const luxValue = output / 100.0;
+    console.log(data);
+    console.log(luxValue);
   }
 
   _startLuxometerNotifications(device, luxometerChartId) {
     const service = SERVICES.Luxometer;
-    const { sampleIntervalTime } = this.state;
+    const {
+      sampleIntervalTime
+    } = this.state;
 
     this._startNotificationForService(device, service);
 
     // Write the delay time
-    this._writeToDevice(device, service, [sampleIntervalTime * 10]);
+    this._writePeriodToDevice(device, service, sampleIntervalTime);
     // Switch on the sensor
     this._writeToDevice(device, service, [1]);
   }
 
   initialiseSensorTags(sensors) {
-    const { connectedDevices, onNetworkError } = this.props;
+    const {
+      connectedDevices,
+      onNetworkError
+    } = this.props;
 
     Object.keys(connectedDevices).map(Id => {
       BleManager.retrieveServices(Id)
@@ -368,7 +490,9 @@ export class InvestigationDetailsComponent extends Component<{}> {
   }
 
   startGraphs() {
-    const { graphs } = this.state;
+    const {
+      graphs
+    } = this.state;
     graphs.started = true;
     graphs.startedAtLeastOnce = true;
     this.setState({
@@ -377,7 +501,9 @@ export class InvestigationDetailsComponent extends Component<{}> {
   }
 
   stopGraphs() {
-    const { graphs } = this.state;
+    const {
+      graphs
+    } = this.state;
     graphs.started = false;
     this.setState({
       graphs
@@ -385,15 +511,15 @@ export class InvestigationDetailsComponent extends Component<{}> {
   }
 
   resetGraphs() {
-    const { investigation } = this.state;
+    const {
+      investigation
+    } = this.state;
 
     Alert.alert(
       'Confirm reset',
       `This will reset all the graphs for the investigation "${
         investigation.labTitle
-      }"`,
-      [
-        {
+      }"`, [{
           text: 'Cancel',
           onPress: () => {},
           style: 'cancel'
@@ -402,8 +528,9 @@ export class InvestigationDetailsComponent extends Component<{}> {
           text: 'Continue',
           onPress: () => this._resetGraphs()
         }
-      ],
-      { cancelable: true }
+      ], {
+        cancelable: true
+      }
     );
   }
 
@@ -416,8 +543,7 @@ export class InvestigationDetailsComponent extends Component<{}> {
     const sensorParams = sensor.config.parameters;
     const mapDataSetConfig = this.mapDataSetConfig;
 
-    const xyzDataSet = [
-      {
+    const xyzDataSet = [{
         mapDataSetConfig,
         borderColor: 'red',
         label: `X-${deviceId}`,
@@ -440,15 +566,13 @@ export class InvestigationDetailsComponent extends Component<{}> {
       }
     ];
 
-    const scalarDataSet = [
-      {
-        mapDataSetConfig,
-        borderColor: 'red',
-        label: `Scalar Value-${deviceId}`,
-        name: 'Scalar Value',
-        deviceId
-      }
-    ];
+    const scalarDataSet = [{
+      mapDataSetConfig,
+      borderColor: 'red',
+      label: `Scalar Value-${deviceId}`,
+      name: 'Scalar Value',
+      deviceId
+    }];
 
     switch (chart.toLowerCase()) {
       case 'temperature':
@@ -481,28 +605,24 @@ export class InvestigationDetailsComponent extends Component<{}> {
         return tempDataSets;
 
       case 'barometer':
-        return [
-          {
-            mapDataSetConfig,
-            borderColor: 'red',
-            label: `Pressure (hPa)-${deviceId}`,
-            name: 'Pressure (hPa)',
-            deviceId
-          }
-        ];
+        return [{
+          mapDataSetConfig,
+          borderColor: 'red',
+          label: `Pressure (hPa)-${deviceId}`,
+          name: 'Pressure (hPa)',
+          deviceId
+        }];
 
       case 'luxometer':
-        return [
-          {
-            mapDataSetConfig,
-            borderColor: 'red',
-            label: `lux-${deviceId}`,
-            name: 'lux',
-            deviceId
-          }
-        ];
+        return [{
+          mapDataSetConfig,
+          borderColor: 'red',
+          label: `lux-${deviceId}`,
+          name: 'lux',
+          deviceId
+        }];
 
-      // Accelerometer and magnetometer share similar data set config
+        // Accelerometer and magnetometer share similar data set config
       case 'accelerometer':
       case 'magnetometer':
         let xyzScalarDataSet = [];
@@ -517,20 +637,18 @@ export class InvestigationDetailsComponent extends Component<{}> {
 
         return xyzScalarDataSet;
 
-      // Gyroscope shares the same xyzDataSet
+        // Gyroscope shares the same xyzDataSet
       case 'gyroscope':
         return xyzDataSet;
 
       case 'humidity':
-        return [
-          {
-            mapDataSetConfig,
-            borderColor: 'red',
-            label: `RH-${deviceId}`,
-            name: 'RH',
-            deviceId
-          }
-        ];
+        return [{
+          mapDataSetConfig,
+          borderColor: 'red',
+          label: `RH-${deviceId}`,
+          name: 'RH',
+          deviceId
+        }];
     }
   }
 
@@ -547,9 +665,11 @@ export class InvestigationDetailsComponent extends Component<{}> {
       case 'luxometer':
       case 'magnetometer':
       case 'temperature':
-        const { datasetsAvailable } = this.state;
+        const {
+          datasetsAvailable
+        } = this.state;
         let datasets = [];
-        const getDatasets = async () => {
+        const getDatasets = async() => {
           await Object.keys(devices).map(deviceId => {
             datasets = datasets.concat(
               this._getChartDatasets(chart, sensor, deviceId)
@@ -565,21 +685,24 @@ export class InvestigationDetailsComponent extends Component<{}> {
         });
 
         return chart;
-      // // These all above use the same graph
-      // return new Chart(ctx, {
-      //   type: 'line',
-      //   data: {
-      //     datasets
-      //   },
-      //   options: this.mapOptions
-      // });
+        // // These all above use the same graph
+        // return new Chart(ctx, {
+        //   type: 'line',
+        //   data: {
+        //     datasets
+        //   },
+        //   options: this.mapOptions
+        // });
     }
   }
 
   // Initialise a chart only once.
   // The datasets need to be configured per device though.
   initialiseChart(sensor, devices) {
-    const { display, charts } = this.state;
+    const {
+      display,
+      charts
+    } = this.state;
     if (!!sensor.config.graph.display || !!sensor.config.graph.graphdisplay) {
       const chartId = `${sensor.name}`;
       const ctx = chartId || document.getElementById(chartId);
@@ -597,7 +720,9 @@ export class InvestigationDetailsComponent extends Component<{}> {
   }
 
   _getGridStyle() {
-    const { display } = this.state;
+    const {
+      display
+    } = this.state;
     return {
       width: `${display.maxGridWidth}%`,
       height: `${display.maxGridWidth}%`
@@ -605,7 +730,9 @@ export class InvestigationDetailsComponent extends Component<{}> {
   }
 
   initialiseGrid(sensor, devices) {
-    const { display } = this.state;
+    const {
+      display
+    } = this.state;
     if (!!sensor.config.grid.display || !!sensor.config.grid.griddisplay) {
       display.grid = true;
       display.maxGridWidth = `${90 / parseInt(sensor.config.grid.columns)}`;
@@ -626,11 +753,13 @@ export class InvestigationDetailsComponent extends Component<{}> {
 
       sensor.config.grids = grids;
 
-      const { datasetsAvailable } = this.state;
+      const {
+        datasetsAvailable
+      } = this.state;
       // Need datasets to decide if the grids can work
       let datasets = [];
       const chart = `${sensor.name}`;
-      const getDatasets = async () => {
+      const getDatasets = async() => {
         await Object.keys(devices).map(deviceId => {
           datasets = datasets.concat(
             this._getChartDatasets(chart, sensor, deviceId)
@@ -651,7 +780,9 @@ export class InvestigationDetailsComponent extends Component<{}> {
   }
 
   render() {
-    const { navigation } = this.props;
+    const {
+      navigation
+    } = this.props;
     const {
       connectedDevices,
       datasetsAvailable,
@@ -663,17 +794,17 @@ export class InvestigationDetailsComponent extends Component<{}> {
     } = this.state;
     const isConnectedToDevices = Object.keys(connectedDevices);
     const connectedText =
-      Object.keys(connectedDevices).length > 0
-        ? 'Connected!'
-        : 'Not connected!';
+      Object.keys(connectedDevices).length > 0 ?
+      'Connected!' :
+      'Not connected!';
 
     return (
       <View style={styles.container}>
         <ScrollView style={styles.scrollContainer}>
           <H2 style={[styles.header, styles.text, styles.textBold]}>
+
             {investigation.labTitle}
           </H2>
-
           <View style={styles.contentBox}>
             <H5 style={[styles.text, styles.textBold]}>
               Sample Interval: {sampleIntervalTime}ms
@@ -689,46 +820,43 @@ export class InvestigationDetailsComponent extends Component<{}> {
                   </H6>
                 ))}
           </View>
-
           {datasetsAvailable.length > 0 ? null : (
             <View style={styles.contentBox}>
               <H5 style={[styles.text, styles.textBold]}>
                 No sensors enabled to run the investigation!
               </H5>
               <H5 style={styles.text}>
-                Please recheck if at least one parameter (eg IR) has been
-                enabled for the chosen sensor (eg Temperature).
+                Please recheck if at least one parameter(eg IR) has been enabled for
+                the chosen sensor(eg Temperature).
               </H5>
             </View>
           )}
-
           {sensors.length <= 0 ? null : (
             <View>
+
               {sensors.map((sensor, i) => {
                 return (
                   <View style={styles.contentBox} key={i}>
-                    <H4 style={[styles.text, styles.textBold]}>
-                      {sensor.name}
-                    </H4>
-
+                    <H4 style={[styles.text, styles.textBold]}> {sensor.name} </H4>
                     {sensor.parameters.length <= 0 ? null : (
                       <View>
-                        <H6 style={styles.text}>Sensor parameters:</H6>
+                        <H6 style={styles.text}> Sensor parameters: </H6>
                         {sensor.parameters.map((param, j) => {
                           return (
                             <View key={i + j} style={styles.twoColBox}>
                               <H5 style={[styles.text, styles.textBold]}>
+
                                 {param.key}
                               </H5>
                               <H5 style={[styles.text, styles.textBold]}>
-                                {param.value ? 'ON' : 'OFF'}
+
+                                {param.value ? "ON" : "OFF"}
                               </H5>
                             </View>
                           );
                         })}
                       </View>
                     )}
-
                     {!isConnectedToDevices
                       ? null
                       : Object.keys(connectedDevices).map(deviceId => (
@@ -736,32 +864,36 @@ export class InvestigationDetailsComponent extends Component<{}> {
                             key={`sensor-tag-value-${deviceId}`}
                             style={styles.twoColBox}
                           >
-                            <H6 style={styles.text}>Device {deviceId}</H6>
+                            <H6 style={styles.text}> Device {deviceId} </H6>
                             <H6 style={[styles.text, styles.textBold]}>
+
                               {connectedDevices[deviceId].value}
                             </H6>
                           </View>
                         ))}
-
                     {!display.graph ? null : (
                       <View>
-                        <H6>{sensor.name} graph</H6>
+                        <H6>
+
+                          {sensor.name}
+                          graph
+                        </H6>
                       </View>
                     )}
-
                     {!display.grid ? null : (
                       <View>
                         <View>
                           <H6 style={styles.text}>
-                            Press any button on sensor tag or tap on grid to
-                            record a value
+                            Press any button on sensor tag or tap on grid to record a
+                            value
                           </H6>
                           <H6 style={styles.text}>
-                            Please note : Tapping on a grid will rewrite any
-                            existing value
+                            Please note: Tapping on a grid will rewrite any existing
+                            value
                           </H6>
                         </View>
                         <View style={styles.gridContainer}>
+
                           {sensor.config && sensor.config.grids
                             ? sensor.config.grids.map(grid => (
                                 <TouchableOpacity
@@ -771,9 +903,7 @@ export class InvestigationDetailsComponent extends Component<{}> {
                                   onPress={() => {}}
                                 >
                                   <View style={styles.gridData}>
-                                    <H6 style={styles.gridText}>
-                                      {grid.number}
-                                    </H6>
+                                    <H6 style={styles.gridText}> {grid.number} </H6>
                                   </View>
                                 </TouchableOpacity>
                               ))
@@ -787,14 +917,15 @@ export class InvestigationDetailsComponent extends Component<{}> {
             </View>
           )}
         </ScrollView>
-
         <ScrollView style={styles.footerButtonContainer} scrollEnabled={false}>
+
           {display.graph && datasetsAvailable.length > 0 ? (
             <View style={styles.footerInnerContainer}>
+
               {!graphs.startedAtLeastOnce ? (
                 <Button
                   uppercase={false}
-                  onPress={() => navigation.navigate('BluetoothConnect')}
+                  onPress={() => navigation.navigate("BluetoothConnect")}
                   style={styles.footerButton}
                 >
                   Sensor Tags
@@ -808,7 +939,6 @@ export class InvestigationDetailsComponent extends Component<{}> {
                   Save graph data
                 </Button>
               )}
-
               {graphs.started ? (
                 <View>
                   <Button
@@ -840,7 +970,6 @@ export class InvestigationDetailsComponent extends Component<{}> {
               )}
             </View>
           ) : null}
-
           {display.grid && datasetsAvailable.length > 0 ? (
             <View>
               <Button
@@ -860,7 +989,7 @@ export class InvestigationDetailsComponent extends Component<{}> {
               </Button>
               <Button
                 uppercase={false}
-                onPress={() => navigation.navigate('BluetoothConnect')}
+                onPress={() => navigation.navigate("BluetoothConnect")}
                 style={styles.footerButton}
               >
                 Sensor Tags
@@ -869,6 +998,7 @@ export class InvestigationDetailsComponent extends Component<{}> {
           ) : null}
         </ScrollView>
       </View>
+
     );
   }
 }
