@@ -231,5 +231,5 @@ function saveDataToFile(fields, data, investigation, user) {
   const fileName = _getFileExtension(investigation.labTitle, user);
   const store = getStore();
 
-  store.dispatch(saveFile(fileName, csvData));
+  store.dispatch(saveFile(fileName, csvData, user));
 }

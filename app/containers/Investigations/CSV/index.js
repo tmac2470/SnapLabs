@@ -2,11 +2,11 @@ import React, {Component} from "react";
 import {connect} from "react-redux";
 
 import {View, FlatList, TouchableOpacity, Alert, Share} from "react-native";
-import {Button, H2, H4} from "nachos-ui";
+import {Button, H2, H3, H4} from "nachos-ui";
 
 import Colors from "../../../Theme/colors";
 
-import {fetchFiles, deleteFile} from '../../FileHandling/actions';
+import {fetchFiles, deleteFile, _getFolderPath} from '../../FileHandling/actions';
 import {networkError} from '../../../Metastores/actions';
 
 export class SavedInvestigationsComponent extends Component < {} > {
@@ -15,7 +15,8 @@ export class SavedInvestigationsComponent extends Component < {} > {
   };
 
   state = {
-    expand: {}
+    expand: {},
+    filePath: ''
   }
 
   _keyExtractor = (item, index) => item.name;
@@ -30,12 +31,14 @@ export class SavedInvestigationsComponent extends Component < {} > {
   }
 
   componentWillMount() {
-    const {onFetchFiles} = this.props;
-    onFetchFiles();
+    const {onFetchFiles, user} = this.props;
+    onFetchFiles(user);
+    const filePath = _getFolderPath(user);
+    this.setState({filePath});
   }
 
   _onDeleteFile(file) {
-    const {onDeleteFile} = this.props;
+    const {onDeleteFile, user} = this.props;
 
     Alert.alert("Confirm deletion", `This will delete the file "${file.name}" from device`, [
       {
@@ -44,7 +47,7 @@ export class SavedInvestigationsComponent extends Component < {} > {
         style: "cancel"
       }, {
         text: "Delete",
-        onPress: () => onDeleteFile(file)
+        onPress: () => onDeleteFile(file, user)
       }
     ], {cancelable: true});
   }
@@ -62,7 +65,6 @@ export class SavedInvestigationsComponent extends Component < {} > {
       // success
     })
       .catch(e => {
-        // console.log(e);
         onNetworkError(e.message);
       });
   }
@@ -102,6 +104,7 @@ export class SavedInvestigationsComponent extends Component < {} > {
 
   render() {
     const {files} = this.props;
+    const {filePath} = this.state;
     const filteredFiles = files.filter(file => {
       return file.isFile() && file
         .name
@@ -110,6 +113,9 @@ export class SavedInvestigationsComponent extends Component < {} > {
 
     return (
       <View style={styles.container}>
+        <View style={styles.textContainer}>
+          <H4 style={styles.info}>Files are stored under: {filePath}</H4>
+        </View>
         <FlatList
           style={styles.list}
           data={filteredFiles}
@@ -127,6 +133,14 @@ export class SavedInvestigationsComponent extends Component < {} > {
 const styles = {
   container: {
     flex: 4
+  },
+  textContainer: {
+    display: "flex",
+    paddingLeft: 10,
+    paddingRight: 10,
+    backgroundColor: Colors.white,
+    borderBottomColor: "black",
+    borderBottomWidth: 0.5,
   },
   createdBy: {
     color: Colors.secondary
@@ -157,13 +171,13 @@ const styles = {
 };
 
 const mapStateToProps = state => {
-  return {files: state.localFiles};
+  return {files: state.localFiles, user: state.currentUser};
 };
 
 const mapDispatchToProps = dispatch => {
   return {
-    onFetchFiles: () => dispatch(fetchFiles()),
-    onDeleteFile: file => dispatch(deleteFile(file)),
+    onFetchFiles: (user) => dispatch(fetchFiles(user)),
+    onDeleteFile: (file, user) => dispatch(deleteFile(file, user)),
     onNetworkError: error => dispatch(networkError(error))
   };
 };

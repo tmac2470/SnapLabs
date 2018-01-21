@@ -15,19 +15,22 @@ export function deleteFileSuccess(file) {
   return {type: DELETE_FILE_SUCCESS, file};
 }
 
-const _getFolderPath = () => {
+export const _getFolderPath = (user) => {
+  let folder = '';
   if (Platform.OS === 'ios') {
-    return RNFS.LibraryDirectoryPath;
+    folder = RNFS.LibraryDirectoryPath;
   } else {
-    return RNFS.ExternalDirectoryPath;
+    folder = RNFS.ExternalDirectoryPath;
   }
+
+  return `${folder}/${user.email}`;
 }
 
-export const fetchFiles = () => {
+export const fetchFiles = (user) => {
   return dispatch => {
     dispatch(networkBusy(true));
     return RNFS
-      .readDir(_getFolderPath())
+      .readDir(_getFolderPath(user))
       .then(files => {
         dispatch(fetchFilesSuccess(files));
         dispatch(networkBusy(false));
@@ -39,28 +42,37 @@ export const fetchFiles = () => {
   }
 }
 
-export const saveFile = (fileName, fileContent) => {
-  const filePath = `${_getFolderPath()}/${fileName}`;
+export const saveFile = (fileName, fileContent, user) => {
+  const path = `${_getFolderPath(user)}`;
+  const filePath = `${path}/${fileName}`;
   return dispatch => {
     dispatch(networkBusy(true));
 
     return RNFS
-      .writeFile(filePath, fileContent)
-      .then(_ => {
-        console.log('saved file', fileName);
-        // dispatch(saveFileSuccess(files));
-        dispatch(networkBusy(false));
+      .mkdir(path)
+      .then(e => {
+        return RNFS
+          .writeFile(filePath, fileContent)
+          .then(_ => {
+            console.log('saved file', fileName);
+            // dispatch(saveFileSuccess(files));
+            dispatch(networkBusy(false));
+          })
+          .catch(error => {
+            dispatch(networkError(error.message));
+            dispatch(networkBusy(false));
+          });
       })
       .catch(error => {
         dispatch(networkError(error.message));
         dispatch(networkBusy(false));
-      });
+      })
   }
 }
 
-export const deleteFile = (file) => {
+export const deleteFile = (file, user) => {
   const fileName = file.name;
-  const filePath = `${_getFolderPath()}/${fileName}`;
+  const filePath = `${_getFolderPath(user)}/${fileName}`;
 
   return dispatch => {
     dispatch(networkBusy(true));
