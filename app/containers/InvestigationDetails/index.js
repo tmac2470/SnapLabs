@@ -1138,7 +1138,7 @@ export class InvestigationDetailsComponent extends Component < {} > {
               )}
             </View>
           ) : null}
-          {display.grid && datasetsAvailable.length > 0 ? (
+          {display.grid ? (
             <View>
               <Button
                 uppercase={false}

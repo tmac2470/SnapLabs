@@ -1,9 +1,7 @@
-import RNFS from 'react-native-fetch-blob'
+import RNFS from 'react-native-fs';
 import {FETCH_FILES_SUCCESS, SAVE_FILE_SUCCESS, DELETE_FILE_SUCCESS} from './constants';
 import {networkBusy, networkError} from "../../Metastores/actions";
 import {Platform} from 'react-native';
-
-const {fs, fetch, wrap} = RNFS;
 
 export function fetchFilesSuccess(files) {
   return {type: FETCH_FILES_SUCCESS, files};
@@ -13,15 +11,15 @@ export function saveFileSuccess(file) {
   return {type: SAVE_FILE_SUCCESS, file};
 }
 
-export function deleteFileSuccess(fileName) {
-  return {type: DELETE_FILE_SUCCESS, fileName};
+export function deleteFileSuccess(file) {
+  return {type: DELETE_FILE_SUCCESS, file};
 }
 
 const _getFolderPath = () => {
   if (Platform.OS === 'ios') {
-    return fs.dirs.DocumentDir;
+    return RNFS.LibraryDirectoryPath;
   } else {
-    return fs.dirs.DownloadDir;
+    return RNFS.ExternalDirectoryPath;
   }
 }
 
@@ -46,10 +44,10 @@ export const saveFile = (fileName, fileContent) => {
   return dispatch => {
     dispatch(networkBusy(true));
 
-    return fs
+    return RNFS
       .writeFile(filePath, fileContent)
       .then(_ => {
-        console.log('lol');
+        console.log('saved file', fileName);
         // dispatch(saveFileSuccess(files));
         dispatch(networkBusy(false));
       })
@@ -60,15 +58,18 @@ export const saveFile = (fileName, fileContent) => {
   }
 }
 
-export const deleteFile = (fileName) => {
+export const deleteFile = (file) => {
+  const fileName = file.name;
   const filePath = `${_getFolderPath()}/${fileName}`;
+
   return dispatch => {
     dispatch(networkBusy(true));
 
-    return fs
+    return RNFS
       .unlink(filePath)
       .then(_ => {
-        dispatch(deleteFileSuccess(fileName));
+        console.log('deleted', fileName);
+        dispatch(deleteFileSuccess(file));
         dispatch(networkBusy(false));
       })
       .catch(error => {

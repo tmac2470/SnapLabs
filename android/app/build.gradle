@@ -137,7 +137,6 @@ android {
 }
 
 dependencies {
-    compile project(':react-native-fetch-blob')
     compile project(':react-native-fs')
     compile project(':react-native-ble-manager')
     compile project(':react-native-spinkit')

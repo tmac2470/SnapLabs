@@ -117,8 +117,6 @@ export function _saveGridData(connectedDevices, sensors, sampleIntervalTime, inv
           });
       });
     });
-  console.log(fields);
-  console.log(gridData);
   saveDataToFile(fields, gridData, investigation, user);
 }
 
@@ -222,7 +220,7 @@ function _getFileExtension(experimentTitle, user) {
     userExt = `${user.username}_${userExt}`;
   }
 
-  const timestamp = moment().format("DD_MM_YYYY_HH_mm");
+  const timestamp = moment().format("DD_MM_YYYY_HH_mm_ss");
   const fileName = `${timestamp}_${experimentTitle}_${userExt}.csv`;
 
   return fileName;
