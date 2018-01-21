@@ -28,6 +28,13 @@ export class DownloadInvestigationsComponent extends Component<{}> {
     onFetchInvestigations();
   }
 
+  _convertObjectToArray = obj => {
+    return Object.keys(obj).map(function(key) {
+      return obj[key];
+    });
+  };
+
+
   render() {
     const {
       investigations,
@@ -38,10 +45,15 @@ export class DownloadInvestigationsComponent extends Component<{}> {
       onDownloadInvestigation,
       onFetchInvestigations
     } = this.props;
+
+    const investigationsArray = this._convertObjectToArray(
+      investigations
+    );
+
     return (
       <View style={styles.container}>
         <InvestigationList
-          investigations={investigations}
+          investigations={investigationsArray}
           localInvestigations={localInvestigations}
           onRefresh={onFetchInvestigations}
           extraData={this.state}

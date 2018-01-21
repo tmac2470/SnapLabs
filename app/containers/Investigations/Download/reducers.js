@@ -1,6 +1,6 @@
 import { FETCH_INVESTIGATIONS_SUCCESS } from "./constants";
 
-const initialDownloadInvestigationsState = [];
+const initialDownloadInvestigationsState = {};
 
 export function downloadInvestigationsReducer(
   initial = initialDownloadInvestigationsState,
@@ -10,9 +10,12 @@ export function downloadInvestigationsReducer(
 
   switch (action.type) {
     case FETCH_INVESTIGATIONS_SUCCESS:
-      return [...investigations];
+      investigations.map(investigation => {
+        initial[investigation._id] = investigation;
+      });
+      return {...initial};
 
     default:
-      return [...initial];
+      return {...initial};
   }
 }
