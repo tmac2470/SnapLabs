@@ -6,6 +6,7 @@ import { downloadInvestigationsReducer } from "./containers/Investigations/Downl
 import { localInvestigationsReducer } from "./containers/Investigations/Local/reducers";
 import { metaStoreReducer } from "./Metastores/reducers";
 import { bluetoothReducer } from "./containers/Bluetooth/reducers";
+import { fileHandlingReducer } from './containers/FileHandling/reducers';
 
 import navReducer from "./Router/reducer";
 
@@ -16,6 +17,7 @@ export default function getRootReducer() {
     downloadInvestigations: downloadInvestigationsReducer,
     meta: metaStoreReducer,
     localInvestigations: localInvestigationsReducer,
-    bluetooth: bluetoothReducer
+    bluetooth: bluetoothReducer,
+    localFiles: fileHandlingReducer
   });
 }

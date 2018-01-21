@@ -3,6 +3,8 @@ package com.snaplab_react;
 import android.app.Application;
 
 import com.facebook.react.ReactApplication;
+import com.RNFetchBlob.RNFetchBlobPackage;
+import com.rnfs.RNFSPackage;
 import it.innove.BleManagerPackage;
 import com.react.rnspinkit.RNSpinkitPackage;
 import com.reactnative.photoview.PhotoViewPackage;
@@ -28,6 +30,8 @@ public class MainApplication extends Application implements ReactApplication {
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
           new MainReactPackage(),
+            new RNFetchBlobPackage(),
+            new RNFSPackage(),
             new BleManagerPackage(),
             new RNSpinkitPackage(),
             new PhotoViewPackage(),

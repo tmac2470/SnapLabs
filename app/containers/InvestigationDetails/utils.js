@@ -2,6 +2,9 @@ import * as _ from "lodash";
 import * as json2csv from 'papaparse';
 import moment from 'moment';
 
+import getStore from '../../store';
+import { saveFile } from '../FileHandling/actions';
+
 export function _getSensorTags(sensorTags) {
   let tags = [];
   for (let id in sensorTags) {
@@ -206,7 +209,7 @@ export function _saveGraphData(connectedDevices, charts, sampleIntervalTime) {
 }
 
 function _convertArrayToCSV(fields, data) {
-  const csv = json2csv.unparse({ data: data, fields: fields });
+  const csv = json2csv.unparse({data: data, fields: fields});
   return csv;
 }
 
@@ -228,8 +231,7 @@ function _getFileExtension(experimentTitle, user) {
 function saveDataToFile(fields, data, investigation, user) {
   const csvData = _convertArrayToCSV(fields, data);
   const fileName = _getFileExtension(investigation.labTitle, user);
-  console.log(fileName);
-  console.log(csvData);
+  const store = getStore();
 
-  // Save to storage
+  store.dispatch(saveFile(fileName, csvData));
 }
