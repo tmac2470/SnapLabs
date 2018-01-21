@@ -1,14 +1,15 @@
-import React, { Component } from "react";
-import { connect } from "react-redux";
+import React, {Component} from "react";
+import {connect} from "react-redux";
 
-import { View, FlatList, TouchableOpacity, Alert } from "react-native";
-import { Button, H2, H4 } from "nachos-ui";
+import {View, FlatList, TouchableOpacity, Alert, Share} from "react-native";
+import {Button, H2, H4} from "nachos-ui";
 
 import Colors from "../../../Theme/colors";
 
-import { fetchFiles, deleteFile } from '../../FileHandling/actions';
+import {fetchFiles, deleteFile} from '../../FileHandling/actions';
+import {networkError} from '../../../Metastores/actions';
 
-export class SavedInvestigationsComponent extends Component<{}> {
+export class SavedInvestigationsComponent extends Component < {} > {
   static navigationOptions = {
     title: "Saved Files"
   };
@@ -20,75 +21,91 @@ export class SavedInvestigationsComponent extends Component<{}> {
   _keyExtractor = (item, index) => item.name;
 
   _onExpandFileItem(file) {
-    const { expand } = this.state;
+    const {expand} = this.state;
     this.setState({
-      expand: { [file.name]: !expand[file.name] }
+      expand: {
+        [file.name]: !expand[file.name]
+      }
     });
   }
 
   componentWillMount() {
-    const { onFetchFiles } = this.props;
+    const {onFetchFiles} = this.props;
     onFetchFiles();
   }
 
   _onDeleteFile(file) {
-    const { onDeleteFile } = this.props;
+    const {onDeleteFile} = this.props;
 
-    Alert.alert(
-      "Confirm deletion",
-      `This will delete the file "${
-        file.name
-      }" from device`,
-      [
-        {
-          text: "Cancel",
-          onPress: () => {},
-          style: "cancel"
-        },
-        { text: "Delete", onPress: () => onDeleteFile(file) }
-      ],
-      { cancelable: true }
-    );
+    Alert.alert("Confirm deletion", `This will delete the file "${file.name}" from device`, [
+      {
+        text: "Cancel",
+        onPress: () => {},
+        style: "cancel"
+      }, {
+        text: "Delete",
+        onPress: () => onDeleteFile(file)
+      }
+    ], {cancelable: true});
   }
 
-  _renderFileItem= ({ item }) => {
-    const { expand } = this.state;
+  onShareFile(file) {
+    const {onNetworkError} = this.props;
+    Share.share({
+      title: "Snaplabs: Experiment data file " + file.name,
+      message: "Snaplabs: Experiment data file " + file.name,
+      url: file.path
+    }, {
+        dialogTitle: "Snaplabs: Experiment data file " + file.name
+      })
+      .then(e => {
+      // success
+    })
+      .catch(e => {
+        // console.log(e);
+        onNetworkError(e.message);
+      });
+  }
+
+  _renderFileItem = ({item}) => {
+    const {expand} = this.state;
 
     return (
       <TouchableOpacity
         style={styles.listItem}
-        onPress={() => this._onExpandFileItem(item)}
-      >
+        onPress={() => this._onExpandFileItem(item)}>
         <H4 style={styles.name}>{item.name}</H4>
-        {!expand[item.name] ? null : (
-          <View>
-            <Button
-              type="success"
-              uppercase={false}
-              onPress={() => onDownloadInvestigation(item._id)}
-              style={styles.button}
-            >
-              Share
-            </Button>
+        {!expand[item.name]
+          ? null
+          : (
+            <View>
+              <Button
+                type="success"
+                uppercase={false}
+                onPress={() => this.onShareFile(item)}
+                style={styles.button}>
+                Share
+              </Button>
 
-            <Button
-              type="danger"
-              uppercase={false}
-              onPress={() => this._onDeleteFile(item)}
-              style={styles.button}
-            >
-              Delete
-            </Button>
-          </View>
-        )}
+              <Button
+                type="danger"
+                uppercase={false}
+                onPress={() => this._onDeleteFile(item)}
+                style={styles.button}>
+                Delete
+              </Button>
+            </View>
+          )}
       </TouchableOpacity>
     )
   }
 
   render() {
-    const { files } = this.props;
+    const {files} = this.props;
     const filteredFiles = files.filter(file => {
-      return file.isFile() && file.name.indexOf('.csv') > -1;
+      return file.isFile() && file
+        .name
+        .indexOf('.csv') > -1;
     });
 
     return (
@@ -99,8 +116,9 @@ export class SavedInvestigationsComponent extends Component<{}> {
           refreshing={false}
           extraData={this.state}
           keyExtractor={this._keyExtractor}
-          renderItem={this._renderFileItem.bind(this)}
-        />
+          renderItem={this
+          ._renderFileItem
+          .bind(this)}/>
       </View>
     );
   }
@@ -139,15 +157,14 @@ const styles = {
 };
 
 const mapStateToProps = state => {
-  return {
-    files: state.localFiles
-  };
+  return {files: state.localFiles};
 };
 
 const mapDispatchToProps = dispatch => {
   return {
     onFetchFiles: () => dispatch(fetchFiles()),
-    onDeleteFile: file=> dispatch(deleteFile(file))
+    onDeleteFile: file => dispatch(deleteFile(file)),
+    onNetworkError: error => dispatch(networkError(error))
   };
 };
 

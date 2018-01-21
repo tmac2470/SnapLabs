@@ -716,7 +716,7 @@
 				E6D0EFA8AD5447A4A6BF2BDE /* libRNSpinkit.a */,
 				D38614D5D4774183B2A6E278 /* libBleManager.a */,
 				217E70F036AA4C9AA6F7B912 /* libRNFS.a */,
-				C0E7EDB2DDAB492AB959196C /* libRNFetchBlob.a */,
+				E6C8DC2019264555A0FD90C5 /* libRNShare.a */,
 			);
 			name = "Recovered References";
 			sourceTree = "<group>";
