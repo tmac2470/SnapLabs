@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import { connect } from "react-redux";
 import { View } from "react-native";
 import InvestigationList from "../../../components/InvestigationList";
+import FullScreenLoader from '../../../components/FullScreenLoading';
 
 import Colors from "../../../Theme/colors";
 import { fetchInvestigations } from "./actions";
@@ -52,12 +53,12 @@ export class DownloadInvestigationsComponent extends Component<{}> {
 
     return (
       <View style={styles.container}>
+        <FullScreenLoader visible={!!isFetching}/>
         <InvestigationList
           investigations={investigationsArray}
           localInvestigations={localInvestigations}
           onRefresh={onFetchInvestigations}
           extraData={this.state}
-          refreshing={isFetching}
           onDownloadInvestigation={onDownloadInvestigation}
           navigation={navigation}
           onDeleteInvestigation={onDeleteInvestigation}

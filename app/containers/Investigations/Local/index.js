@@ -31,7 +31,6 @@ export class LocalInvestigationsComponent extends Component<{}> {
 
   render() {
     const {
-      isFetching,
       localInvestigations,
       navigation,
       onDeleteInvestigation,
@@ -48,7 +47,6 @@ export class LocalInvestigationsComponent extends Component<{}> {
           localInvestigations={localInvestigations}
           onRefresh={() => {}}
           extraData={this.state}
-          refreshing={isFetching}
           onDownloadInvestigation={onDownloadInvestigation}
           navigation={navigation}
           onDeleteInvestigation={onDeleteInvestigation}
@@ -87,7 +85,6 @@ const styles = {
 
 const mapStateToProps = state => {
   return {
-    isFetching: state.meta.isFetching,
     localInvestigations: state.localInvestigations
   };
 };

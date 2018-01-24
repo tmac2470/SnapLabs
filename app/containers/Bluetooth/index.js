@@ -12,7 +12,7 @@ import {
   PermissionsAndroid
 } from "react-native";
 import { Button, H5, H4, H6, Badge } from "nachos-ui";
-import Spinner from "react-native-spinkit";
+import FullScreenLoader from '../../components/FullScreenLoading';
 
 import Colors from "../../Theme/colors";
 
@@ -327,10 +327,12 @@ export class BluetoothConnectComponent extends Component<{}> {
 
   render() {
     const { isBusy, peripherals } = this.state;
-    const { connectedDevices } = this.props;
+    const { connectedDevices, isFetching } = this.props;
     const numOfConnectedDevices = Object.keys(connectedDevices).length;
     return (
       <View style={styles.container}>
+        <FullScreenLoader visible={!!isFetching || !!isBusy}/>
+
         {numOfConnectedDevices > 0 && peripherals.length > 0 ? (
           <View style={styles.connectedInfoContainer}>
             <H6 style={styles.text}>
@@ -347,13 +349,6 @@ export class BluetoothConnectComponent extends Component<{}> {
           keyExtractor={this._keyExtractor}
           renderItem={this._renderDeviceDetails}
         />
-        <View style={styles.spinnerContainer}>
-          <Spinner
-            type="FadingCircleAlt"
-            isVisible={!!isBusy}
-            color={Colors.primary}
-          />
-        </View>
         <View style={styles.footerButtonContainer}>
           <Button
             disabled={!!isBusy}
@@ -376,11 +371,6 @@ const styles = {
   },
   list: {
     flex: 4
-  },
-  spinnerContainer: {
-    padding: 10,
-    justifyContent: "center",
-    alignItems: "center"
   },
   connectedInfoContainer: {
     padding: 10
@@ -433,7 +423,8 @@ const styles = {
 const mapStateToProps = state => {
   return {
     bluetoothStarted: state.bluetooth.started,
-    connectedDevices: state.bluetooth.connectedDevices
+    connectedDevices: state.bluetooth.connectedDevices,
+    isFetching: state.meta.isFetching
   };
 };
 

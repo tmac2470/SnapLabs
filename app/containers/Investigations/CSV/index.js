@@ -1,5 +1,6 @@
 import React, {Component} from "react";
 import {connect} from "react-redux";
+import FullScreenLoader from '../../../components/FullScreenLoading';
 
 import {View, FlatList, TouchableOpacity, Alert, Share} from "react-native";
 import {Button, H2, H3, H4} from "nachos-ui";
@@ -103,7 +104,7 @@ export class SavedInvestigationsComponent extends Component < {} > {
   }
 
   render() {
-    const {files} = this.props;
+    const {files, isFetching} = this.props;
     const {filePath} = this.state;
     const filteredFiles = files.filter(file => {
       return file.isFile() && file
@@ -113,6 +114,7 @@ export class SavedInvestigationsComponent extends Component < {} > {
 
     return (
       <View style={styles.container}>
+        <FullScreenLoader visible={!!isFetching}/>
         <View style={styles.textContainer}>
           <H4 style={styles.info}>Files are stored under: {filePath}</H4>
         </View>
@@ -140,7 +142,7 @@ const styles = {
     paddingRight: 10,
     backgroundColor: Colors.white,
     borderBottomColor: "black",
-    borderBottomWidth: 0.5,
+    borderBottomWidth: 0.5
   },
   createdBy: {
     color: Colors.secondary
@@ -171,7 +173,7 @@ const styles = {
 };
 
 const mapStateToProps = state => {
-  return {files: state.localFiles, user: state.currentUser};
+  return {files: state.localFiles, user: state.currentUser, isFetching: state.meta.isFetching};
 };
 
 const mapDispatchToProps = dispatch => {

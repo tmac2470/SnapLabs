@@ -47,8 +47,8 @@ export class SplashComponent extends Component<{}> {
         <Image source={pic} style={styles.image} />
         <H2 style={styles.textStyle}>Create. Investigate. Share.</H2>
         <View style={styles.spinnerContainer}>
-          <Spinner type="FadingCircleAlt" color={Colors.primary} />
-        </View>
+          <Spinner type={'FadingCircle'} size={50} color={Colors.primary}/>
+          </View>
       </View>
     );
   }
