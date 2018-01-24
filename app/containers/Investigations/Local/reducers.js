@@ -2,6 +2,8 @@ import {
   DOWNLOAD_INVESTIGATION_SUCCESS,
   DELETE_INVESTIGATION
 } from "./constants";
+import { REHYDRATE } from 'redux-persist';
+
 import Balloon_Pressure_Investigation from "../../../../data/investigations/Balloon_Pressure_Investigation.json";
 import Classroom_Heat_and_Light_Investigation from "../../../../data/investigations/Classroom_Heat_and_Light_Investigation.json";
 import Investigating_the_SensorTags from "../../../../data/investigations/Investigating_the_SensorTags.json";
@@ -43,6 +45,14 @@ export function localInvestigationsReducer(
   const { investigation } = action;
 
   switch (action.type) {
+    case REHYDRATE:
+      // Need to manually handle the rehydration
+      // As the nesting of reducers(may be) is causing issues
+      // with copying of saved localInvestigations to the state
+      const { payload } = action;
+      return {
+        ...payload.localInvestigations
+      };
     case DOWNLOAD_INVESTIGATION_SUCCESS:
       initial[investigation._id] = investigation;
       return {

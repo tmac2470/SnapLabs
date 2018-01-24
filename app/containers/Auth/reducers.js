@@ -1,10 +1,6 @@
 import { UNSET_USER, SET_USER } from "./constants";
 
-const initialUserState = {
-  username: "",
-  email: "",
-  isLoggedIn: false
-};
+const initialUserState = {};
 
 export function userReducer(user = initialUserState, action) {
   switch (action.type) {

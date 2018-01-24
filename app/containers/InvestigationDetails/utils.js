@@ -229,7 +229,7 @@ function _getFileExtension(experimentTitle, user) {
 function saveDataToFile(fields, data, investigation, user) {
   const csvData = _convertArrayToCSV(fields, data);
   const fileName = _getFileExtension(investigation.labTitle, user);
-  const store = getStore();
+  const { store } = getStore();
 
   store.dispatch(saveFile(fileName, csvData, user));
 }
