@@ -6,7 +6,7 @@ import JoinScreen from "../containers/Auth";
 import SplashScreen from "../containers/Splash";
 import DownloadInvestigationsScreen from "../containers/Investigations/Download";
 import InvestigationListScreen from "../containers/Investigations/Local";
-import SavedInvestigationsScreen from "../containers/Investigations/CSV";
+import FileHandlingScreen from "../containers/FileHandling";
 import InvestigationDetailsScreen from "../containers/InvestigationDetails";
 import BluetoothConnectScreen from "../containers/Bluetooth";
 
@@ -27,8 +27,8 @@ const AppNavigator = StackNavigator(
     InvestigationList: {
       screen: InvestigationListScreen
     },
-    SavedInvestigations: {
-      screen: SavedInvestigationsScreen
+    FileHandling: {
+      screen: FileHandlingScreen
     },
     InvestigationDetails: {
       screen: InvestigationDetailsScreen

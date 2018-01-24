@@ -73,7 +73,7 @@ export class HomeComponent extends Component<{}> {
 
           <Button
             type="success"
-            onPress={() => navigation.navigate("SavedInvestigations")}
+            onPress={() => navigation.navigate("FileHandling")}
             uppercase={false}
             style={styles.button}
           >
