@@ -26,11 +26,13 @@ import {
   H5,
   H6
 } from 'nachos-ui';
+import FullScreenLoader from '../../components/FullScreenLoading';
 
 import Colors from '../../Theme/colors';
 import * as utils from './utils';
 import {
-  appError
+  appError,
+  appBusy
 } from '../../Metastores/actions';
 
 const BleManagerModule = NativeModules.BleManager;
@@ -944,13 +946,20 @@ export class InvestigationDetailsComponent extends Component < {} > {
 
   saveGridData() {
     const { connectedDevices, sensors, sampleIntervalTime, investigation } = this.state;
-    const { user } = this.props;
-    utils._saveGridData(connectedDevices, sensors, sampleIntervalTime, investigation, user);
+    const { user, onAppBusy } = this.props;
+
+    onAppBusy(true);
+    const asyncSave = async () => {
+      await utils._saveGridData(connectedDevices, sensors, sampleIntervalTime, investigation, user);
+      onAppBusy(false);
+    };
+    asyncSave();
   }
 
   render() {
     const {
-      navigation
+      navigation,
+      busy
     } = this.props;
     const {
       connectedDevices,
@@ -969,6 +978,8 @@ export class InvestigationDetailsComponent extends Component < {} > {
 
     return (
       <View style={styles.container}>
+        <FullScreenLoader visible={!!busy}/>
+
         <ScrollView style={styles.scrollContainer}>
           <H2 style={[styles.header, styles.text, styles.textBold]}>
 
@@ -1238,12 +1249,14 @@ const styles = {
 const mapStateToProps = state => {
   return {
     connectedDevices: state.bluetooth.connectedDevices,
-    user: state.currentUser
+    user: state.currentUser,
+    busy: state.meta.busy
   };
 };
 
 const mapDispatchToProps = dispatch => {
   return {
+    onAppBusy: (busy) => dispatch(appBusy(busy)),
     onAppError: error => dispatch(appError(error))
   };
 };

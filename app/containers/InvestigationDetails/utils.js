@@ -117,7 +117,7 @@ export function _saveGridData(connectedDevices, sensors, sampleIntervalTime, inv
           });
       });
     });
-  saveDataToFile(fields, gridData, investigation, user);
+  return saveDataToFile(fields, gridData, investigation, user);
 }
 
 // Pick data from the sensor.rawValues
@@ -231,5 +231,5 @@ function saveDataToFile(fields, data, investigation, user) {
   const fileName = _getFileExtension(investigation.labTitle, user);
   const { store } = getStore();
 
-  store.dispatch(saveFile(fileName, csvData, user));
+  return store.dispatch(saveFile(fileName, csvData, user));
 }
