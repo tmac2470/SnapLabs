@@ -1,7 +1,7 @@
 import axios from "axios";
 import { FETCH_INVESTIGATIONS_SUCCESS } from "./constants";
 import { API_PATH } from "../../../constants";
-import { networkBusy, networkError } from "../../../Metastores/actions";
+import { appBusy, appError } from "../../../Metastores/actions";
 
 export function fetchInvestigationsSuccess(investigations) {
   return {
@@ -15,7 +15,7 @@ export const fetchInvestigations = () => {
   // Returns a dispatcher function
   // that dispatches an action at a later time
   return dispatch => {
-    dispatch(networkBusy(true));
+    dispatch(appBusy(true));
     // Returns a promise
     return axios
       .get(apiUrl)
@@ -23,11 +23,11 @@ export const fetchInvestigations = () => {
         // Dispatch another action
         // to consume data
         dispatch(fetchInvestigationsSuccess(response.data.data));
-        dispatch(networkBusy(false));
+        dispatch(appBusy(false));
       })
       .catch(error => {
-        dispatch(networkError(error.message));
-        dispatch(networkBusy(false));
+        dispatch(appError(error.message));
+        dispatch(appBusy(false));
       });
   };
 };

@@ -39,7 +39,7 @@ export class DownloadInvestigationsComponent extends Component<{}> {
   render() {
     const {
       investigations,
-      isFetching,
+      busy,
       localInvestigations,
       navigation,
       onDeleteInvestigation,
@@ -53,7 +53,7 @@ export class DownloadInvestigationsComponent extends Component<{}> {
 
     return (
       <View style={styles.container}>
-        <FullScreenLoader visible={!!isFetching}/>
+        <FullScreenLoader visible={!!busy}/>
         <InvestigationList
           investigations={investigationsArray}
           localInvestigations={localInvestigations}
@@ -78,7 +78,7 @@ const styles = {
 const mapStateToProps = state => {
   return {
     investigations: state.downloadInvestigations,
-    isFetching: state.meta.isFetching,
+    busy: state.meta.busy,
     localInvestigations: state.localInvestigations
   };
 };

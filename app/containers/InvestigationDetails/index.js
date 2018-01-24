@@ -30,7 +30,7 @@ import {
 import Colors from '../../Theme/colors';
 import * as utils from './utils';
 import {
-  networkError
+  appError
 } from '../../Metastores/actions';
 
 const BleManagerModule = NativeModules.BleManager;
@@ -144,7 +144,7 @@ export class InvestigationDetailsComponent extends Component < {} > {
 
   _startNotificationForService(device, service) {
     const {
-      onNetworkError
+      onAppError
     } = this.props;
 
     BleManager.startNotification(device.id, service.UUID, service.DATA)
@@ -152,13 +152,13 @@ export class InvestigationDetailsComponent extends Component < {} > {
         // Once the notifications have been started, listen to the handlerUpdate event
       })
       .catch(error => {
-        onNetworkError(error.message);
+        onAppError(error.message);
       });
   }
 
   _writePeriodToDevice(device, service, sampleIntervalTime) {
     const {
-      onNetworkError
+      onAppError
     } = this.props;
 
     const period = [sampleIntervalTime / 10];
@@ -169,13 +169,13 @@ export class InvestigationDetailsComponent extends Component < {} > {
         // Success
       })
       .catch(e => {
-        onNetworkError('Unable to write period to device! Please reconnect device', e);
+        onAppError('Unable to write period to device! Please reconnect device', e);
       });
   }
 
   _writeToDevice(device, service, data) {
     const {
-      onNetworkError
+      onAppError
     } = this.props;
 
     BleManager.write(device.id, service.UUID, service.CONFIG, data)
@@ -184,7 +184,7 @@ export class InvestigationDetailsComponent extends Component < {} > {
         // Success
       })
       .catch(e => {
-        onNetworkError('Unable to write to device! Please reconnect device', e);
+        onAppError('Unable to write to device! Please reconnect device', e);
       });
   }
 
@@ -193,7 +193,7 @@ export class InvestigationDetailsComponent extends Component < {} > {
       sensors
     } = this.state;
     const {
-      onNetworkError
+      onAppError
     } = this.props;
 
     sensors.map(sensorTag => {
@@ -237,7 +237,7 @@ export class InvestigationDetailsComponent extends Component < {} > {
             // Success
           })
           .catch(error => {
-            onNetworkError(error.message);
+            onAppError(error.message);
           });
       }
     });
@@ -588,7 +588,7 @@ export class InvestigationDetailsComponent extends Component < {} > {
   initialiseSensorTags(sensors) {
     const {
       connectedDevices,
-      onNetworkError
+      onAppError
     } = this.props;
 
     Object.keys(connectedDevices).map(Id => {
@@ -597,7 +597,7 @@ export class InvestigationDetailsComponent extends Component < {} > {
           this.startNotifications(connectedDevices[Id]);
         })
         .catch(error => {
-          onNetworkError(error.message);
+          onAppError(error.message);
         });
     });
 
@@ -1244,7 +1244,7 @@ const mapStateToProps = state => {
 
 const mapDispatchToProps = dispatch => {
   return {
-    onNetworkError: error => dispatch(networkError(error))
+    onAppError: error => dispatch(appError(error))
   };
 };
 

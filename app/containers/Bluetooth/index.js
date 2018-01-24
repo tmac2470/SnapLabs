@@ -22,7 +22,7 @@ import {
   deviceDisconnect,
   updateConnectedDevice
 } from "./actions.js";
-import { networkError } from "../../Metastores/actions";
+import { appError } from "../../Metastores/actions";
 import * as SERVICES from "./services";
 
 const BleManagerModule = NativeModules.BleManager;
@@ -45,7 +45,7 @@ export class BluetoothConnectComponent extends Component<{}> {
       connectedDevices,
       bluetoothStarted,
       onBluetoothStarted,
-      onNetworkError
+      onAppError
     } = this.props;
     BleManager.checkState();
 
@@ -58,7 +58,7 @@ export class BluetoothConnectComponent extends Component<{}> {
           onBluetoothStarted();
         })
         .catch(error => {
-          onNetworkError(error.message);
+          onAppError(error.message);
         });
     } else {
       this.startScan();
@@ -78,7 +78,7 @@ export class BluetoothConnectComponent extends Component<{}> {
             PermissionsAndroid.PERMISSIONS.ACCESS_COARSE_LOCATION
           ).then(result => {
             if (!result) {
-              onNetworkError("User refused bluetooth");
+              onAppError("User refused bluetooth");
             }
           });
         }
@@ -115,21 +115,21 @@ export class BluetoothConnectComponent extends Component<{}> {
   }
 
   _pingAllConnectedDevices() {
-    const { connectedDevices, onNetworkError } = this.props;
+    const { connectedDevices, onAppError } = this.props;
     Object.keys(connectedDevices).map(Id => {
       BleManager.retrieveServices(Id)
         .then(_ => {
           this._pingDevice(connectedDevices[Id]);
         })
         .catch(error => {
-          onNetworkError(error.message);
+          onAppError(error.message);
         });
     });
   }
 
   _unpingAllConnectedDevices() {
     const service = SERVICES.IOBUTTON;
-    const { onNetworkError, connectedDevices } = this.props;
+    const { onAppError, connectedDevices } = this.props;
 
     Object.keys(connectedDevices).map(key => {
       const device = connectedDevices[key];
@@ -138,20 +138,20 @@ export class BluetoothConnectComponent extends Component<{}> {
           // Success
         })
         .catch(error => {
-          onNetworkError(error.message);
+          onAppError(error.message);
         });
     });
   }
 
   startScan() {
-    const { onNetworkError } = this.props;
+    const { onAppError } = this.props;
     if (!this.state.isBusy) {
       BleManager.scan([], 10, false)
         .then(_ => {
           this.setState({ isBusy: true });
         })
         .catch(error => {
-          onNetworkError(error.message);
+          onAppError(error.message);
         });
     }
 
@@ -169,31 +169,31 @@ export class BluetoothConnectComponent extends Component<{}> {
               });
             })
             .catch(error => {
-              onNetworkError(error.message);
+              onAppError(error.message);
             });
         })
         .catch(error => {
-          onNetworkError(error.message);
+          onAppError(error.message);
         });
     }, 5000);
   }
 
   _pingDevice(device) {
     const service = SERVICES.IOBUTTON;
-    const { onNetworkError } = this.props;
+    const { onAppError } = this.props;
 
     BleManager.startNotification(device.id, service.UUID, service.DATA)
       .then(e => {
         // Once the notifications have been started, listen to the handlerUpdate event
       })
       .catch(error => {
-        onNetworkError(error.message);
+        onAppError(error.message);
       });
   }
 
   _getDeviceBatteryInfo(device) {
     const service = SERVICES.BATTERY;
-    const { onNetworkError, onUpdateConnectedDevice } = this.props;
+    const { onAppError, onUpdateConnectedDevice } = this.props;
 
     BleManager.read(device.id, service.UUID, service.DATA)
       .then(data => {
@@ -203,13 +203,13 @@ export class BluetoothConnectComponent extends Component<{}> {
         this.forceUpdate();
       })
       .catch(error => {
-        onNetworkError(error.message);
+        onAppError(error.message);
       });
   }
 
   // When the device has been connected ping it and then get its battery status
   connectToDevice(device) {
-    const { onDeviceConnect, onNetworkError } = this.props;
+    const { onDeviceConnect, onAppError } = this.props;
     this.setState({ isBusy: true });
 
     BleManager.connect(device.id)
@@ -227,17 +227,17 @@ export class BluetoothConnectComponent extends Component<{}> {
             this.forceUpdate();
           })
           .catch(error => {
-            onNetworkError(error.message);
+            onAppError(error.message);
           });
       })
       .catch(error => {
         this.setState({ isBusy: false });
-        onNetworkError(error.message);
+        onAppError(error.message);
       });
   }
 
   disConnectDevice(device) {
-    const { onDeviceDisconnect, onNetworkError } = this.props;
+    const { onDeviceDisconnect, onAppError } = this.props;
     this.setState({ isBusy: true });
 
     BleManager.disconnect(device.id)
@@ -251,7 +251,7 @@ export class BluetoothConnectComponent extends Component<{}> {
       })
       .catch(error => {
         this.setState({ isBusy: false });
-        onNetworkError(error.message);
+        onAppError(error.message);
       });
   }
 
@@ -327,11 +327,11 @@ export class BluetoothConnectComponent extends Component<{}> {
 
   render() {
     const { isBusy, peripherals } = this.state;
-    const { connectedDevices, isFetching } = this.props;
+    const { connectedDevices, busy } = this.props;
     const numOfConnectedDevices = Object.keys(connectedDevices).length;
     return (
       <View style={styles.container}>
-        <FullScreenLoader visible={!!isFetching || !!isBusy}/>
+        <FullScreenLoader visible={!!busy || !!isBusy}/>
 
         {numOfConnectedDevices > 0 && peripherals.length > 0 ? (
           <View style={styles.connectedInfoContainer}>
@@ -424,7 +424,7 @@ const mapStateToProps = state => {
   return {
     bluetoothStarted: state.bluetooth.started,
     connectedDevices: state.bluetooth.connectedDevices,
-    isFetching: state.meta.isFetching
+    busy: state.meta.busy
   };
 };
 
@@ -433,7 +433,7 @@ const mapDispatchToProps = dispatch => {
     onBluetoothStarted: started => dispatch(bluetoothStart(true)),
     onDeviceConnect: device => dispatch(deviceConnect(device)),
     onDeviceDisconnect: device => dispatch(deviceDisconnect(device)),
-    onNetworkError: error => dispatch(networkError(error)),
+    onAppError: error => dispatch(appError(error)),
     onUpdateConnectedDevice: device => dispatch(updateConnectedDevice(device))
   };
 };

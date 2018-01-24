@@ -1,2 +1,2 @@
-export const NETWORK_ERROR = "/app/METASTORES/NETWORK_ERROR";
-export const NETWORK_FETCHING = "/app/METASTORES/NETWORK_FETCHING";
+export const APP_ERROR = "/app/METASTORES/APP_ERROR";
+export const APP_BUSY = "/app/METASTORES/APP_BUSY";

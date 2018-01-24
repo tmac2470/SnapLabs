@@ -1,23 +1,23 @@
-import { NETWORK_ERROR, NETWORK_FETCHING } from "./constants";
+import { APP_ERROR, APP_BUSY } from "./constants";
 
 const initialMetastoreState = {
-  isFetching: false,
+  busy: false,
   error: null
 };
 
 export function metaStoreReducer(initial = initialMetastoreState, action) {
-  const { isFetching, error } = action;
+  const { busy, error } = action;
 
   switch (action.type) {
-    case NETWORK_ERROR:
+    case APP_ERROR:
       return {
         ...initial,
         error
       };
-    case NETWORK_FETCHING:
+    case APP_BUSY:
       return {
         ...initial,
-        isFetching
+        busy
       };
 
     default:

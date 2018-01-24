@@ -1,15 +1,15 @@
-import { NETWORK_ERROR, NETWORK_FETCHING } from "./constants";
+import { APP_ERROR, APP_BUSY } from "./constants";
 
-export function networkError(error) {
+export function appError(error) {
   return {
-    type: NETWORK_ERROR,
+    type: APP_ERROR,
     error
   };
 }
 
-export function networkBusy(isFetching) {
+export function appBusy(busy) {
   return {
-    type: NETWORK_FETCHING,
-    isFetching
+    type: APP_BUSY,
+    busy
   };
 }

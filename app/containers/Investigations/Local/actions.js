@@ -4,7 +4,7 @@ import {
   DELETE_INVESTIGATION
 } from "./constants";
 import { API_PATH } from "../../../constants";
-import { networkBusy, networkError } from "../../../Metastores/actions";
+import { appBusy, appError } from "../../../Metastores/actions";
 
 export function downloadInvestigationSuccess(investigation) {
   return {
@@ -25,7 +25,7 @@ export const fetchInvestigationById = Id => {
   // Returns a dispatcher function
   // that dispatches an action at a later time
   return dispatch => {
-    dispatch(networkBusy(true));
+    dispatch(appBusy(true));
     // Returns a promise
     return axios
       .get(apiUrl)
@@ -33,11 +33,11 @@ export const fetchInvestigationById = Id => {
         // Dispatch another action
         // to consume data
         dispatch(downloadInvestigationSuccess(response.data.data));
-        dispatch(networkBusy(false));
+        dispatch(appBusy(false));
       })
       .catch(error => {
-        dispatch(networkError(error.message));
-        dispatch(networkBusy(false));
+        dispatch(appError(error.message));
+        dispatch(appBusy(false));
       });
   };
 };

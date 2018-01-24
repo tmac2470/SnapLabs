@@ -8,7 +8,7 @@ import {Button, H2, H3, H4} from "nachos-ui";
 import Colors from "../../../Theme/colors";
 
 import {fetchFiles, deleteFile, _getFolderPath} from '../../FileHandling/actions';
-import {networkError} from '../../../Metastores/actions';
+import {appError} from '../../../Metastores/actions';
 
 export class SavedInvestigationsComponent extends Component < {} > {
   static navigationOptions = {
@@ -54,7 +54,7 @@ export class SavedInvestigationsComponent extends Component < {} > {
   }
 
   onShareFile(file) {
-    const {onNetworkError} = this.props;
+    const {onAppError} = this.props;
     Share.share({
       title: "Snaplabs: Experiment data file " + file.name,
       message: "Snaplabs: Experiment data file " + file.name,
@@ -66,7 +66,7 @@ export class SavedInvestigationsComponent extends Component < {} > {
       // success
     })
       .catch(e => {
-        onNetworkError(e.message);
+        onAppError(e.message);
       });
   }
 
@@ -104,7 +104,7 @@ export class SavedInvestigationsComponent extends Component < {} > {
   }
 
   render() {
-    const {files, isFetching} = this.props;
+    const {files, busy} = this.props;
     const {filePath} = this.state;
     const filteredFiles = files.filter(file => {
       return file.isFile() && file
@@ -114,7 +114,7 @@ export class SavedInvestigationsComponent extends Component < {} > {
 
     return (
       <View style={styles.container}>
-        <FullScreenLoader visible={!!isFetching}/>
+        <FullScreenLoader visible={!!busy}/>
         <View style={styles.textContainer}>
           <H4 style={styles.info}>Files are stored under: {filePath}</H4>
         </View>
@@ -173,14 +173,14 @@ const styles = {
 };
 
 const mapStateToProps = state => {
-  return {files: state.localFiles, user: state.currentUser, isFetching: state.meta.isFetching};
+  return {files: state.localFiles, user: state.currentUser, busy: state.meta.busy};
 };
 
 const mapDispatchToProps = dispatch => {
   return {
     onFetchFiles: (user) => dispatch(fetchFiles(user)),
     onDeleteFile: (file, user) => dispatch(deleteFile(file, user)),
-    onNetworkError: error => dispatch(networkError(error))
+    onAppError: error => dispatch(appError(error))
   };
 };
 
