@@ -2,7 +2,7 @@ import {
   DOWNLOAD_INVESTIGATION_SUCCESS,
   DELETE_INVESTIGATION
 } from "./constants";
-import { REHYDRATE } from 'redux-persist';
+import { REHYDRATE } from "redux-persist";
 
 import Balloon_Pressure_Investigation from "../../../../data/investigations/Balloon_Pressure_Investigation.json";
 import Classroom_Heat_and_Light_Investigation from "../../../../data/investigations/Classroom_Heat_and_Light_Investigation.json";
@@ -50,9 +50,15 @@ export function localInvestigationsReducer(
       // As the nesting of reducers(may be) is causing issues
       // with copying of saved localInvestigations to the state
       const { payload } = action;
-      return {
-        ...payload.localInvestigations
-      };
+      if (payload && payload.localInvestigations) {
+        return {
+          ...payload.localInvestigations
+        };
+      } else {
+        return {
+          ...initial
+        };
+      }
     case DOWNLOAD_INVESTIGATION_SUCCESS:
       initial[investigation._id] = investigation;
       return {
