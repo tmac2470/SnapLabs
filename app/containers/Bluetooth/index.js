@@ -12,7 +12,7 @@ import {
   PermissionsAndroid
 } from "react-native";
 import { Button, H5, H4, H6, Badge } from "nachos-ui";
-import FullScreenLoader from '../../components/FullScreenLoading';
+import FullScreenLoader from "../../components/FullScreenLoading";
 
 import Colors from "../../Theme/colors";
 
@@ -36,7 +36,8 @@ export class BluetoothConnectComponent extends Component<{}> {
   state = {
     isBusy: false,
     peripherals: [],
-    connectedDeviceKeyPressed: {}
+    connectedDeviceKeyPressed: {},
+    showHighlightInfo: false
   };
 
   // Start with the Blemanager start method to initialise bluetooth
@@ -62,14 +63,23 @@ export class BluetoothConnectComponent extends Component<{}> {
         });
     } else {
       this.startScan();
-      this._pingAllConnectedDevices();
     }
+
     this._bleEmitterEvent = bleManagerEmitter.addListener(
       "BleManagerDidUpdateValueForCharacteristic",
       this._subscribeToBleData.bind(this)
     );
 
     if (Platform.OS === "android" && Platform.Version >= 23) {
+      BleManager.enableBluetooth()
+        .then(() => {
+          // Success code
+          this.startScan();
+        })
+        .catch(error => {
+          // Failure code
+        });
+
       PermissionsAndroid.check(
         PermissionsAndroid.PERMISSIONS.ACCESS_COARSE_LOCATION
       ).then(result => {
@@ -102,8 +112,11 @@ export class BluetoothConnectComponent extends Component<{}> {
     } else {
       connectedDeviceKeyPressed[deviceId] = false;
     }
-    this.forceUpdate();
+    this.setState({
+      ...connectedDeviceKeyPressed
+    });
   }
+
   // Subscribes to the data emitted by ble module
   // Will work only when notifications have been started
   // Parameter: data => contains the peripheral(deviceID), characteristicUUID  and its value
@@ -116,15 +129,24 @@ export class BluetoothConnectComponent extends Component<{}> {
 
   _pingAllConnectedDevices() {
     const { connectedDevices, onAppError } = this.props;
-    Object.keys(connectedDevices).map(Id => {
+    const connectedDeviceIds = Object.keys(connectedDevices);
+
+    // Need recursive pings coz running a loop doesnt work
+    const _pingRecursive = (deviceIds) => {
+      const Id = deviceIds.pop();
+      if (!Id) {
+        return;
+      }
       BleManager.retrieveServices(Id)
-        .then(_ => {
-          this._pingDevice(connectedDevices[Id]);
-        })
-        .catch(error => {
-          onAppError(error.message);
-        });
-    });
+      .then(_ => {
+        this._pingDevice(connectedDevices[Id]);
+        _pingRecursive(deviceIds);
+      })
+      .catch(error => {
+        onAppError(error.message);
+      });
+    }
+    _pingRecursive(connectedDeviceIds);
   }
 
   _unpingAllConnectedDevices() {
@@ -146,7 +168,7 @@ export class BluetoothConnectComponent extends Component<{}> {
   startScan() {
     const { onAppError } = this.props;
     if (!this.state.isBusy) {
-      BleManager.scan([], 10, false)
+      BleManager.scan([], 100, false)
         .then(_ => {
           this.setState({ isBusy: true });
         })
@@ -164,9 +186,11 @@ export class BluetoothConnectComponent extends Component<{}> {
           // Once the scan is stopped get the discovered peripherals
           BleManager.getDiscoveredPeripherals([])
             .then(peripherals => {
+              const filteredPeripherals = peripherals.filter(p => !!p.name);
               this.setState({
-                peripherals
+                peripherals: filteredPeripherals
               });
+              this._pingAllConnectedDevices();
             })
             .catch(error => {
               onAppError(error.message);
@@ -175,20 +199,25 @@ export class BluetoothConnectComponent extends Component<{}> {
         .catch(error => {
           onAppError(error.message);
         });
-    }, 5000);
+    }, 10000);
   }
 
   _pingDevice(device) {
     const service = SERVICES.IOBUTTON;
     const { onAppError } = this.props;
-
     BleManager.startNotification(device.id, service.UUID, service.DATA)
       .then(e => {
         // Once the notifications have been started, listen to the handlerUpdate event
+        this.setState({
+          showHighlightInfo: true
+        });
       })
       .catch(error => {
         onAppError(error.message);
+        return error;
       });
+
+    this._getDeviceBatteryInfo(device);
   }
 
   _getDeviceBatteryInfo(device) {
@@ -200,10 +229,9 @@ export class BluetoothConnectComponent extends Component<{}> {
         const state = new Uint8Array(data);
         device.batteryLevel = state[0];
         onUpdateConnectedDevice(device);
-        this.forceUpdate();
       })
       .catch(error => {
-        onAppError(error.message);
+        onAppError(error);
       });
   }
 
@@ -222,9 +250,6 @@ export class BluetoothConnectComponent extends Component<{}> {
         BleManager.retrieveServices(device.id)
           .then(device => {
             this._pingDevice(device);
-            this._getDeviceBatteryInfo(device);
-            // Hack to let the component know that devices have changed
-            this.forceUpdate();
           })
           .catch(error => {
             onAppError(error.message);
@@ -246,8 +271,6 @@ export class BluetoothConnectComponent extends Component<{}> {
           isBusy: false
         });
         onDeviceDisconnect(device);
-        // Hack to let the component know that devices have changed
-        this.forceUpdate();
       })
       .catch(error => {
         this.setState({ isBusy: false });
@@ -326,14 +349,16 @@ export class BluetoothConnectComponent extends Component<{}> {
   };
 
   render() {
-    const { isBusy, peripherals } = this.state;
+    const { isBusy, peripherals, showHighlightInfo } = this.state;
     const { connectedDevices, busy } = this.props;
     const numOfConnectedDevices = Object.keys(connectedDevices).length;
     return (
       <View style={styles.container}>
-        <FullScreenLoader visible={!!busy || !!isBusy}/>
+        <FullScreenLoader visible={!!busy || !!isBusy} />
 
-        {numOfConnectedDevices > 0 && peripherals.length > 0 ? (
+        {showHighlightInfo &&
+        numOfConnectedDevices > 0 &&
+        peripherals.length > 0 ? (
           <View style={styles.connectedInfoContainer}>
             <H6 style={styles.text}>
               Press any button on the device to highlight the device name

@@ -14,34 +14,35 @@ export function bluetoothReducer(initial = initialBluetoothState, action) {
   const { device, started } = action;
   const connectedDevices = initial.connectedDevices;
   switch (action.type) {
+    case CONNECT_DEVICE_SUCCESS:
     case UPDATE_DEVICE_SUCCESS:
-      connectedDevices[device.id] = {
-        ...connectedDevices[device.id],
+      const devices = {};
+      devices[device.id] = {
         ...device
       };
+
       return {
         ...initial,
-        connectedDevices
+        connectedDevices: {
+          ...connectedDevices,
+          ...devices
+        },
+        started: initial.started
       };
 
     case BLUETOOTH_STARTED:
       return {
         ...initial,
-        started
-      };
-
-    case CONNECT_DEVICE_SUCCESS:
-      connectedDevices[device.id] = device;
-      return {
-        ...initial,
-        connectedDevices
+        started: started
       };
 
     case DISCONNECT_DEVICE_SUCCESS:
       delete connectedDevices[device.id];
       return {
-        ...initial,
-        connectedDevices
+        connectedDevices: {
+          ...connectedDevices
+        },
+        started: initial.started
       };
 
     default:
