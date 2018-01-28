@@ -30,7 +30,6 @@ const persistedReducer = persistReducer(persistConfig, getRootReducer());
 export default function getStore() {
   const store =  createStore(
     persistedReducer,
-    {},
     enhancer
   );
   const persistor = persistStore(store);
