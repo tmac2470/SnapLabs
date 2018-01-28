@@ -645,12 +645,12 @@ export class InvestigationDetailsComponent extends Component < {} > {
         investigation.labTitle
       }"`, [{
           text: 'Cancel',
-          onPress: () => {},
+          onPressIn: () => {},
           style: 'cancel'
         },
         {
           text: 'Continue',
-          onPress: () => this._resetGraphs()
+          onPressIn: () => this._resetGraphs()
         }
       ], {
         cancelable: true
@@ -970,6 +970,7 @@ export class InvestigationDetailsComponent extends Component < {} > {
       sampleIntervalTime,
       sensors
     } = this.state;
+    console.table(this.state);
     const isConnectedToDevices = Object.keys(connectedDevices);
     const connectedText =
       Object.keys(connectedDevices).length > 0 ?
@@ -1079,7 +1080,7 @@ export class InvestigationDetailsComponent extends Component < {} > {
                                   key={grid.id}
                                   id={grid.id}
                                   style={this._getGridStyle(grid)}
-                                  onPress={() => this.captureDeviceDataForGrid(grid, sensor)}
+                                  onPressIn={() => this.captureDeviceDataForGrid(grid, sensor)}
                                 >
                                   <View style={[styles.gridData, this._getInnerGridStyle(grid)]}>
                                     <H6 style={styles.gridText}> {grid.number} </H6>
@@ -1104,7 +1105,7 @@ export class InvestigationDetailsComponent extends Component < {} > {
               {!graphs.startedAtLeastOnce ? (
                 <Button
                   uppercase={false}
-                  onPress={() => navigation.navigate("BluetoothConnect")}
+                  onPressIn={() => navigation.navigate("BluetoothConnect")}
                   style={styles.footerButton}
                 >
                   Sensor Tags
@@ -1112,7 +1113,7 @@ export class InvestigationDetailsComponent extends Component < {} > {
               ) : (
                 <Button
                   uppercase={false}
-                  onPress={() => {}}
+                  onPressIn={() => {}}
                   style={styles.footerButton}
                 >
                   Save graph data
@@ -1123,7 +1124,7 @@ export class InvestigationDetailsComponent extends Component < {} > {
                   <Button
                     type="success"
                     uppercase={false}
-                    onPress={() => this.stopGraphs()}
+                    onPressIn={() => this.stopGraphs()}
                     style={styles.footerButton}
                   >
                     Stop graphs
@@ -1131,7 +1132,7 @@ export class InvestigationDetailsComponent extends Component < {} > {
                   <Button
                     type="danger"
                     uppercase={false}
-                    onPress={() => this.resetGraphs()}
+                    onPressIn={() => this.resetGraphs()}
                     style={styles.footerButton}
                   >
                     Reset graphs
@@ -1141,7 +1142,7 @@ export class InvestigationDetailsComponent extends Component < {} > {
                 <Button
                   type="success"
                   uppercase={false}
-                  onPress={() => this.startGraphs()}
+                  onPressIn={() => this.startGraphs()}
                   style={styles.footerButton}
                 >
                   Start graphs
@@ -1153,7 +1154,7 @@ export class InvestigationDetailsComponent extends Component < {} > {
             <View>
               <Button
                 uppercase={false}
-                onPress={() => this.saveGridData()}
+                onPressIn={() => this.saveGridData()}
                 style={styles.footerButton}
               >
                 Save grid data
@@ -1161,14 +1162,14 @@ export class InvestigationDetailsComponent extends Component < {} > {
               <Button
                 type="danger"
                 uppercase={false}
-                onPress={() => this.resetGrids()}
+                onPressIn={() => this.resetGrids()}
                 style={styles.footerButton}
               >
                 Reset grids
               </Button>
               <Button
                 uppercase={false}
-                onPress={() => navigation.navigate("BluetoothConnect")}
+                onPressIn={() => navigation.navigate("BluetoothConnect")}
                 style={styles.footerButton}
               >
                 Sensor Tags
