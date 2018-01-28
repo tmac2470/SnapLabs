@@ -3,8 +3,8 @@ package com.snaplab_react;
 import android.app.Application;
 
 import com.facebook.react.ReactApplication;
-import com.rnfs.RNFSPackage;
 import it.innove.BleManagerPackage;
+import com.rnfs.RNFSPackage;
 import com.react.rnspinkit.RNSpinkitPackage;
 import com.reactnative.photoview.PhotoViewPackage;
 import com.BV.LinearGradient.LinearGradientPackage;
@@ -29,8 +29,8 @@ public class MainApplication extends Application implements ReactApplication {
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
           new MainReactPackage(),
-            new RNFSPackage(),
             new BleManagerPackage(),
+            new RNFSPackage(),
             new RNSpinkitPackage(),
             new PhotoViewPackage(),
             new LinearGradientPackage(),
