@@ -43,7 +43,7 @@ export class HomeComponent extends Component<{}> {
           <Button
             iconColor={Colors.danger}
             iconName="ios-power"
-            onPress={() => this.logout(this.props)}
+            onPressIn={() => this.logout(this.props)}
             style={styles.logoutButton}
           />
         </View>
@@ -56,7 +56,7 @@ export class HomeComponent extends Component<{}> {
           <Button
             type="success"
             uppercase={false}
-            onPress={() => navigation.navigate("InvestigationList")}
+            onPressIn={() => navigation.navigate("InvestigationList")}
             style={styles.button}
           >
             Select a local investigation
@@ -65,7 +65,7 @@ export class HomeComponent extends Component<{}> {
           <Button
             type="success"
             uppercase={false}
-            onPress={() => navigation.navigate("DownloadInvestigations")}
+            onPressIn={() => navigation.navigate("DownloadInvestigations")}
             style={styles.button}
           >
             Download a new investigation
@@ -73,7 +73,7 @@ export class HomeComponent extends Component<{}> {
 
           <Button
             type="success"
-            onPress={() => navigation.navigate("FileHandling")}
+            onPressIn={() => navigation.navigate("FileHandling")}
             uppercase={false}
             style={styles.button}
           >

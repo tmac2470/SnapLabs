@@ -84,7 +84,7 @@ export class InvestigationList extends Component<{}> {
                   type="success"
                   uppercase={false}
                   disabled={refreshing}
-                  onPress={() =>
+                  onPressIn={() =>
                     navigation.navigate("InvestigationDetails", {
                       investigation: localInvestigations[item._id]
                     })
@@ -98,7 +98,7 @@ export class InvestigationList extends Component<{}> {
                   type="success"
                   disabled={!!item.isLocal || refreshing}
                   uppercase={false}
-                  onPress={() => onDownloadInvestigation(item._id)}
+                  onPressIn={() => onDownloadInvestigation(item._id)}
                   style={styles.button}
                 >
                   Update
@@ -108,7 +108,7 @@ export class InvestigationList extends Component<{}> {
                   type="danger"
                   disabled={!!item.isLocal || refreshing}
                   uppercase={false}
-                  onPress={() => this._onDeleteInvestigation(item)}
+                  onPressIn={() => this._onDeleteInvestigation(item)}
                   style={styles.button}
                 >
                   Delete
