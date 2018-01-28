@@ -14,6 +14,7 @@ const FullScreenLoader = props => {
       transparent={true}
       animationType={'fade'}
       visible={visible}
+      onRequestClose={() => {}}
     >
       <View style={styles.modalBackground}>
         <Spinner type={'FadingCircle'} size={50} color={Colors.secondary}/>
