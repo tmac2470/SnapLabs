@@ -56,7 +56,7 @@ export class LocalInvestigationsComponent extends Component<{}> {
         <View style={styles.footerButtonContainer}>
           <Button
             uppercase={false}
-            onPress={() => navigation.navigate("BluetoothConnect")}
+            onPressIn={() => navigation.navigate("BluetoothConnect")}
             style={styles.footerButton}
           >
             Sensor Tags

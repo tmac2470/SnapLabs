@@ -26,10 +26,10 @@ export class InvestigationList extends Component<{}> {
       [
         {
           text: "Cancel",
-          onPress: () => {},
+          onPressIn: () => {},
           style: "cancel"
         },
-        { text: "Delete", onPress: () => onDeleteInvestigation(investigation) }
+        { text: "Delete", onPressIn: () => onDeleteInvestigation(investigation) }
       ],
       { cancelable: false }
     );
@@ -50,7 +50,7 @@ export class InvestigationList extends Component<{}> {
     return (
       <TouchableOpacity
         style={styles.listItem}
-        onPress={() => expandInvestigation(item)}
+        onPressIn={() => expandInvestigation(item)}
       >
         <H4 style={styles.labTitle}>{item.labTitle}</H4>
 
@@ -73,7 +73,7 @@ export class InvestigationList extends Component<{}> {
               <Button
                 type="success"
                 uppercase={false}
-                onPress={() => onDownloadInvestigation(item._id)}
+                onPressIn={() => onDownloadInvestigation(item._id)}
                 style={styles.button}
               >
                 Download

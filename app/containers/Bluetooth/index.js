@@ -280,7 +280,7 @@ export class BluetoothConnectComponent extends Component<{}> {
                   styles.deviceContainer,
                   getHighlightedDeviceContainerStyle(item.id)
                 ]}
-                onPress={() => this.disConnectDevice(item)}
+                onPressIn={() => this.disConnectDevice(item)}
               >
                 <H4 style={[styles.text, styles.connected]}>
                   {!!connectedDevice.advertising &&
@@ -304,7 +304,7 @@ export class BluetoothConnectComponent extends Component<{}> {
             ) : (
               <TouchableOpacity
                 style={styles.deviceContainer}
-                onPress={() => this.connectToDevice(item)}
+                onPressIn={() => this.connectToDevice(item)}
               >
                 <H4 style={styles.text}>
                   {!!item.advertising && !!item.advertising.kCBAdvDataLocalName
@@ -353,7 +353,7 @@ export class BluetoothConnectComponent extends Component<{}> {
           <Button
             disabled={!!isBusy}
             uppercase={false}
-            onPress={() => this.startScan()}
+            onPressIn={() => this.startScan()}
             style={styles.footerButton}
           >
             Scan

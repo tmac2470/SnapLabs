@@ -97,7 +97,7 @@ export class JoinComponent extends Component<{}> {
         <View style={styles.footerButtonContainer}>
           <Button
             disabled={!this.validateEmail(email)}
-            onPress={this.submit.bind(this)}
+            onPressIn={this.submit.bind(this)}
             style={styles.footerButton}
           >
             Save

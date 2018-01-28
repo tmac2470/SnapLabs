@@ -44,11 +44,11 @@ export class FileHandlingComponent extends Component < {} > {
     Alert.alert("Confirm deletion", `This will delete the file "${file.name}" from device`, [
       {
         text: "Cancel",
-        onPress: () => {},
+        onPressIn: () => {},
         style: "cancel"
       }, {
         text: "Delete",
-        onPress: () => onDeleteFile(file, user)
+        onPressIn: () => onDeleteFile(file, user)
       }
     ], {cancelable: true});
   }
@@ -76,7 +76,7 @@ export class FileHandlingComponent extends Component < {} > {
     return (
       <TouchableOpacity
         style={styles.listItem}
-        onPress={() => this._onExpandFileItem(item)}>
+        onPressIn={() => this._onExpandFileItem(item)}>
         <H4 style={styles.name}>{item.name}</H4>
         {!expand[item.name]
           ? null
@@ -85,7 +85,7 @@ export class FileHandlingComponent extends Component < {} > {
               <Button
                 type="success"
                 uppercase={false}
-                onPress={() => this.onShareFile(item)}
+                onPressIn={() => this.onShareFile(item)}
                 style={styles.button}>
                 Share
               </Button>
@@ -93,7 +93,7 @@ export class FileHandlingComponent extends Component < {} > {
               <Button
                 type="danger"
                 uppercase={false}
-                onPress={() => this._onDeleteFile(item)}
+                onPressIn={() => this._onDeleteFile(item)}
                 style={styles.button}>
                 Delete
               </Button>
