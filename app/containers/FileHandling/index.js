@@ -44,11 +44,11 @@ export class FileHandlingComponent extends Component < {} > {
     Alert.alert("Confirm deletion", `This will delete the file "${file.name}" from device`, [
       {
         text: "Cancel",
-        onPressIn: () => {},
+        onPress: () => {},
         style: "cancel"
       }, {
         text: "Delete",
-        onPressIn: () => onDeleteFile(file, user)
+        onPress: () => onDeleteFile(file, user)
       }
     ], {cancelable: true});
   }
