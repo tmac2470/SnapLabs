@@ -1184,9 +1184,11 @@ const styles = {
     paddingLeft: 5
   },
   twoColBox: {
-    flexDirection: 'column',
+    display: 'flex',
+    flexDirection: 'row',
+    flexWrap: 'wrap',
     // alignItems: 'stretch',
-    // justifyContent: 'space-between',
+    justifyContent: 'space-between',
     width: '80%',
     paddingLeft: 5,
     paddingRight: 5
