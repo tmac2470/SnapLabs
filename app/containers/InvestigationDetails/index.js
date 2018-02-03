@@ -85,22 +85,23 @@ export class InvestigationDetailsComponent extends Component<{}> {
 
   _subscribeToBleData(data) {
     const { peripheral, characteristic, value } = data;
+
     switch (characteristic.toLowerCase()) {
-      case SERVICES.Luxometer.DATA:
+      case SERVICES.Luxometer.DATA.toLowerCase():
         this._readLuxometerNotifications(peripheral, value);
         break;
-      case SERVICES.Temperature.DATA:
+      case SERVICES.Temperature.DATA.toLowerCase():
         this._readTemperatureNotifications(peripheral, value);
         break;
-      case SERVICES.Barometer.DATA:
+      case SERVICES.Barometer.DATA.toLowerCase():
         this._readBarometerNotifications(peripheral, value);
         break;
-      case SERVICES.Humidity.DATA:
+      case SERVICES.Humidity.DATA.toLowerCase():
         this._readHumidityNotifications(peripheral, value);
         break;
-      case SERVICES.Accelerometer.DATA:
+      case SERVICES.Accelerometer.DATA.toLowerCase():
         this._readMovementNotifications(peripheral, value);
-      case SERVICES.IOBUTTON.DATA:
+      case SERVICES.IOBUTTON.DATA.toLowerCase():
         this._readSensorBtnNotifications(peripheral, value);
       default:
         break;
@@ -210,16 +211,16 @@ export class InvestigationDetailsComponent extends Component<{}> {
             case 'barometer':
               this._startBarometerNotifications(device, 'Barometer');
               break;
-            case 'accelerometer':
-            case 'gyroscope':
-            case 'magnetometer':
-              this._startMovementNotifications(
-                device,
-                'Accelerometer',
-                'Gyroscope',
-                'Magnetometer'
-              );
-              break;
+            // case 'accelerometer':
+            // case 'gyroscope':
+            // case 'magnetometer':
+            //   this._startMovementNotifications(
+            //     device,
+            //     'Accelerometer',
+            //     'Gyroscope',
+            //     'Magnetometer'
+            //   );
+            //   break;
             case 'humidity':
               this._startHumidityNotifications(device, 'Humidity');
               break;
@@ -237,7 +238,7 @@ export class InvestigationDetailsComponent extends Component<{}> {
     asyncActivation();
   }
 
-  _readMovementNotifications(device, data) {
+  _readMovementNotifications(deviceId, data) {
     // Movement DATA
     // GXLSB:GXMSB:GYLSB:GYMSB:GZLSB:GZMSB,
     // AXLSB:AXMSB:AYLSB:AYMSB:AZLSB:AZMSB
@@ -299,20 +300,17 @@ export class InvestigationDetailsComponent extends Component<{}> {
     this._asyncStartNotificationsForService(service, device, [1]);
   }
 
-  _readHumidityNotifications(device, data) {
+  _readHumidityNotifications(deviceId, data) {
+    const sensorName = 'Humidity';
     // Humidity DATA
     // TempLSB:TempMSB:HumidityLSB:HumidityMSB
-    const humidityValues = {
+    const dataValueMap = {
       RH: data[3],
       TEMP: data[1]
     };
 
-    const values = {
-      '% RH': humidityValues.RH.toFixed(3),
-      '°C': humidityValues.TEMP.toFixed(3)
-    };
-    // % RH at ${humidityValues.TEMP.toFixed(3)} °C
-    console.log('Humidity', humidityValues);
+    const displayVal = `${dataValueMap.RH}% RH at ${dataValueMap.TEMP.toFixed(3)} °C`;
+    this._updateSensorValue(sensorName, deviceId, displayVal, dataValueMap);
   }
 
   _startHumidityNotifications(device, humidityChartId) {
@@ -320,20 +318,31 @@ export class InvestigationDetailsComponent extends Component<{}> {
     this._asyncStartNotificationsForService(service, device, [1]);
   }
 
-  _readBarometerNotifications(device, data) {
+  _readBarometerNotifications(deviceId, data) {
+    const sensorName = 'Barometer';
     // Barometer DATA
     // TempLSB:TempMSB(:TempEXt):PressureLSB:PressureMSB(:PressureExt)
+
+    const pressureValue = data[3];
+    const tempValue = data[0];
+
     const values = {
-      hPa: data[1],
-      '°C': data[2]
+      hPa: pressureValue,
+      '°C': tempValue
     };
-    // `${pressureValue} hPa at ${tempValue} °C`
-    console.log(values);
+
+    const displayVal = `${pressureValue} hPa at ${tempValue} °C`;
+
+    const dataValueMap = {
+      hPa: pressureValue,
+      '°C': tempValue
+    };
+    this._updateSensorValue(sensorName, deviceId, displayVal, dataValueMap);
   }
 
   _startBarometerNotifications(device, barometerChartId) {
     const service = SERVICES.Barometer;
-    this._asyncStartNotificationsForService(service, device, [0]);
+    this._asyncStartNotificationsForService(service, device, [1]);
   }
 
   _readTemperatureNotifications(deviceId, data) {
@@ -350,9 +359,7 @@ export class InvestigationDetailsComponent extends Component<{}> {
         value: data[2]
       }
     };
-    const displayVal = `${values.amb.key} - ${values.amb.value}°C [Amb] ${
-      values.ir.key
-    } - ${values.ir.value}°C [IR]`;
+    const displayVal = `${values.amb.value}°C [Amb], ${values.ir.value}°C [IR]`;
     const dataValueMap = {
       [values.amb.key]: values.amb.value,
       [values.ir.key]: values.ir.value
