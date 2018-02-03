@@ -13,6 +13,7 @@ import {
 } from "react-native";
 import { Button, H5, H4, H6, Badge } from "nachos-ui";
 import FullScreenLoader from "../../components/FullScreenLoading";
+import { Map } from 'immutable';
 
 import Colors from "../../Theme/colors";
 
@@ -37,7 +38,8 @@ export class BluetoothConnectComponent extends Component<{}> {
     isBusy: false,
     peripherals: [],
     connectedDeviceKeyPressed: {},
-    showHighlightInfo: false
+    showHighlightInfo: false,
+    peripheralMap: new Map()
   };
 
   // Start with the Blemanager start method to initialise bluetooth
@@ -59,18 +61,23 @@ export class BluetoothConnectComponent extends Component<{}> {
           onBluetoothStarted();
         })
         .catch(error => {
-          onAppError(error.message);
+          onAppError(error);
         });
     } else {
       this.startScan();
     }
 
-    this._bleEmitterEvent = bleManagerEmitter.addListener(
+    this._bleUpdateEmitterEvent = bleManagerEmitter.addListener(
       "BleManagerDidUpdateValueForCharacteristic",
       this._subscribeToBleData.bind(this)
     );
 
-    if (Platform.OS === "android" && Platform.Version >= 23) {
+    this._bleDiscoverEmitterEvent = bleManagerEmitter.addListener(
+      'BleManagerDiscoverPeripheral',
+      this._subscribeToDiscoveredPeripherals.bind(this)
+    );
+
+    if (Platform.OS === "android") {
       BleManager.enableBluetooth()
         .then(() => {
           // Success code
@@ -78,6 +85,7 @@ export class BluetoothConnectComponent extends Component<{}> {
         })
         .catch(error => {
           // Failure code
+          onAppError("User refused bluetooth");
         });
 
       PermissionsAndroid.check(
@@ -98,7 +106,8 @@ export class BluetoothConnectComponent extends Component<{}> {
 
   componentWillUnmount() {
     this._unpingAllConnectedDevices();
-    this._bleEmitterEvent.remove();
+    this._bleUpdateEmitterEvent.remove();
+    this._bleDiscoverEmitterEvent.remove();
   }
 
   _highlightConnectedDevice(deviceId, value) {
@@ -132,21 +141,33 @@ export class BluetoothConnectComponent extends Component<{}> {
     const connectedDeviceIds = Object.keys(connectedDevices);
 
     // Need recursive pings coz running a loop doesnt work
-    const _pingRecursive = (deviceIds) => {
+    const _pingRecursive = deviceIds => {
       const Id = deviceIds.pop();
       if (!Id) {
         return;
       }
       BleManager.retrieveServices(Id)
-      .then(_ => {
-        this._pingDevice(connectedDevices[Id]);
-        _pingRecursive(deviceIds);
-      })
-      .catch(error => {
-        onAppError(error.message);
-      });
-    }
+        .then(_ => {
+          this._pingDevice(connectedDevices[Id]);
+          _pingRecursive(deviceIds);
+        })
+        .catch(error => {
+          onAppError(error);
+        });
+    };
     _pingRecursive(connectedDeviceIds);
+  }
+
+  _subscribeToDiscoveredPeripherals(peripheral) {
+    if (!peripheral.name) {
+      return;
+    }
+    const { peripheralMap } = this.state;
+    const map = peripheralMap.set(peripheral.id, peripheral);
+
+    this.setState({
+      peripheralMap: map
+    });
   }
 
   _unpingAllConnectedDevices() {
@@ -160,7 +181,7 @@ export class BluetoothConnectComponent extends Component<{}> {
           // Success
         })
         .catch(error => {
-          onAppError(error.message);
+          onAppError(error);
         });
     });
   }
@@ -168,12 +189,13 @@ export class BluetoothConnectComponent extends Component<{}> {
   startScan() {
     const { onAppError } = this.props;
     if (!this.state.isBusy) {
-      BleManager.scan([], 100, false)
+      BleManager.scan([], 5, false)
         .then(_ => {
           this.setState({ isBusy: true });
+          this._pingAllConnectedDevices();
         })
         .catch(error => {
-          onAppError(error.message);
+          onAppError(error);
         });
     }
 
@@ -182,24 +204,11 @@ export class BluetoothConnectComponent extends Component<{}> {
         .then(e => {
           // Success code
           this.setState({ isBusy: false });
-
-          // Once the scan is stopped get the discovered peripherals
-          BleManager.getDiscoveredPeripherals([])
-            .then(peripherals => {
-              const filteredPeripherals = peripherals.filter(p => !!p.name);
-              this.setState({
-                peripherals: filteredPeripherals
-              });
-              this._pingAllConnectedDevices();
-            })
-            .catch(error => {
-              onAppError(error.message);
-            });
         })
         .catch(error => {
-          onAppError(error.message);
+          onAppError(error);
         });
-    }, 10000);
+    }, 5000);
   }
 
   _pingDevice(device) {
@@ -213,7 +222,7 @@ export class BluetoothConnectComponent extends Component<{}> {
         });
       })
       .catch(error => {
-        onAppError(error.message);
+        onAppError(error);
         return error;
       });
 
@@ -252,12 +261,12 @@ export class BluetoothConnectComponent extends Component<{}> {
             this._pingDevice(device);
           })
           .catch(error => {
-            onAppError(error.message);
+            onAppError(error);
           });
       })
       .catch(error => {
         this.setState({ isBusy: false });
-        onAppError(error.message);
+        onAppError(error);
       });
   }
 
@@ -274,7 +283,7 @@ export class BluetoothConnectComponent extends Component<{}> {
       })
       .catch(error => {
         this.setState({ isBusy: false });
-        onAppError(error.message);
+        onAppError(error);
       });
   }
 
@@ -349,9 +358,12 @@ export class BluetoothConnectComponent extends Component<{}> {
   };
 
   render() {
-    const { isBusy, peripherals, showHighlightInfo } = this.state;
+    const { isBusy, showHighlightInfo, peripheralMap } = this.state;
     const { connectedDevices, busy } = this.props;
     const numOfConnectedDevices = Object.keys(connectedDevices).length;
+
+    const peripherals = peripheralMap.toArray();
+
     return (
       <View style={styles.container}>
         <FullScreenLoader visible={!!busy || !!isBusy} />

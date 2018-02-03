@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "axios": "^0.17.1",
+    "immutable": "^3.8.2",
     "lodash": "^4.17.4",
     "moment": "^2.20.1",
     "nachos-ui": "^0.1.2",
