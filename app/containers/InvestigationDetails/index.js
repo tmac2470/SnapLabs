@@ -1086,15 +1086,7 @@ export class InvestigationDetailsComponent extends Component<{}> {
         <ScrollView style={styles.footerButtonContainer} scrollEnabled={false}>
           {display.graph && datasetsAvailable.length > 0 ? (
             <View style={styles.footerInnerContainer}>
-              {!graphs.startedAtLeastOnce ? (
-                <Button
-                  uppercase={false}
-                  onPressIn={() => navigation.navigate('BluetoothConnect')}
-                  style={styles.footerButton}
-                >
-                  Sensor Tags
-                </Button>
-              ) : (
+              {!graphs.startedAtLeastOnce ? null : (
                 <Button
                   uppercase={false}
                   onPressIn={() => {}}
@@ -1150,13 +1142,6 @@ export class InvestigationDetailsComponent extends Component<{}> {
                 style={styles.footerButton}
               >
                 Reset grids
-              </Button>
-              <Button
-                uppercase={false}
-                onPressIn={() => navigation.navigate('BluetoothConnect')}
-                style={styles.footerButton}
-              >
-                Sensor Tags
               </Button>
             </View>
           ) : null}
