@@ -101,8 +101,10 @@ export class InvestigationDetailsComponent extends Component<{}> {
         break;
       case SERVICES.Accelerometer.DATA.toLowerCase():
         this._readMovementNotifications(peripheral, value);
+        break;
       case SERVICES.IOBUTTON.DATA.toLowerCase():
         this._readSensorBtnNotifications(peripheral, value);
+        break;
       default:
         break;
     }
@@ -211,16 +213,16 @@ export class InvestigationDetailsComponent extends Component<{}> {
             case 'barometer':
               this._startBarometerNotifications(device, 'Barometer');
               break;
-            // case 'accelerometer':
-            // case 'gyroscope':
-            // case 'magnetometer':
-            //   this._startMovementNotifications(
-            //     device,
-            //     'Accelerometer',
-            //     'Gyroscope',
-            //     'Magnetometer'
-            //   );
-            //   break;
+            case 'accelerometer':
+            case 'gyroscope':
+            case 'magnetometer':
+              this._startMovementNotifications(
+                device,
+                'Accelerometer',
+                'Gyroscope',
+                'Magnetometer'
+              );
+              break;
             case 'humidity':
               this._startHumidityNotifications(device, 'Humidity');
               break;
@@ -287,6 +289,36 @@ export class InvestigationDetailsComponent extends Component<{}> {
       Z: magZ,
       'Scalar Value': magScalar
     };
+
+    const displayValGyro = `X ${gyroscopeValues.X}, Y ${gyroscopeValues.Y}, Z ${
+      gyroscopeValues.Z
+    }`;
+    this._updateSensorValue(
+      'Gyroscope',
+      deviceId,
+      displayValGyro,
+      gyroscopeValues
+    );
+
+    const displayValAcc = `X ${accelerometerValues.X}, Y ${
+      accelerometerValues.Y
+    }, Z ${accelerometerValues.Z}`;
+    this._updateSensorValue(
+      'Accelerometer',
+      deviceId,
+      displayValAcc,
+      accelerometerValues
+    );
+
+    const displayValMag = `X ${magnetometerValues.X}, Y ${
+      magnetometerValues.Y
+    }, Z ${magnetometerValues.Z}`;
+    this._updateSensorValue(
+      'Magnetometer',
+      deviceId,
+      displayValMag,
+      magnetometerValues
+    );
   }
 
   // file:///Users/shailendrapal/Downloads/attr_cc2650%20sensortag.html
@@ -297,7 +329,9 @@ export class InvestigationDetailsComponent extends Component<{}> {
     magnetometerChartId
   ) {
     const service = SERVICES.Accelerometer;
-    this._asyncStartNotificationsForService(service, device, [1]);
+    console.log('accelerometer');
+
+    this._asyncStartNotificationsForService(service, device, [1, 0]);
   }
 
   _readHumidityNotifications(deviceId, data) {
@@ -309,7 +343,9 @@ export class InvestigationDetailsComponent extends Component<{}> {
       TEMP: data[1]
     };
 
-    const displayVal = `${dataValueMap.RH}% RH at ${dataValueMap.TEMP.toFixed(3)} °C`;
+    const displayVal = `${dataValueMap.RH}% RH at ${dataValueMap.TEMP.toFixed(
+      3
+    )} °C`;
     this._updateSensorValue(sensorName, deviceId, displayVal, dataValueMap);
   }
 
