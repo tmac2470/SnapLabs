@@ -77,6 +77,10 @@ export class BluetoothConnectComponent extends Component<{}> {
       this._subscribeToDiscoveredPeripherals.bind(this)
     );
 
+    // Get the already connected peripherals and display them first
+    BleManager.getConnectedPeripherals([])
+    .then((peripherals) => peripherals.map(peripheral => this._addPeripheral(peripheral)));
+
     if (Platform.OS === "android") {
       BleManager.enableBluetooth()
         .then(() => {
@@ -162,6 +166,10 @@ export class BluetoothConnectComponent extends Component<{}> {
     if (!peripheral.name) {
       return;
     }
+    this._addPeripheral(peripheral);
+  }
+
+  _addPeripheral(peripheral) {
     const { peripheralMap } = this.state;
     const map = peripheralMap.set(peripheral.id, peripheral);
 
