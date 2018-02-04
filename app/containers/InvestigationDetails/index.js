@@ -38,15 +38,6 @@ export class InvestigationDetailsComponent extends Component<{}> {
     title: 'Investigation Details'
   };
 
-  static mapDataSetConfig = {
-    drawTicks: false,
-    fill: false,
-    lineTension: 0.1,
-    data: [],
-    pointBorderWidth: 0.01,
-    backgroundColor: Colors.white
-  };
-
   state = {
     connectedDevices: {},
     investigation: {},
@@ -61,8 +52,7 @@ export class InvestigationDetailsComponent extends Component<{}> {
       grid: false,
       maxGridWidth: 100
     },
-    datasetsAvailable: [],
-    charts: {}
+    datasetsAvailable: []
   };
 
   componentWillMount() {
@@ -217,26 +207,21 @@ export class InvestigationDetailsComponent extends Component<{}> {
         ) {
           switch (sensorTag.name.toLowerCase()) {
             case 'temperature':
-              this._startTemperatureNotifications(device, 'Temperature');
+              this._startTemperatureNotifications(device);
               break;
             case 'barometer':
-              this._startBarometerNotifications(device, 'Barometer');
+              this._startBarometerNotifications(device);
               break;
             case 'accelerometer':
             case 'gyroscope':
             case 'magnetometer':
-              this._startMovementNotifications(
-                device,
-                'Accelerometer',
-                'Gyroscope',
-                'Magnetometer'
-              );
+              this._startMovementNotifications(device);
               break;
             case 'humidity':
-              this._startHumidityNotifications(device, 'Humidity');
+              this._startHumidityNotifications(device);
               break;
             case 'luxometer':
-              this._startLuxometerNotifications(device, 'Luxometer');
+              this._startLuxometerNotifications(device);
               break;
 
             default:
@@ -331,12 +316,7 @@ export class InvestigationDetailsComponent extends Component<{}> {
   }
 
   // file:///Users/shailendrapal/Downloads/attr_cc2650%20sensortag.html
-  _startMovementNotifications(
-    device,
-    accelerometerChartId,
-    gyroscopeChartId,
-    magnetometerChartId
-  ) {
+  _startMovementNotifications(device) {
     const service = SERVICES.Accelerometer;
     this._asyncStartNotificationsForService(service, device, [1, 0]);
   }
@@ -356,7 +336,7 @@ export class InvestigationDetailsComponent extends Component<{}> {
     this._updateSensorValue(sensorName, deviceId, displayVal, dataValueMap);
   }
 
-  _startHumidityNotifications(device, humidityChartId) {
+  _startHumidityNotifications(device) {
     const service = SERVICES.Humidity;
     this._asyncStartNotificationsForService(service, device, [1]);
   }
@@ -382,7 +362,7 @@ export class InvestigationDetailsComponent extends Component<{}> {
     this._updateSensorValue(sensorName, deviceId, displayVal, dataValueMap);
   }
 
-  _startBarometerNotifications(device, barometerChartId) {
+  _startBarometerNotifications(device) {
     const service = SERVICES.Barometer;
     this._asyncStartNotificationsForService(service, device, [1]);
   }
@@ -404,12 +384,12 @@ export class InvestigationDetailsComponent extends Component<{}> {
     const displayVal = `${values.amb.value}°C [Amb], ${values.ir.value}°C [IR]`;
     const dataValueMap = {
       [values.amb.key]: values.amb.value,
-      [values.ir.key]: values.ir.value/10
+      [values.ir.key]: values.ir.value / 10
     };
     this._updateSensorValue(sensorName, deviceId, displayVal, dataValueMap);
   }
 
-  _startTemperatureNotifications(device, temperatureChartId) {
+  _startTemperatureNotifications(device) {
     const service = SERVICES.Temperature;
     this._asyncStartNotificationsForService(service, device, [1]);
   }
@@ -425,7 +405,7 @@ export class InvestigationDetailsComponent extends Component<{}> {
     this._updateSensorValue(sensorName, deviceId, displayVal, dataValueMap);
   }
 
-  _startLuxometerNotifications(device, luxometerChartId) {
+  _startLuxometerNotifications(device) {
     const service = SERVICES.Luxometer;
     this._asyncStartNotificationsForService(service, device, [1]);
   }
@@ -583,10 +563,24 @@ export class InvestigationDetailsComponent extends Component<{}> {
     sensors.map(sensorTag => {
       sensorTag = this.initialiseChart(sensorTag, connectedDevices);
       sensorTag = this.initialiseGrid(sensorTag, connectedDevices);
+      this._getDatasets(sensorTag);
       return sensorTag;
     });
+
     this.setState({
       sensors
+    });
+  }
+
+  _getDatasets(sensor) {
+    const { datasetsAvailable } = this.state;
+    // Need datasets to decide if the grids can work
+    const datasets = this._getSensorDatasets(sensor);
+    const allDatasets = datasetsAvailable.concat(datasets);
+    console.log(allDatasets);
+
+    this.setState({
+      datasetsAvailable: allDatasets
     });
   }
 
@@ -646,183 +640,81 @@ export class InvestigationDetailsComponent extends Component<{}> {
     });
   }
 
-  _getChartDatasets(chart, sensor, deviceId) {
+  _getSensorDatasets(sensor) {
     const sensorParams = sensor.config.parameters;
     const mapDataSetConfig = this.mapDataSetConfig;
 
-    const xyzDataSet = [
-      {
-        mapDataSetConfig,
-        borderColor: 'red',
-        label: `X-${deviceId}`,
-        name: 'X',
-        deviceId
-      },
-      {
-        mapDataSetConfig,
-        borderColor: 'red',
-        label: `Y-${deviceId}`,
-        name: 'Y',
-        deviceId
-      },
-      {
-        mapDataSetConfig,
-        borderColor: 'red',
-        label: `Z-${deviceId}`,
-        name: 'Z',
-        deviceId
-      }
-    ];
-
-    const scalarDataSet = [
-      {
-        mapDataSetConfig,
-        borderColor: 'red',
-        label: `Scalar Value-${deviceId}`,
-        name: 'Scalar Value',
-        deviceId
-      }
-    ];
-
-    switch (chart.toLowerCase()) {
+    switch (sensor.name.toLowerCase()) {
       case 'temperature':
         let tempDataSets = [];
 
-        let ambientDataSet = {
-          mapDataSetConfig,
-          borderColor: 'red',
-          label: `Ambient Temperature (C)-${deviceId}`,
-          name: 'Ambient Temperature (C)',
-          deviceId
-        };
-
-        let irDataSet = {
-          mapDataSetConfig,
-          borderColor: 'red',
-          label: `Target (IR) Temperature (C)-${deviceId}`,
-          name: 'Target (IR) Temperature (C)',
-          deviceId
-        };
-
         if (sensorParams.ambient) {
-          tempDataSets.push(ambientDataSet);
+          tempDataSets.push({ type: 'amb' });
         }
 
         if (sensorParams.IR) {
-          tempDataSets.push(irDataSet);
+          tempDataSets.push({ type: 'ir' });
         }
 
         return tempDataSets;
 
       case 'barometer':
-        return [
-          {
-            mapDataSetConfig,
-            borderColor: 'red',
-            label: `Pressure (hPa)-${deviceId}`,
-            name: 'Pressure (hPa)',
-            deviceId
-          }
-        ];
+        return [{ type: 'hPa' }];
 
       case 'luxometer':
-        return [
-          {
-            mapDataSetConfig,
-            borderColor: 'red',
-            label: `lux-${deviceId}`,
-            name: 'lux',
-            deviceId
-          }
-        ];
+        return [{ type: 'lux' }];
 
       // Accelerometer and magnetometer share similar data set config
       case 'accelerometer':
-      case 'magnetometer':
-        let xyzScalarDataSet = [];
+        let accXyzScalarDataSet = [];
 
         if (sensorParams.xyz) {
-          xyzScalarDataSet = xyzScalarDataSet.concat(xyzDataSet);
+          accXyzScalarDataSet.push({
+            type: 'accxyz'
+          });
         }
 
         if (sensorParams.scalar) {
-          xyzScalarDataSet = xyzScalarDataSet.concat(scalarDataSet);
+          accXyzScalarDataSet.push({
+            type: 'accscalar'
+          });
         }
 
-        return xyzScalarDataSet;
+        return accXyzScalarDataSet;
+      case 'magnetometer':
+        let mgXyzScalarDataSet = [];
+
+        if (sensorParams.xyz) {
+          mgXyzScalarDataSet.push({
+            type: 'mgxyz'
+          });
+        }
+
+        if (sensorParams.scalar) {
+          mgXyzScalarDataSet.push({
+            type: 'mgscalar'
+          });
+        }
+
+        return mgXyzScalarDataSet;
 
       // Gyroscope shares the same xyzDataSet
       case 'gyroscope':
-        return xyzDataSet;
+        return [{ type: 'gyroscope' }];
 
       case 'humidity':
-        return [
-          {
-            mapDataSetConfig,
-            borderColor: 'red',
-            label: `RH-${deviceId}`,
-            name: 'RH',
-            deviceId
-          }
-        ];
-    }
-  }
-
-  _getChartType(chart, ctx, sensor, devices) {
-    if (!ctx || !chart) {
-      return;
-    }
-    // this.mapOptions.title.text = sensor.config.graph.graphTitle;
-    switch (chart.toLowerCase()) {
-      case 'accelerometer':
-      case 'barometer':
-      case 'gyroscope':
-      case 'humidity':
-      case 'luxometer':
-      case 'magnetometer':
-      case 'temperature':
-        const { datasetsAvailable } = this.state;
-        let datasets = [];
-        const getDatasets = async () => {
-          await Object.keys(devices).map(deviceId => {
-            datasets = datasets.concat(
-              this._getChartDatasets(chart, sensor, deviceId)
-            );
-          });
-        };
-
-        getDatasets();
-        datasetsAvailable = datasetsAvailable.concat(datasets);
-
-        this.setState({
-          datasetsAvailable
-        });
-
-        return chart;
-      // // These all above use the same graph
-      // return new Chart(ctx, {
-      //   type: 'line',
-      //   data: {
-      //     datasets
-      //   },
-      //   options: this.mapOptions
-      // });
+        return [{ type: 'humidity' }];
     }
   }
 
   // Initialise a chart only once.
   // The datasets need to be configured per device though.
   initialiseChart(sensor, devices) {
-    const { display, charts } = this.state;
+    const { display } = this.state;
     if (!!sensor.config.graph.display || !!sensor.config.graph.graphdisplay) {
-      const chartId = `${sensor.name}`;
-      const ctx = chartId || document.getElementById(chartId);
-      charts[chartId] = this._getChartType(chartId, ctx, sensor, devices);
-
       display.graph = true;
       this.setState({
-        display,
-        charts
+        display
       });
       return sensor;
     } else {
@@ -893,7 +785,7 @@ export class InvestigationDetailsComponent extends Component<{}> {
     if (!!sensor.config.grid.display || !!sensor.config.grid.griddisplay) {
       display.grid = true;
       display.maxGridWidth = `${90 / parseInt(sensor.config.grid.columns)}`;
-      const chartId = `${sensor.name}-grid`;
+      const gridId = `${sensor.name}-grid`;
       const countX = sensor.config.grid.columns || 1;
       const countY = sensor.config.grid.rows || 1;
 
@@ -903,30 +795,14 @@ export class InvestigationDetailsComponent extends Component<{}> {
 
       _.times(numOfGrids, count => {
         grids.push({
-          id: `${chartId}-${count + 1}`,
+          id: `${gridId}-${count + 1}`,
           number: count + 1
         });
       });
 
       sensor.config.grids = grids;
-
-      const { datasetsAvailable } = this.state;
-      // Need datasets to decide if the grids can work
-      let datasets = [];
-      const chart = `${sensor.name}`;
-      const getDatasets = async () => {
-        await Object.keys(devices).map(deviceId => {
-          datasets = datasets.concat(
-            this._getChartDatasets(chart, sensor, deviceId)
-          );
-        });
-      };
-
-      getDatasets();
-      datasetsAvailable = datasetsAvailable.concat(datasets);
       this.setState({
-        display,
-        datasetsAvailable
+        display
       });
       return sensor;
     } else {
