@@ -216,7 +216,7 @@ export class BluetoothConnectComponent extends Component<{}> {
         .catch(error => {
           onAppError(error);
         });
-    }, 5000);
+    }, 2000);
   }
 
   _pingDevice(device) {
