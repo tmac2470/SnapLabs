@@ -61,7 +61,7 @@ export class InvestigationDetailsComponent extends Component<{}> {
 
     const _assignState = async tags => {
       const sampleIntervalTime = parseInt(investigation.sampleInterval);
-      const sensors = await utils._getSensorTags(tags);
+      const sensors = await utils._getSensorTags(tags, connectedDevices);
 
       this.setState({
         investigation,
@@ -767,8 +767,8 @@ export class InvestigationDetailsComponent extends Component<{}> {
         sensor.rawValue[deviceId] = dataValueMap;
 
         if (graphs.started) {
-          Object.keys(sensor.graph.type).map(graphKey => {
-            const graph = sensor.graph.type[graphKey];
+          Object.keys(sensor.graph[deviceId].type).map(graphKey => {
+            const graph = sensor.graph[deviceId].type[graphKey];
             graph.data.push({
               [graphKey]: dataValueMap[graph.label]
             });
@@ -943,7 +943,6 @@ export class InvestigationDetailsComponent extends Component<{}> {
                           standalone
                           data={sensor.graph.legends}
                         />
-
                         <VictoryLabel
                           x="50%"
                           y="20"
@@ -952,14 +951,25 @@ export class InvestigationDetailsComponent extends Component<{}> {
                           textAnchor="middle"
                         />
 
-                        {Object.keys(sensor.graph.type).map(graphKey => (
-                          <VictoryLine
-                            key={graphKey}
-                            style={sensor.graph.type[graphKey].style}
-                            data={sensor.graph.type[graphKey].data}
-                            y={graphKey}
-                          />
-                        ))}
+                        {Object.keys(connectedDevices).map(deviceId => {
+                          return !!sensor.graph[deviceId].type
+                            ? Object.keys(sensor.graph[deviceId].type).map(
+                                graphKey => (
+                                  <VictoryLine
+                                    key={graphKey}
+                                    style={
+                                      sensor.graph[deviceId].type[graphKey]
+                                        .style
+                                    }
+                                    data={
+                                      sensor.graph[deviceId].type[graphKey].data
+                                    }
+                                    y={graphKey}
+                                  />
+                                )
+                              )
+                            : null;
+                        })}
                       </VictoryChart>
                     ) : null}
                     {!display.grid ? null : (

@@ -28,13 +28,15 @@ const _getDataset = (label, color) => {
   };
 };
 
-const _getGraphConfig = sensor => {
+const _getGraphConfig = (sensor, devices) => {
   let color = randomColor();
   let color1 = randomColor();
   let color2 = randomColor();
   let color3 = randomColor();
 
-  let config = {};
+  let config = {
+    legends: []
+  };
   const sensorParams = sensor.parameters;
 
   const xLabel = 'X';
@@ -42,126 +44,129 @@ const _getGraphConfig = sensor => {
   const zLabel = 'Z';
   const scalarLabel = 'Scalar Value';
 
-  switch (sensor.name.toLowerCase()) {
-    case 'barometer':
-      const hpaLabel = 'Pressure (hPa)';
-      return {
-        type: {
-          hPa: _getDataset(hpaLabel, color)
-        },
-        legends: [_getLegend(hpaLabel, color)]
-      };
+  return Object.keys(devices).map(deviceId => {
+    switch (sensor.name.toLowerCase()) {
+      case 'barometer':
+        const hpaLabel = 'Pressure (hPa)';
+        config[deviceId] = {
+          type: {
+            hPa: _getDataset(hpaLabel, color)
+          }
+        };
+        config.legends = [_getLegend(hpaLabel, color)];
+        return config;
+      case 'humidity':
+        const humTEMPLabel = '°C';
+        const humRHLabel = '% RH';
 
-    case 'humidity':
-      color1 = randomColor();
-
-      const humTEMPLabel = '°C';
-      const humRHLabel = '% RH';
-
-      return {
-        type: {
-          temp: _getDataset(humTEMPLabel, color),
-          rh: _getDataset(humRHLabel, color1)
-        },
-        legends: [
+        config[deviceId] = {
+          type: {
+            temp: _getDataset(humTEMPLabel, color),
+            rh: _getDataset(humRHLabel, color1)
+          }
+        };
+        config.legends = [
           _getLegend(humTEMPLabel, color),
           _getLegend(humRHLabel, color1)
-        ]
-      };
+        ];
 
-    case 'luxometer':
-      const luxLabel = 'lux';
-      return {
-        type: {
-          lux: _getDataset(luxLabel, color)
-        },
-        legends: [_getLegend(luxLabel, color)]
-      };
-    case 'temperature':
-      color1 = randomColor();
-      const ambLabel = 'Ambient Temperature (C)';
-      const irLabel = 'Target (IR) Temperature (C)';
+        return config;
 
-      config = {
-        type: {},
-        legends: []
-      };
+      case 'luxometer':
+        const luxLabel = 'lux';
+        config[deviceId] = {
+          type: {
+            lux: _getDataset(luxLabel, color)
+          }
+        };
+        config.legends = [_getLegend(luxLabel, color)];
+        return config;
+      case 'temperature':
+        const ambLabel = 'Ambient Temperature (C)';
+        const irLabel = 'Target (IR) Temperature (C)';
 
-      if (sensorParams.ambient) {
-        config.type['amb'] = _getDataset(ambLabel, color);
-        config.legends.push(_getLegend(ambLabel, color));
-      }
+        config[deviceId] = {
+          type: {}
+        };
+        config.legends = [];
 
-      if (sensorParams.IR) {
-        config.type['ir'] = _getDataset(irLabel, color1);
-        config.legends.push(_getLegend(irLabel, color1));
-      }
+        if (sensorParams.ambient) {
+          config[deviceId].type['amb'] = _getDataset(ambLabel, color);
+          config.legends.push(_getLegend(ambLabel, color));
+        }
 
-      return config;
+        if (sensorParams.IR) {
+          config[deviceId].type['ir'] = _getDataset(irLabel, color1);
+          config.legends.push(_getLegend(irLabel, color1));
+        }
 
-    case 'magnetometer':
-      config = {
-        type: {},
-        legends: []
-      };
-      if (sensorParams.xyz) {
-        config.type['magx'] = _getDataset(xLabel, color);
-        config.type['magy'] = _getDataset(yLabel, color1);
-        config.type['magz'] = _getDataset(zLabel, color2);
+        return config;
+
+      case 'magnetometer':
+        config[deviceId] = {
+          type: {}
+        };
+        config.legends = [];
+
+        if (sensorParams.xyz) {
+          config[deviceId].type['magx'] = _getDataset(xLabel, color);
+          config[deviceId].type['magy'] = _getDataset(yLabel, color1);
+          config[deviceId].type['magz'] = _getDataset(zLabel, color2);
+          config.legends.push(
+            _getLegend(xLabel, color),
+            _getLegend(yLabel, color1),
+            _getLegend(zLabel, color2)
+          );
+        }
+
+        if (sensorParams.scalar) {
+          config[deviceId].type['accscalar'] = _getDataset(scalarLabel, color2);
+          config.legends.push(_getLegend(scalarLabel, color3));
+        }
+
+        return config;
+      case 'accelerometer':
+        config[deviceId] = {
+          type: {}
+        };
+        config.legends = [];
+        if (sensorParams.xyz) {
+          config[deviceId].type['accx'] = _getDataset(xLabel, color);
+          config[deviceId].type['accy'] = _getDataset(yLabel, color1);
+          config[deviceId].type['accz'] = _getDataset(zLabel, color2);
+          config.legends.push(
+            _getLegend(xLabel, color),
+            _getLegend(yLabel, color1),
+            _getLegend(zLabel, color2)
+          );
+        }
+
+        if (sensorParams.scalar) {
+          config[deviceId].type['accscalar'] = _getDataset(scalarLabel, color2);
+          config.legends.push(_getLegend(scalarLabel, color3));
+        }
+
+        return config;
+      case 'gyroscope':
+        config[deviceId] = {
+          type: {}
+        };
+        config.legends = [];
+        config[deviceId].type['gyrox'] = _getDataset(xLabel, color);
+        config[deviceId].type['gyroy'] = _getDataset(yLabel, color1);
+        config[deviceId].type['gyroz'] = _getDataset(zLabel, color2);
         config.legends.push(
           _getLegend(xLabel, color),
           _getLegend(yLabel, color1),
           _getLegend(zLabel, color2)
         );
-      }
 
-      if (sensorParams.scalar) {
-        config.type['accscalar'] = _getDataset(scalarLabel, color2);
-        config.legends.push(_getLegend(scalarLabel, color3));
-      }
-
-      return config;
-    case 'accelerometer':
-      config = {
-        type: {},
-        legends: []
-      };
-      if (sensorParams.xyz) {
-        config.type['accx'] = _getDataset(xLabel, color);
-        config.type['accy'] = _getDataset(yLabel, color1);
-        config.type['accz'] = _getDataset(zLabel, color2);
-        config.legends.push(
-          _getLegend(xLabel, color),
-          _getLegend(yLabel, color1),
-          _getLegend(zLabel, color2)
-        );
-      }
-
-      if (sensorParams.scalar) {
-        config.type['accscalar'] = _getDataset(scalarLabel, color2);
-        config.legends.push(_getLegend(scalarLabel, color3));
-      }
-
-      return config;
-    case 'gyroscope':
-      config = {
-        type: {},
-        legends: []
-      };
-      config.type['gyrox'] = _getDataset(xLabel, color);
-      config.type['gyroy'] = _getDataset(yLabel, color1);
-      config.type['gyroz'] = _getDataset(zLabel, color2);
-      config.legends.push(
-        _getLegend(xLabel, color),
-        _getLegend(yLabel, color1),
-        _getLegend(zLabel, color2)
-      );
-
-      return config;
-  }
+        return config;
+    }
+  });
 };
 
-export function _getSensorTags(sensorTags) {
+export function _getSensorTags(sensorTags, connectedDevices) {
   let tags = [];
   for (let id in sensorTags) {
     const sensorTag = sensorTags[id];
@@ -181,7 +186,8 @@ export function _getSensorTags(sensorTags) {
           sensor.graph.graphdisplay ||
           sensor.grid.griddisplay
         ) {
-          const graphData = _getGraphConfig(sensor);
+          const graphData = _getGraphConfig(sensor, connectedDevices)[0];
+
           let parameters = [];
           _.map(_.keys(sensor.parameters), key => {
             const value = sensor.parameters[key];
