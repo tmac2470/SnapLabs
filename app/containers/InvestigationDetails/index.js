@@ -140,7 +140,7 @@ export class InvestigationDetailsComponent extends Component<{}> {
     const { sensors } = this.state;
     const { onAppError } = this.props;
 
-    sensors.map(sensorTag => {
+    sensors.map(async sensorTag => {
       const config = sensorTag.config;
       let service = {};
 
@@ -177,13 +177,15 @@ export class InvestigationDetailsComponent extends Component<{}> {
         if (!service.UUID) {
           return;
         }
-        BleManager.stopNotification(device.id, service.UUID, service.DATA)
-          .then(e => {
-            // Success
-          })
-          .catch(error => {
-            onAppError(error.message);
-          });
+        try {
+          await BleManager.stopNotification(
+            device.id,
+            service.UUID,
+            service.DATA
+          );
+        } catch (error) {
+          onAppError(error.message);
+        }
       }
     });
   }
@@ -195,7 +197,7 @@ export class InvestigationDetailsComponent extends Component<{}> {
       // captureOnClick enabled
       await this._startSensorBtnNotifications(device);
 
-      await sensors.map(sensorTag => {
+      sensors.map(async sensorTag => {
         const config = sensorTag.config;
 
         // if the displays are off, do not start notifications
@@ -207,10 +209,10 @@ export class InvestigationDetailsComponent extends Component<{}> {
         ) {
           switch (sensorTag.name.toLowerCase()) {
             case 'temperature':
-              this._startTemperatureNotifications(device);
+              await this._startTemperatureNotifications(device);
               break;
             case 'barometer':
-              this._startBarometerNotifications(device);
+              await this._startBarometerNotifications(device);
               break;
             // case 'accelerometer':
             // case 'gyroscope':
@@ -218,10 +220,10 @@ export class InvestigationDetailsComponent extends Component<{}> {
             //   this._startMovementNotifications(device);
             //   break;
             case 'humidity':
-              this._startHumidityNotifications(device);
+              await this._startHumidityNotifications(device);
               break;
             case 'luxometer':
-              this._startLuxometerNotifications(device);
+              await this._startLuxometerNotifications(device);
               break;
 
             default:
@@ -330,9 +332,7 @@ export class InvestigationDetailsComponent extends Component<{}> {
       temp: data[1]
     };
 
-    const displayVal = `${values.rh}% RH at ${values.temp.toFixed(
-      3
-    )} °C`;
+    const displayVal = `${values.rh}% RH at ${values.temp.toFixed(3)} °C`;
 
     const dataValueMap = {
       '°C': values.temp,
@@ -423,8 +423,10 @@ export class InvestigationDetailsComponent extends Component<{}> {
       await this._startNotificationForService(device, service);
       // Write the delay time
       await this._writePeriodToDevice(device, service, sampleIntervalTime);
-      // Switch on the sensor
-      await this._writeToDevice(device, service, activationBits);
+      if (activationBits) {
+        // Switch on the sensor
+        await this._writeToDevice(device, service, activationBits);
+      }
     } catch (e) {
       onAppError('Unable to write to device! Please reconnect device', e);
     }
@@ -630,8 +632,9 @@ export class InvestigationDetailsComponent extends Component<{}> {
     this.stopGraphs();
     // Also reset the graph data
     sensors.map(sensor => {
-      sensor.graph.data = [];
-      return sensor;
+      Object.keys(sensor.graph.type).map(graphKey => {
+        sensor.graph.type[graphKey].data = [];
+      });
     });
 
     this.setState({
