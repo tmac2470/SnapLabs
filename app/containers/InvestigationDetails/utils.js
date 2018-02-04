@@ -28,14 +28,22 @@ const _getDataset = (label, color) => {
   };
 };
 
-const _getGraphConfig = sensorName => {
+const _getGraphConfig = sensor => {
   let color = randomColor();
   let color1 = randomColor();
   let color2 = randomColor();
+  let color3 = randomColor();
 
-  switch (sensorName.toLowerCase()) {
+  let config = {};
+  const sensorParams = sensor.parameters;
+
+  const xLabel = 'X';
+  const yLabel = 'Y';
+  const zLabel = 'Z';
+  const scalarLabel = 'Scalar Value';
+
+  switch (sensor.name.toLowerCase()) {
     case 'barometer':
-      color = randomColor();
       const hpaLabel = 'Pressure (hPa)';
       return {
         type: {
@@ -45,7 +53,6 @@ const _getGraphConfig = sensorName => {
       };
 
     case 'humidity':
-      color = randomColor();
       color1 = randomColor();
 
       const humTEMPLabel = '°C';
@@ -63,7 +70,6 @@ const _getGraphConfig = sensorName => {
       };
 
     case 'luxometer':
-      color = randomColor();
       const luxLabel = 'lux';
       return {
         type: {
@@ -72,23 +78,86 @@ const _getGraphConfig = sensorName => {
         legends: [_getLegend(luxLabel, color)]
       };
     case 'temperature':
-      color = randomColor();
       color1 = randomColor();
       const ambLabel = 'Ambient Temperature (C)';
       const irLabel = 'Target (IR) Temperature (C)';
 
-      return {
-        type: {
-          amb: _getDataset(ambLabel, color),
-          ir: _getDataset(irLabel, color1)
-        },
-        legends: [_getLegend(ambLabel, color), _getLegend(irLabel, color1)]
+      config = {
+        type: {},
+        legends: []
       };
 
-    case 'gyroscope':
-    case 'humidity':
+      if (sensorParams.ambient) {
+        config.type['amb'] = _getDataset(ambLabel, color);
+        config.legends.push(_getLegend(ambLabel, color));
+      }
+
+      if (sensorParams.IR) {
+        config.type['ir'] = _getDataset(irLabel, color1);
+        config.legends.push(_getLegend(irLabel, color1));
+      }
+
+      return config;
+
     case 'magnetometer':
+      config = {
+        type: {},
+        legends: []
+      };
+      if (sensorParams.xyz) {
+        config.type['magx'] = _getDataset(xLabel, color);
+        config.type['magy'] = _getDataset(yLabel, color1);
+        config.type['magz'] = _getDataset(zLabel, color2);
+        config.legends.push(
+          _getLegend(xLabel, color),
+          _getLegend(yLabel, color1),
+          _getLegend(zLabel, color2)
+        );
+      }
+
+      if (sensorParams.scalar) {
+        config.type['accscalar'] = _getDataset(scalarLabel, color2);
+        config.legends.push(_getLegend(scalarLabel, color3));
+      }
+
+      return config;
     case 'accelerometer':
+      config = {
+        type: {},
+        legends: []
+      };
+      if (sensorParams.xyz) {
+        config.type['accx'] = _getDataset(xLabel, color);
+        config.type['accy'] = _getDataset(yLabel, color1);
+        config.type['accz'] = _getDataset(zLabel, color2);
+        config.legends.push(
+          _getLegend(xLabel, color),
+          _getLegend(yLabel, color1),
+          _getLegend(zLabel, color2)
+        );
+      }
+
+      if (sensorParams.scalar) {
+        config.type['accscalar'] = _getDataset(scalarLabel, color2);
+        config.legends.push(_getLegend(scalarLabel, color3));
+      }
+
+      return config;
+    case 'gyroscope':
+      config = {
+        type: {},
+        legends: []
+      };
+      config.type['gyrox'] = _getDataset(xLabel, color);
+      config.type['gyroy'] = _getDataset(yLabel, color1);
+      config.type['gyroz'] = _getDataset(zLabel, color2);
+      config.legends.push(
+        _getLegend(xLabel, color),
+        _getLegend(yLabel, color1),
+        _getLegend(zLabel, color2)
+      );
+
+      return config;
   }
 };
 
@@ -104,6 +173,7 @@ export function _getSensorTags(sensorTags) {
       // Fetch each sensor from the sensor tags config
       for (let iSensor in sensors) {
         const sensor = sensors[iSensor];
+        sensor.name = iSensor;
         // Fetch only the sensors which have been switched "on"
         if (
           sensor.data.display ||
@@ -111,7 +181,7 @@ export function _getSensorTags(sensorTags) {
           sensor.graph.graphdisplay ||
           sensor.grid.griddisplay
         ) {
-          const graphData = _getGraphConfig(iSensor);
+          const graphData = _getGraphConfig(sensor);
           let parameters = [];
           _.map(_.keys(sensor.parameters), key => {
             const value = sensor.parameters[key];
@@ -121,7 +191,7 @@ export function _getSensorTags(sensorTags) {
             });
           });
           tags.push({
-            name: iSensor,
+            name: sensor.name,
             config: sensor,
             value: {},
             rawValue: {},
