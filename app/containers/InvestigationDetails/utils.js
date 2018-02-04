@@ -8,9 +8,12 @@ import { saveFile } from '../FileHandling/actions';
 
 const _getGraphConfig = sensorName => {
   let color = randomColor();
+  let color1 = randomColor();
+  let color2 = randomColor();
+
   switch (sensorName.toLowerCase()) {
-    case 'accelerometer':
     case 'barometer':
+      color = randomColor();
       const hpaLabel = 'Pressure (hPa)';
       return {
         type: {
@@ -34,7 +37,55 @@ const _getGraphConfig = sensorName => {
           }
         ]
       };
+
+    case 'humidity':
+      color = randomColor();
+      color1 = randomColor();
+
+      const humTEMPLabel = '°C';
+      const humRHLabel = '% RH';
+
+      return {
+        type: {
+          temp: {
+            label: humTEMPLabel,
+            data: [],
+            style: {
+              data: {
+                stroke: color,
+                strokeWidth: 2,
+                strokeLinecap: 'round'
+              }
+            }
+          },
+          rh: {
+            label: humRHLabel,
+            data: [],
+            style: {
+              data: {
+                stroke: color1,
+                strokeWidth: 2,
+                strokeLinecap: 'round'
+              }
+            }
+          }
+        },
+        legends: [
+          {
+            name: humTEMPLabel,
+            symbol: { fill: color },
+            labels: { fill: color }
+          },
+          {
+            name: humRHLabel,
+            symbol: { fill: color1 },
+            labels: { fill: color1 }
+          }
+        ]
+      };
+
     case 'luxometer':
+      color = randomColor();
       const luxLabel = 'lux';
       return {
         type: {
@@ -58,10 +109,6 @@ const _getGraphConfig = sensorName => {
           }
         ]
       };
-    case 'gyroscope':
-    case 'humidity':
-    case 'magnetometer':
-      return;
     case 'temperature':
       color = randomColor();
       color1 = randomColor();
@@ -106,6 +153,11 @@ const _getGraphConfig = sensorName => {
           }
         ]
       };
+
+    case 'gyroscope':
+    case 'humidity':
+    case 'magnetometer':
+    case 'accelerometer':
   }
 };
 

@@ -206,23 +206,23 @@ export class InvestigationDetailsComponent extends Component<{}> {
           !!config.grid.griddisplay
         ) {
           switch (sensorTag.name.toLowerCase()) {
-            case 'temperature':
-              this._startTemperatureNotifications(device);
-              break;
-            case 'barometer':
-              this._startBarometerNotifications(device);
-              break;
+            // case 'temperature':
+            //   this._startTemperatureNotifications(device);
+            //   break;
+            // case 'barometer':
+            //   this._startBarometerNotifications(device);
+            //   break;
             // case 'accelerometer':
             // case 'gyroscope':
             // case 'magnetometer':
             //   this._startMovementNotifications(device);
             //   break;
-            // case 'humidity':
-            //   this._startHumidityNotifications(device);
-            //   break;
-            case 'luxometer':
-              this._startLuxometerNotifications(device);
+            case 'humidity':
+              this._startHumidityNotifications(device);
               break;
+            // case 'luxometer':
+            //   this._startLuxometerNotifications(device);
+            //   break;
 
             default:
               break;
@@ -325,14 +325,19 @@ export class InvestigationDetailsComponent extends Component<{}> {
     const sensorName = 'Humidity';
     // Humidity DATA
     // TempLSB:TempMSB:HumidityLSB:HumidityMSB
-    const dataValueMap = {
-      RH: data[3],
-      TEMP: data[1]
+    const values = {
+      rh: data[3],
+      temp: data[1]
     };
 
-    const displayVal = `${dataValueMap.RH}% RH at ${dataValueMap.TEMP.toFixed(
+    const displayVal = `${values.rh}% RH at ${values.temp.toFixed(
       3
     )} °C`;
+
+    const dataValueMap = {
+      '°C': values.temp,
+      '% RH': values.rh
+    };
     this._updateSensorValue(sensorName, deviceId, displayVal, dataValueMap);
   }
 
