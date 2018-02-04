@@ -206,12 +206,12 @@ export class InvestigationDetailsComponent extends Component<{}> {
           !!config.grid.griddisplay
         ) {
           switch (sensorTag.name.toLowerCase()) {
-            // case 'temperature':
-            //   this._startTemperatureNotifications(device);
-            //   break;
-            // case 'barometer':
-            //   this._startBarometerNotifications(device);
-            //   break;
+            case 'temperature':
+              this._startTemperatureNotifications(device);
+              break;
+            case 'barometer':
+              this._startBarometerNotifications(device);
+              break;
             // case 'accelerometer':
             // case 'gyroscope':
             // case 'magnetometer':
@@ -220,9 +220,9 @@ export class InvestigationDetailsComponent extends Component<{}> {
             case 'humidity':
               this._startHumidityNotifications(device);
               break;
-            // case 'luxometer':
-            //   this._startLuxometerNotifications(device);
-            //   break;
+            case 'luxometer':
+              this._startLuxometerNotifications(device);
+              break;
 
             default:
               break;
@@ -351,18 +351,15 @@ export class InvestigationDetailsComponent extends Component<{}> {
     // Barometer DATA
     // TempLSB:TempMSB(:TempEXt):PressureLSB:PressureMSB(:PressureExt)
 
-    const pressureValue = data[3];
-    const tempValue = data[0];
-
     const values = {
-      hPa: pressureValue,
-      '°C': tempValue
+      hPa: data[3],
+      c: data[0]
     };
 
-    const displayVal = `${pressureValue} hPa at ${tempValue} °C`;
+    const displayVal = `${values.hPa} hPa at ${values.c} °C`;
 
     const dataValueMap = {
-      'Pressure (hPa)': pressureValue
+      'Pressure (hPa)': values.hPa
     };
     this._updateSensorValue(sensorName, deviceId, displayVal, dataValueMap);
   }
@@ -377,19 +374,15 @@ export class InvestigationDetailsComponent extends Component<{}> {
     // Temperature DATA
     // ObjectLSB:ObjectMSB:AmbientLSB:AmbientMSB
     const values = {
-      amb: {
-        key: 'Ambient Temperature (C)',
-        value: data[1]
-      },
-      ir: {
-        key: 'Target (IR) Temperature (C)',
-        value: data[2]
-      }
+      amb: data[1],
+      ir: data[2]
     };
-    const displayVal = `${values.amb.value}°C [Amb], ${values.ir.value}°C [IR]`;
+
+    const displayVal = `${values.amb}°C [Amb], ${values.ir}°C [IR]`;
+
     const dataValueMap = {
-      [values.amb.key]: values.amb.value,
-      [values.ir.key]: values.ir.value / 10
+      'Ambient Temperature (C)': values.amb,
+      'Target (IR) Temperature (C)': values.ir / 10
     };
     this._updateSensorValue(sensorName, deviceId, displayVal, dataValueMap);
   }
@@ -402,10 +395,12 @@ export class InvestigationDetailsComponent extends Component<{}> {
   _readLuxometerNotifications(deviceId, data) {
     const sensorName = 'Luxometer';
     // Luxometer DATA
-    const value = data[0];
-    const displayVal = `${value} lux`;
+    const values = {
+      lux: data[0]
+    };
+    const displayVal = `${values.lux} lux`;
     const dataValueMap = {
-      lux: value
+      lux: values.lux
     };
     this._updateSensorValue(sensorName, deviceId, displayVal, dataValueMap);
   }
