@@ -6,6 +6,28 @@ import randomColor from 'randomcolor';
 import getStore from '../../store';
 import { saveFile } from '../FileHandling/actions';
 
+const _getLegend = (label, color) => {
+  return {
+    name: label,
+    symbol: { fill: color },
+    labels: { fill: color }
+  };
+};
+
+const _getDataset = (label, color) => {
+  return {
+    label: label,
+    data: [],
+    style: {
+      data: {
+        stroke: color,
+        strokeWidth: 2,
+        strokeLinecap: 'round'
+      }
+    }
+  };
+};
+
 const _getGraphConfig = sensorName => {
   let color = randomColor();
   let color1 = randomColor();
@@ -17,25 +39,9 @@ const _getGraphConfig = sensorName => {
       const hpaLabel = 'Pressure (hPa)';
       return {
         type: {
-          hPa: {
-            label: hpaLabel,
-            data: [],
-            style: {
-              data: {
-                stroke: color,
-                strokeWidth: 2,
-                strokeLinecap: 'round'
-              }
-            }
-          }
+          hPa: _getDataset(hpaLabel, color)
         },
-        legends: [
-          {
-            name: hpaLabel,
-            symbol: { fill: color },
-            labels: { fill: color }
-          }
-        ]
+        legends: [_getLegend(hpaLabel, color)]
       };
 
     case 'humidity':
@@ -47,40 +53,12 @@ const _getGraphConfig = sensorName => {
 
       return {
         type: {
-          temp: {
-            label: humTEMPLabel,
-            data: [],
-            style: {
-              data: {
-                stroke: color,
-                strokeWidth: 2,
-                strokeLinecap: 'round'
-              }
-            }
-          },
-          rh: {
-            label: humRHLabel,
-            data: [],
-            style: {
-              data: {
-                stroke: color1,
-                strokeWidth: 2,
-                strokeLinecap: 'round'
-              }
-            }
-          }
+          temp: _getDataset(humTEMPLabel, color),
+          rh: _getDataset(humRHLabel, color1)
         },
         legends: [
-          {
-            name: humTEMPLabel,
-            symbol: { fill: color },
-            labels: { fill: color }
-          },
-          {
-            name: humRHLabel,
-            symbol: { fill: color1 },
-            labels: { fill: color1 }
-          }
+          _getLegend(humTEMPLabel, color),
+          _getLegend(humRHLabel, color1)
         ]
       };
 
@@ -89,25 +67,9 @@ const _getGraphConfig = sensorName => {
       const luxLabel = 'lux';
       return {
         type: {
-          lux: {
-            label: luxLabel,
-            data: [],
-            style: {
-              data: {
-                stroke: color,
-                strokeWidth: 2,
-                strokeLinecap: 'round'
-              }
-            }
-          }
+          lux: _getDataset(luxLabel, color)
         },
-        legends: [
-          {
-            name: luxLabel,
-            symbol: { fill: color },
-            labels: { fill: color }
-          }
-        ]
+        legends: [_getLegend(luxLabel, color)]
       };
     case 'temperature':
       color = randomColor();
@@ -117,41 +79,10 @@ const _getGraphConfig = sensorName => {
 
       return {
         type: {
-          amb: {
-            label: ambLabel,
-            data: [],
-            style: {
-              data: {
-                stroke: color,
-                strokeWidth: 2,
-                strokeLinecap: 'round'
-              }
-            }
-          },
-          ir: {
-            label: irLabel,
-            data: [],
-            style: {
-              data: {
-                stroke: color1,
-                strokeWidth: 2,
-                strokeLinecap: 'round'
-              }
-            }
-          }
+          amb: _getDataset(ambLabel, color),
+          ir: _getDataset(irLabel, color1)
         },
-        legends: [
-          {
-            name: ambLabel,
-            symbol: { fill: color },
-            labels: { fill: color }
-          },
-          {
-            name: irLabel,
-            symbol: { fill: color1 },
-            labels: { fill: color1 }
-          }
-        ]
+        legends: [_getLegend(ambLabel, color), _getLegend(irLabel, color1)]
       };
 
     case 'gyroscope':
