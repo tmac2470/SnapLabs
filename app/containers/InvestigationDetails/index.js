@@ -15,6 +15,15 @@ import {
   View
 } from 'react-native';
 import { Button, H2, H4, H5, H6 } from 'nachos-ui';
+import {
+  VictoryLine,
+  VictoryChart,
+  VictoryAxis,
+  VictoryTheme,
+  VictoryLabel,
+  VictoryLegend,
+  VictoryZoomContainer
+} from 'victory-native';
 import FullScreenLoader from '../../components/FullScreenLoading';
 
 import Colors from '../../Theme/colors';
@@ -43,8 +52,8 @@ export class InvestigationDetailsComponent extends Component<{}> {
     investigation: {},
     sensors: [],
     graphs: {
-      started: false,
-      startedAtLeastOnce: false
+      started: true,
+      startedAtLeastOnce: true
     },
     sampleIntervalTime: 1000,
     display: {
@@ -87,24 +96,24 @@ export class InvestigationDetailsComponent extends Component<{}> {
     const { peripheral, characteristic, value } = data;
 
     switch (characteristic.toLowerCase()) {
-      case SERVICES.Luxometer.DATA.toLowerCase():
-        this._readLuxometerNotifications(peripheral, value);
-        break;
+      // case SERVICES.Luxometer.DATA.toLowerCase():
+      //   this._readLuxometerNotifications(peripheral, value);
+      //   break;
       case SERVICES.Temperature.DATA.toLowerCase():
         this._readTemperatureNotifications(peripheral, value);
         break;
       case SERVICES.Barometer.DATA.toLowerCase():
         this._readBarometerNotifications(peripheral, value);
         break;
-      case SERVICES.Humidity.DATA.toLowerCase():
-        this._readHumidityNotifications(peripheral, value);
-        break;
-      case SERVICES.Accelerometer.DATA.toLowerCase():
-        this._readMovementNotifications(peripheral, value);
-        break;
-      case SERVICES.IOBUTTON.DATA.toLowerCase():
-        this._readSensorBtnNotifications(peripheral, value);
-        break;
+      // case SERVICES.Humidity.DATA.toLowerCase():
+      //   this._readHumidityNotifications(peripheral, value);
+      //   break;
+      // case SERVICES.Accelerometer.DATA.toLowerCase():
+      //   this._readMovementNotifications(peripheral, value);
+      //   break;
+      // case SERVICES.IOBUTTON.DATA.toLowerCase():
+      //   this._readSensorBtnNotifications(peripheral, value);
+      //   break;
       default:
         break;
     }
@@ -329,8 +338,6 @@ export class InvestigationDetailsComponent extends Component<{}> {
     magnetometerChartId
   ) {
     const service = SERVICES.Accelerometer;
-    console.log('accelerometer');
-
     this._asyncStartNotificationsForService(service, device, [1, 0]);
   }
 
@@ -370,8 +377,7 @@ export class InvestigationDetailsComponent extends Component<{}> {
     const displayVal = `${pressureValue} hPa at ${tempValue} °C`;
 
     const dataValueMap = {
-      hPa: pressureValue,
-      '°C': tempValue
+      'Pressure (hPa)': pressureValue
     };
     this._updateSensorValue(sensorName, deviceId, displayVal, dataValueMap);
   }
@@ -398,7 +404,7 @@ export class InvestigationDetailsComponent extends Component<{}> {
     const displayVal = `${values.amb.value}°C [Amb], ${values.ir.value}°C [IR]`;
     const dataValueMap = {
       [values.amb.key]: values.amb.value,
-      [values.ir.key]: values.ir.value
+      [values.ir.key]: values.ir.value/10
     };
     this._updateSensorValue(sensorName, deviceId, displayVal, dataValueMap);
   }
@@ -435,15 +441,11 @@ export class InvestigationDetailsComponent extends Component<{}> {
 
     try {
       await this._startNotificationForService(device, service);
-      console.log('start notif');
       // Write the delay time
       await this._writePeriodToDevice(device, service, sampleIntervalTime);
-      console.log('start period');
       // Switch on the sensor
       await this._writeToDevice(device, service, activationBits);
-      console.log('switch on sensor');
     } catch (e) {
-      console.log(e);
       onAppError('Unable to write to device! Please reconnect device', e);
     }
   };
@@ -616,12 +618,12 @@ export class InvestigationDetailsComponent extends Component<{}> {
       [
         {
           text: 'Cancel',
-          onPressIn: () => {},
+          onPress: () => {},
           style: 'cancel'
         },
         {
           text: 'Continue',
-          onPressIn: () => this._resetGraphs()
+          onPress: () => this._resetGraphs()
         }
       ],
       {
@@ -631,8 +633,17 @@ export class InvestigationDetailsComponent extends Component<{}> {
   }
 
   _resetGraphs() {
+    const { sensors } = this.state;
     this.stopGraphs();
     // Also reset the graph data
+    sensors.map(sensor => {
+      sensor.graph.data = [];
+      return sensor;
+    });
+
+    this.setState({
+      sensors
+    });
   }
 
   _getChartDatasets(chart, sensor, deviceId) {
@@ -848,7 +859,7 @@ export class InvestigationDetailsComponent extends Component<{}> {
   }
 
   _updateSensorValue(sensorName, deviceId, value, dataValueMap) {
-    const { sensors } = this.state;
+    const { sensors, graphs } = this.state;
     sensors.map(sensor => {
       if (sensor.name === sensorName) {
         if (!sensor.value) {
@@ -860,6 +871,15 @@ export class InvestigationDetailsComponent extends Component<{}> {
         dataValueMap = this._addTimeStampValues(dataValueMap);
         sensor.value[deviceId] = value;
         sensor.rawValue[deviceId] = dataValueMap;
+
+        if (graphs.started) {
+          Object.keys(sensor.graph.type).map(graphKey => {
+            const graph = sensor.graph.type[graphKey];
+            graph.data.push({
+              [graphKey]: dataValueMap[graph.label]
+            });
+          });
+        }
         return sensor;
       }
     });
@@ -996,8 +1016,7 @@ export class InvestigationDetailsComponent extends Component<{}> {
                 return (
                   <View style={styles.contentBox} key={i}>
                     <H4 style={[styles.text, styles.textBold]}>
-                      {' '}
-                      {sensor.name}{' '}
+                      {sensor.name}
                     </H4>
                     {sensor.parameters.length <= 0 ? null : (
                       <View>
@@ -1029,14 +1048,42 @@ export class InvestigationDetailsComponent extends Component<{}> {
                             </H6>
                           </View>
                         ))}
-                    {!display.graph ? null : (
-                      <View>
-                        <H6>
-                          {sensor.name}
-                          graph
-                        </H6>
-                      </View>
-                    )}
+                    {display.graph && sensor.graph ? (
+                      <VictoryChart
+                        theme={VictoryTheme.material}
+                        containerComponent={
+                          <VictoryZoomContainer
+                            minimumZoom={{ x: 10, y: 10 }}
+                          />
+                        }
+                      >
+                        <VictoryLegend
+                          x={125}
+                          y={50}
+                          orientation="vertical"
+                          gutter={20}
+                          standalone
+                          data={sensor.graph.legends}
+                        />
+
+                        <VictoryLabel
+                          x="50%"
+                          y="20"
+                          labelPlacement="vertical"
+                          text={sensor.config.graph.graphTitle}
+                          textAnchor="middle"
+                        />
+
+                        {Object.keys(sensor.graph.type).map(graphKey => (
+                          <VictoryLine
+                            key={graphKey}
+                            style={sensor.graph.type[graphKey].style}
+                            data={sensor.graph.type[graphKey].data}
+                            y={graphKey}
+                          />
+                        ))}
+                      </VictoryChart>
+                    ) : null}
                     {!display.grid ? null : (
                       <View>
                         <View>
@@ -1096,24 +1143,14 @@ export class InvestigationDetailsComponent extends Component<{}> {
                 </Button>
               )}
               {graphs.started ? (
-                <View>
-                  <Button
-                    type="success"
-                    uppercase={false}
-                    onPressIn={() => this.stopGraphs()}
-                    style={styles.footerButton}
-                  >
-                    Stop graphs
-                  </Button>
-                  <Button
-                    type="danger"
-                    uppercase={false}
-                    onPressIn={() => this.resetGraphs()}
-                    style={styles.footerButton}
-                  >
-                    Reset graphs
-                  </Button>
-                </View>
+                <Button
+                  type="success"
+                  uppercase={false}
+                  onPressIn={() => this.stopGraphs()}
+                  style={styles.footerButton}
+                >
+                  Stop graphs
+                </Button>
               ) : (
                 <Button
                   type="success"
@@ -1124,6 +1161,16 @@ export class InvestigationDetailsComponent extends Component<{}> {
                   Start graphs
                 </Button>
               )}
+              {graphs.startedAtLeastOnce ? (
+                <Button
+                  type="danger"
+                  uppercase={false}
+                  onPressIn={() => this.resetGraphs()}
+                  style={styles.footerButton}
+                >
+                  Reset graphs
+                </Button>
+              ) : null}
             </View>
           ) : null}
           {display.grid ? (

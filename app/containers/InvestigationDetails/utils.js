@@ -1,9 +1,92 @@
 import * as _ from 'lodash';
 import * as json2csv from 'papaparse';
 import moment from 'moment';
+import randomColor from 'randomcolor';
 
 import getStore from '../../store';
 import { saveFile } from '../FileHandling/actions';
+
+const _getGraphConfig = sensorName => {
+  // If there is just one parameter then it has to be y
+
+  let color = randomColor();
+  switch (sensorName.toLowerCase()) {
+    case 'accelerometer':
+    case 'barometer':
+      color = randomColor();
+      const hpaLabel = 'Pressure (hPa)';
+      return {
+        type: {
+          hPa: {
+            label: hpaLabel,
+            data: [],
+            style: {
+              data: {
+                stroke: color,
+                strokeWidth: 2,
+                strokeLinecap: 'round'
+              }
+            }
+          }
+        },
+        legends: [
+          {
+            name: hpaLabel,
+            symbol: { fill: color },
+            labels: { fill: color }
+          }
+        ]
+      };
+    case 'gyroscope':
+    case 'humidity':
+    case 'luxometer':
+    case 'magnetometer':
+    case 'temperature':
+      color = randomColor();
+      color1 = randomColor();
+      const ambLabel = 'Ambient Temperature (C)';
+      const irLabel = 'Target (IR) Temperature (C)';
+
+      return {
+        type: {
+          amb: {
+            label: ambLabel,
+            data: [],
+            style: {
+              data: {
+                stroke: color,
+                strokeWidth: 2,
+                strokeLinecap: 'round'
+              }
+            }
+          },
+          ir: {
+            label: irLabel,
+            data: [],
+            style: {
+              data: {
+                stroke: color1,
+                strokeWidth: 2,
+                strokeLinecap: 'round'
+              }
+            }
+          }
+        },
+        legends: [
+          {
+            name: ambLabel,
+            symbol: { fill: color },
+            labels: { fill: color }
+          },
+          {
+            name: irLabel,
+            symbol: { fill: color1 },
+            labels: { fill: color1 }
+          }
+        ]
+      };
+  }
+};
 
 export function _getSensorTags(sensorTags) {
   let tags = [];
@@ -24,6 +107,7 @@ export function _getSensorTags(sensorTags) {
           sensor.graph.graphdisplay ||
           sensor.grid.griddisplay
         ) {
+          const graphData = _getGraphConfig(iSensor);
           let parameters = [];
           _.map(_.keys(sensor.parameters), key => {
             const value = sensor.parameters[key];
@@ -37,6 +121,7 @@ export function _getSensorTags(sensorTags) {
             config: sensor,
             value: {},
             rawValue: {},
+            graph: graphData,
             parameters
           });
         }
