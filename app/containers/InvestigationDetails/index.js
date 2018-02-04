@@ -86,24 +86,24 @@ export class InvestigationDetailsComponent extends Component<{}> {
     const { peripheral, characteristic, value } = data;
 
     switch (characteristic.toLowerCase()) {
-      // case SERVICES.Luxometer.DATA.toLowerCase():
-      //   this._readLuxometerNotifications(peripheral, value);
-      //   break;
+      case SERVICES.Luxometer.DATA.toLowerCase():
+        this._readLuxometerNotifications(peripheral, value);
+        break;
       case SERVICES.Temperature.DATA.toLowerCase():
         this._readTemperatureNotifications(peripheral, value);
         break;
       case SERVICES.Barometer.DATA.toLowerCase():
         this._readBarometerNotifications(peripheral, value);
         break;
-      // case SERVICES.Humidity.DATA.toLowerCase():
-      //   this._readHumidityNotifications(peripheral, value);
-      //   break;
-      // case SERVICES.Accelerometer.DATA.toLowerCase():
-      //   this._readMovementNotifications(peripheral, value);
-      //   break;
-      // case SERVICES.IOBUTTON.DATA.toLowerCase():
-      //   this._readSensorBtnNotifications(peripheral, value);
-      //   break;
+      case SERVICES.Humidity.DATA.toLowerCase():
+        this._readHumidityNotifications(peripheral, value);
+        break;
+      case SERVICES.Accelerometer.DATA.toLowerCase():
+        this._readMovementNotifications(peripheral, value);
+        break;
+      case SERVICES.IOBUTTON.DATA.toLowerCase():
+        this._readSensorBtnNotifications(peripheral, value);
+        break;
       default:
         break;
     }
@@ -212,14 +212,14 @@ export class InvestigationDetailsComponent extends Component<{}> {
             case 'barometer':
               this._startBarometerNotifications(device);
               break;
-            case 'accelerometer':
-            case 'gyroscope':
-            case 'magnetometer':
-              this._startMovementNotifications(device);
-              break;
-            case 'humidity':
-              this._startHumidityNotifications(device);
-              break;
+            // case 'accelerometer':
+            // case 'gyroscope':
+            // case 'magnetometer':
+            //   this._startMovementNotifications(device);
+            //   break;
+            // case 'humidity':
+            //   this._startHumidityNotifications(device);
+            //   break;
             case 'luxometer':
               this._startLuxometerNotifications(device);
               break;
@@ -577,7 +577,6 @@ export class InvestigationDetailsComponent extends Component<{}> {
     // Need datasets to decide if the grids can work
     const datasets = this._getSensorDatasets(sensor);
     const allDatasets = datasetsAvailable.concat(datasets);
-    console.log(allDatasets);
 
     this.setState({
       datasetsAvailable: allDatasets

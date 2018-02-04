@@ -7,13 +7,10 @@ import getStore from '../../store';
 import { saveFile } from '../FileHandling/actions';
 
 const _getGraphConfig = sensorName => {
-  // If there is just one parameter then it has to be y
-
   let color = randomColor();
   switch (sensorName.toLowerCase()) {
     case 'accelerometer':
     case 'barometer':
-      color = randomColor();
       const hpaLabel = 'Pressure (hPa)';
       return {
         type: {
@@ -37,10 +34,34 @@ const _getGraphConfig = sensorName => {
           }
         ]
       };
+    case 'luxometer':
+      const luxLabel = 'lux';
+      return {
+        type: {
+          lux: {
+            label: luxLabel,
+            data: [],
+            style: {
+              data: {
+                stroke: color,
+                strokeWidth: 2,
+                strokeLinecap: 'round'
+              }
+            }
+          }
+        },
+        legends: [
+          {
+            name: luxLabel,
+            symbol: { fill: color },
+            labels: { fill: color }
+          }
+        ]
+      };
     case 'gyroscope':
     case 'humidity':
-    case 'luxometer':
     case 'magnetometer':
+      return;
     case 'temperature':
       color = randomColor();
       color1 = randomColor();
