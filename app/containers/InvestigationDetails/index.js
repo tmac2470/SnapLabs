@@ -812,6 +812,33 @@ export class InvestigationDetailsComponent extends Component<{}> {
     }
   }
 
+  saveGraphData() {
+    const {
+      connectedDevices,
+      sensors,
+      sampleIntervalTime,
+      investigation
+    } = this.state;
+    const { user, onAppBusy, onAppError } = this.props;
+    onAppBusy(true);
+    const asyncSave = async () => {
+      try {
+        await utils._saveGraphData(
+          connectedDevices,
+          sensors,
+          sampleIntervalTime,
+          investigation,
+          user
+        );
+      } catch (error) {
+        onAppBusy(false);
+        onAppError(error);
+      }
+      onAppBusy(false);
+    };
+    asyncSave();
+  }
+
   saveGridData() {
     const {
       connectedDevices,
@@ -819,17 +846,22 @@ export class InvestigationDetailsComponent extends Component<{}> {
       sampleIntervalTime,
       investigation
     } = this.state;
-    const { user, onAppBusy } = this.props;
+    const { user, onAppBusy, onAppError } = this.props;
 
     onAppBusy(true);
     const asyncSave = async () => {
-      await utils._saveGridData(
-        connectedDevices,
-        sensors,
-        sampleIntervalTime,
-        investigation,
-        user
-      );
+      try {
+        await utils._saveGridData(
+          connectedDevices,
+          sensors,
+          sampleIntervalTime,
+          investigation,
+          user
+        );
+      } catch (error) {
+        onAppBusy(false);
+        onAppError(error);
+      }
       onAppBusy(false);
     };
     asyncSave();
@@ -1024,7 +1056,7 @@ export class InvestigationDetailsComponent extends Component<{}> {
               {!graphs.startedAtLeastOnce ? null : (
                 <Button
                   uppercase={false}
-                  onPressIn={() => {}}
+                  onPressIn={() => this.saveGraphData()}
                   style={styles.footerButton}
                 >
                   Save graph data

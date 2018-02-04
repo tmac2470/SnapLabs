@@ -283,7 +283,13 @@ export function _saveGridData(
 }
 
 // Pick data from the sensor.rawValues
-export function _saveGraphData(connectedDevices, charts, sampleIntervalTime) {
+export function _saveGraphData(
+  connectedDevices,
+  sensors,
+  sampleIntervalTime,
+  investigation,
+  user
+) {
   const fields = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
   const graphData = [];
 
@@ -296,49 +302,69 @@ export function _saveGraphData(connectedDevices, charts, sampleIntervalTime) {
     graphData.push({ A: '', B: '' });
     graphData.push({ A: `Sensor Identifier ${device.id}`, B: '' });
 
-    _.keys(charts).map(chartId => {
+    sensors.map(sensor => {
       graphData.push({ A: '', B: '' });
       graphData.push({ A: '', B: '' });
-      graphData.push({ A: `Type: ${chartId}`, B: '' });
-      graphData.push({ A: '', B: '' });
 
-      /**
-       * First collect all the units used
-       * Assign a header/field value to each unit
-       * Use the field value of the unit to push data into it
-       */
-      let unitMap = {};
-      let fieldMap = {};
+      const graph = sensor.graph[deviceId];
+      Object.keys(graph.type).map(graphKey => {
 
-      charts[chartId].data.labels.map(label => {
-        if (device.id === label.deviceId) {
-          _.keys(label.dataValueMap).map((dataValueKey, i) => {
-            if (!unitMap[dataValueKey]) {
-              unitMap[dataValueKey] = {};
-            }
-            unitMap[dataValueKey] = fields[i];
-            fieldMap[fields[i]] = dataValueKey;
-          });
-        }
-      });
-      graphData.push(fieldMap);
+        const data = graph.type[graphKey];
+        graphData.push({ A: `Type: ${data.label}`, B: '' });
+        graphData.push({ A: '', B: '' });
 
-      charts[chartId].data.labels.map(label => {
-        if (device.id === label.deviceId) {
-          let modifiedDataValueMap = {};
-
-          _.keys(label.dataValueMap).map(dataValueKey => {
-            if (!modifiedDataValueMap[unitMap[dataValueKey]]) {
-              modifiedDataValueMap[unitMap[dataValueKey]] = {};
-            }
-            modifiedDataValueMap[unitMap[dataValueKey]] =
-              label.dataValueMap[dataValueKey];
-          });
-
-          graphData.push(modifiedDataValueMap);
-        }
+        data.data.forEach(d => {
+          graphData.push({
+            A: graphKey,
+            B: d[graphKey]
+          })
+        });
       });
     });
+
+    // _.keys(charts).map(chartId => {
+    //   graphData.push({ A: '', B: '' });
+    //   graphData.push({ A: '', B: '' });
+    //   graphData.push({ A: `Type: ${chartId}`, B: '' });
+    //   graphData.push({ A: '', B: '' });
+
+    //   /**
+    //    * First collect all the units used
+    //    * Assign a header/field value to each unit
+    //    * Use the field value of the unit to push data into it
+    //    */
+    //   let unitMap = {};
+    //   let fieldMap = {};
+
+    //   charts[chartId].data.labels.map(label => {
+    //     if (device.id === label.deviceId) {
+    //       _.keys(label.dataValueMap).map((dataValueKey, i) => {
+    //         if (!unitMap[dataValueKey]) {
+    //           unitMap[dataValueKey] = {};
+    //         }
+    //         unitMap[dataValueKey] = fields[i];
+    //         fieldMap[fields[i]] = dataValueKey;
+    //       });
+    //     }
+    //   });
+    //   graphData.push(fieldMap);
+
+    //   charts[chartId].data.labels.map(label => {
+    //     if (device.id === label.deviceId) {
+    //       let modifiedDataValueMap = {};
+
+    //       _.keys(label.dataValueMap).map(dataValueKey => {
+    //         if (!modifiedDataValueMap[unitMap[dataValueKey]]) {
+    //           modifiedDataValueMap[unitMap[dataValueKey]] = {};
+    //         }
+    //         modifiedDataValueMap[unitMap[dataValueKey]] =
+    //           label.dataValueMap[dataValueKey];
+    //       });
+
+    //       graphData.push(modifiedDataValueMap);
+    //     }
+    //   });
+    // });
   });
   console.log(fields);
   console.log(graphData);
