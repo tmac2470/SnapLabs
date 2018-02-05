@@ -128,7 +128,7 @@ export class InvestigationDetailsComponent extends Component<{}> {
   }
 
   _writePeriodToDevice(device, service, sampleIntervalTime) {
-    const period = [sampleIntervalTime / 10];
+    const period = [sampleIntervalTime * 10];
     return BleManager.write(device.id, service.UUID, service.PERIOD, period);
   }
 
@@ -359,7 +359,7 @@ export class InvestigationDetailsComponent extends Component<{}> {
     const displayVal = `${values.hPa} hPa at ${values.c} °C`;
 
     const dataValueMap = {
-      'hPa': values.hPa,
+      hPa: values.hPa,
       '°C': values.c
     };
     this._updateSensorValue(sensorName, deviceId, displayVal, dataValueMap);
@@ -629,12 +629,14 @@ export class InvestigationDetailsComponent extends Component<{}> {
   }
 
   _resetGraphs() {
-    const { sensors } = this.state;
+    const { sensors, connectedDevices } = this.state;
     this.stopGraphs();
     // Also reset the graph data
-    sensors.map(sensor => {
-      Object.keys(sensor.graph.type).map(graphKey => {
-        sensor.graph.type[graphKey].data = [];
+    Object.keys(connectedDevices).map(deviceId => {
+      sensors.map(sensor => {
+        Object.keys(sensor.graph[deviceId].type).map(graphKey => {
+          sensor.graph[deviceId].type[graphKey].data = [];
+        });
       });
     });
 
@@ -773,9 +775,9 @@ export class InvestigationDetailsComponent extends Component<{}> {
             graph.data.push({
               [graphKey]: dataValueMap[graph.label]
             });
-
-            sensor.graph[deviceId].rawValues.push(dataValueMap);
           });
+
+          sensor.graph[deviceId].rawValues.push(dataValueMap);
         }
         return sensor;
       }

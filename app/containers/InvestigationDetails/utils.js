@@ -47,7 +47,7 @@ const _getGraphConfig = (sensor, devices) => {
   return Object.keys(devices).map(deviceId => {
     switch (sensor.name.toLowerCase()) {
       case 'barometer':
-        const hpaLabel = 'Pressure (hPa)';
+        const hpaLabel = 'hPa';
         config[deviceId] = {
           type: {
             hPa: _getDataset(hpaLabel, color)
@@ -85,8 +85,8 @@ const _getGraphConfig = (sensor, devices) => {
         config.legends = [_getLegend(luxLabel, color)];
         return config;
       case 'temperature':
-        const ambLabel = 'Ambient Temperature (C)';
-        const irLabel = 'Target (IR) Temperature (C)';
+        const ambLabel = 'Ambient Temperature (°C)';
+        const irLabel = 'Target (IR) Temperature (°C)';
 
         config[deviceId] = {
           type: {},
@@ -318,7 +318,6 @@ export function _saveGraphData(
       const graph = sensor.graph[deviceId];
 
       const headers = {};
-      const values = {};
       graph.rawValues.map(rawValue => {
         Object.keys(rawValue).map((key, i) => {
           headers[fields[i]] = key;
@@ -327,12 +326,14 @@ export function _saveGraphData(
       graphData.push(headers);
 
       graph.rawValues.map(rawValue => {
+        const values = {};
         Object.keys(rawValue).map((key, i) => {
           values[fields[i]] = rawValue[key];
         });
 
         graphData.push(values);
       });
+
       graphData.push({ A: '', B: '' });
     });
   });
