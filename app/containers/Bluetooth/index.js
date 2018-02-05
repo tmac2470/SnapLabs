@@ -54,7 +54,7 @@ export class BluetoothConnectComponent extends Component<{}> {
 
     if (!bluetoothStarted) {
       // Call .start only once
-      BleManager.start({ showAlert: false })
+      BleManager.start({ showAlert: true })
         .then(e => {
           // Start scan once initialisation complete
           this.startScan();
