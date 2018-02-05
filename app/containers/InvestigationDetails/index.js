@@ -43,8 +43,8 @@ export class InvestigationDetailsComponent extends Component<{}> {
     investigation: {},
     sensors: [],
     graphs: {
-      started: true,
-      startedAtLeastOnce: true
+      started: false,
+      startedAtLeastOnce: false
     },
     sampleIntervalTime: 1000,
     display: {
@@ -359,7 +359,7 @@ export class InvestigationDetailsComponent extends Component<{}> {
     const displayVal = `${values.hPa} hPa at ${values.c} °C`;
 
     const dataValueMap = {
-      'Pressure (hPa)': values.hPa,
+      'hPa': values.hPa,
       '°C': values.c
     };
     this._updateSensorValue(sensorName, deviceId, displayVal, dataValueMap);
@@ -382,8 +382,8 @@ export class InvestigationDetailsComponent extends Component<{}> {
     const displayVal = `${values.amb}°C [Amb], ${values.ir}°C [IR]`;
 
     const dataValueMap = {
-      'Ambient Temperature (C)': values.amb,
-      'Target (IR) Temperature (C)': values.ir / 10
+      'Ambient Temperature (°C)': values.amb,
+      'Target (IR) Temperature (°C)': values.ir / 10
     };
     this._updateSensorValue(sensorName, deviceId, displayVal, dataValueMap);
   }
