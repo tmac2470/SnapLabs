@@ -1,7 +1,8 @@
-import axios from "axios";
-import { FETCH_INVESTIGATIONS_SUCCESS } from "./constants";
-import { API_PATH } from "../../../constants";
-import { appBusy, appError } from "../../../Metastores/actions";
+import axios from 'axios';
+import { FETCH_INVESTIGATIONS_SUCCESS } from './constants';
+import { API_PATH } from '../../../constants';
+import { appBusy, appError } from '../../../Metastores/actions';
+import { stringify } from 'query-string';
 
 export function fetchInvestigationsSuccess(investigations) {
   return {
@@ -10,8 +11,10 @@ export function fetchInvestigationsSuccess(investigations) {
   };
 }
 
-export const fetchInvestigations = () => {
-  const apiUrl = `${API_PATH}/experiments`;
+export const fetchInvestigations = params => {
+  const queryString = stringify(params);
+  const apiUrl = `${API_PATH}/experiments?${queryString}`;
+
   // Returns a dispatcher function
   // that dispatches an action at a later time
   return dispatch => {

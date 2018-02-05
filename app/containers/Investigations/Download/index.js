@@ -1,16 +1,16 @@
-import React, { Component } from "react";
-import { connect } from "react-redux";
-import { View } from "react-native";
-import InvestigationList from "../../../components/InvestigationList";
+import React, { Component } from 'react';
+import { connect } from 'react-redux';
+import { View } from 'react-native';
+import InvestigationList from '../../../components/InvestigationList';
 import FullScreenLoader from '../../../components/FullScreenLoading';
 
-import Colors from "../../../Theme/colors";
-import { fetchInvestigations } from "./actions";
-import { fetchInvestigationById, deleteInvestigation } from "../Local/actions";
+import Colors from '../../../Theme/colors';
+import { fetchInvestigations } from './actions';
+import { fetchInvestigationById, deleteInvestigation } from '../Local/actions';
 
 export class DownloadInvestigationsComponent extends Component<{}> {
   static navigationOptions = {
-    title: "Download Investigations"
+    title: 'Download Investigations'
   };
 
   state = {
@@ -24,9 +24,15 @@ export class DownloadInvestigationsComponent extends Component<{}> {
     });
   }
 
-  componentWillMount() {
+  componentDidMount() {
     const { onFetchInvestigations } = this.props;
-    onFetchInvestigations();
+    const params = {
+      afterDate: '2016-12-01',
+      fields: 'all',
+      query: '',
+      sort: '-lastupdated'
+    };
+    onFetchInvestigations(params);
   }
 
   _convertObjectToArray = obj => {
@@ -34,7 +40,6 @@ export class DownloadInvestigationsComponent extends Component<{}> {
       return obj[key];
     });
   };
-
 
   render() {
     const {
@@ -47,13 +52,11 @@ export class DownloadInvestigationsComponent extends Component<{}> {
       onFetchInvestigations
     } = this.props;
 
-    const investigationsArray = this._convertObjectToArray(
-      investigations
-    );
+    const investigationsArray = this._convertObjectToArray(investigations);
 
     return (
       <View style={styles.container}>
-        <FullScreenLoader visible={!!busy}/>
+        <FullScreenLoader visible={!!busy} />
         <InvestigationList
           investigations={investigationsArray}
           localInvestigations={localInvestigations}
@@ -87,7 +90,7 @@ const mapDispatchToProps = dispatch => {
   return {
     onDeleteInvestigation: investigation =>
       dispatch(deleteInvestigation(investigation)),
-    onFetchInvestigations: _ => dispatch(fetchInvestigations()),
+    onFetchInvestigations: params => dispatch(fetchInvestigations(params)),
     onDownloadInvestigation: id => dispatch(fetchInvestigationById(id))
   };
 };
