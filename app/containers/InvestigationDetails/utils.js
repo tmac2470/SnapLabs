@@ -51,7 +51,8 @@ const _getGraphConfig = (sensor, devices) => {
         config[deviceId] = {
           type: {
             hPa: _getDataset(hpaLabel, color)
-          }
+          },
+          rawValues: []
         };
         config.legends = [_getLegend(hpaLabel, color)];
         return config;
@@ -63,7 +64,8 @@ const _getGraphConfig = (sensor, devices) => {
           type: {
             temp: _getDataset(humTEMPLabel, color),
             rh: _getDataset(humRHLabel, color1)
-          }
+          },
+          rawValues: []
         };
         config.legends = [
           _getLegend(humTEMPLabel, color),
@@ -77,7 +79,8 @@ const _getGraphConfig = (sensor, devices) => {
         config[deviceId] = {
           type: {
             lux: _getDataset(luxLabel, color)
-          }
+          },
+          rawValues: []
         };
         config.legends = [_getLegend(luxLabel, color)];
         return config;
@@ -86,7 +89,8 @@ const _getGraphConfig = (sensor, devices) => {
         const irLabel = 'Target (IR) Temperature (C)';
 
         config[deviceId] = {
-          type: {}
+          type: {},
+          rawValues: []
         };
         config.legends = [];
 
@@ -104,7 +108,8 @@ const _getGraphConfig = (sensor, devices) => {
 
       case 'magnetometer':
         config[deviceId] = {
-          type: {}
+          type: {},
+          rawValues: []
         };
         config.legends = [];
 
@@ -127,7 +132,8 @@ const _getGraphConfig = (sensor, devices) => {
         return config;
       case 'accelerometer':
         config[deviceId] = {
-          type: {}
+          type: {},
+          rawValues: []
         };
         config.legends = [];
         if (sensorParams.xyz) {
@@ -149,7 +155,8 @@ const _getGraphConfig = (sensor, devices) => {
         return config;
       case 'gyroscope':
         config[deviceId] = {
-          type: {}
+          type: {},
+          rawValues: []
         };
         config.legends = [];
         config[deviceId].type['gyrox'] = _getDataset(xLabel, color);
@@ -305,71 +312,32 @@ export function _saveGraphData(
     sensors.map(sensor => {
       graphData.push({ A: '', B: '' });
       graphData.push({ A: '', B: '' });
+      graphData.push({ A: `Type: ${sensor.name}`, B: '' });
+      graphData.push({ A: '', B: '' });
 
       const graph = sensor.graph[deviceId];
-      Object.keys(graph.type).map(graphKey => {
 
-        const data = graph.type[graphKey];
-        graphData.push({ A: `Type: ${data.label}`, B: '' });
-        graphData.push({ A: '', B: '' });
-
-        data.data.forEach(d => {
-          graphData.push({
-            A: graphKey,
-            B: d[graphKey]
-          })
+      const headers = {};
+      const values = {};
+      graph.rawValues.map(rawValue => {
+        Object.keys(rawValue).map((key, i) => {
+          headers[fields[i]] = key;
         });
       });
+      graphData.push(headers);
+
+      graph.rawValues.map(rawValue => {
+        Object.keys(rawValue).map((key, i) => {
+          values[fields[i]] = rawValue[key];
+        });
+
+        graphData.push(values);
+      });
+      graphData.push({ A: '', B: '' });
     });
-
-    // _.keys(charts).map(chartId => {
-    //   graphData.push({ A: '', B: '' });
-    //   graphData.push({ A: '', B: '' });
-    //   graphData.push({ A: `Type: ${chartId}`, B: '' });
-    //   graphData.push({ A: '', B: '' });
-
-    //   /**
-    //    * First collect all the units used
-    //    * Assign a header/field value to each unit
-    //    * Use the field value of the unit to push data into it
-    //    */
-    //   let unitMap = {};
-    //   let fieldMap = {};
-
-    //   charts[chartId].data.labels.map(label => {
-    //     if (device.id === label.deviceId) {
-    //       _.keys(label.dataValueMap).map((dataValueKey, i) => {
-    //         if (!unitMap[dataValueKey]) {
-    //           unitMap[dataValueKey] = {};
-    //         }
-    //         unitMap[dataValueKey] = fields[i];
-    //         fieldMap[fields[i]] = dataValueKey;
-    //       });
-    //     }
-    //   });
-    //   graphData.push(fieldMap);
-
-    //   charts[chartId].data.labels.map(label => {
-    //     if (device.id === label.deviceId) {
-    //       let modifiedDataValueMap = {};
-
-    //       _.keys(label.dataValueMap).map(dataValueKey => {
-    //         if (!modifiedDataValueMap[unitMap[dataValueKey]]) {
-    //           modifiedDataValueMap[unitMap[dataValueKey]] = {};
-    //         }
-    //         modifiedDataValueMap[unitMap[dataValueKey]] =
-    //           label.dataValueMap[dataValueKey];
-    //       });
-
-    //       graphData.push(modifiedDataValueMap);
-    //     }
-    //   });
-    // });
   });
-  console.log(fields);
-  console.log(graphData);
 
-  // this.saveDataToFile(fields, graphData);
+  return saveDataToFile(fields, graphData, investigation, user);
 }
 
 function _convertArrayToCSV(fields, data) {

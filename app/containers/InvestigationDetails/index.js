@@ -359,7 +359,8 @@ export class InvestigationDetailsComponent extends Component<{}> {
     const displayVal = `${values.hPa} hPa at ${values.c} °C`;
 
     const dataValueMap = {
-      'Pressure (hPa)': values.hPa
+      'Pressure (hPa)': values.hPa,
+      '°C': values.c
     };
     this._updateSensorValue(sensorName, deviceId, displayVal, dataValueMap);
   }
@@ -772,6 +773,8 @@ export class InvestigationDetailsComponent extends Component<{}> {
             graph.data.push({
               [graphKey]: dataValueMap[graph.label]
             });
+
+            sensor.graph[deviceId].rawValues.push(dataValueMap);
           });
         }
         return sensor;
