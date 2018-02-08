@@ -8,5 +8,6 @@ export default class Colors {
   static valid = "#17B978";
   static success = "green";
   static white = "#fff";
+  static dark = "#000";
   static backgroundBlurColor = "#00000040";
 }

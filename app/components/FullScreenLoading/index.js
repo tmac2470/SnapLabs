@@ -23,8 +23,6 @@ const FullScreenLoader = props => {
   )
 }
 
-// <ActivityIndicator animating={visible} size={'large'}/>
-
 const styles = StyleSheet.create({
   modalBackground: {
     flex: 1,

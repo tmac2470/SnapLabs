@@ -214,11 +214,11 @@ export class InvestigationDetailsComponent extends Component<{}> {
             case 'barometer':
               await this._startBarometerNotifications(device);
               break;
-            // case 'accelerometer':
-            // case 'gyroscope':
-            // case 'magnetometer':
-            //   this._startMovementNotifications(device);
-            //   break;
+            case 'accelerometer':
+            case 'gyroscope':
+            case 'magnetometer':
+              this._startMovementNotifications(device);
+              break;
             case 'humidity':
               await this._startHumidityNotifications(device);
               break;
