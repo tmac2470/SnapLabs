@@ -1,6 +1,13 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { View, Modal, Text, TextInput } from 'react-native';
+import {
+  View,
+  Modal,
+  Text,
+  DatePickerIOS,
+  Picker,
+  TouchableOpacity
+} from 'react-native';
 import InvestigationList from '../../../components/InvestigationList';
 import FullScreenLoader from '../../../components/FullScreenLoading';
 
@@ -88,6 +95,9 @@ export class DownloadInvestigationsComponent extends Component<{}> {
     const { filters } = this.state;
 
     const investigationsArray = this._convertObjectToArray(investigations);
+    const propFilters = this.props.filters;
+    const filtersSelected =
+      Object.keys(propFilters).filter(key => !!propFilters[key]).length > 0;
 
     return (
       <View style={styles.container}>
@@ -140,6 +150,14 @@ export class DownloadInvestigationsComponent extends Component<{}> {
                 />
               </View>
 
+              <H5 style={styles.text}>After Date</H5>
+              <DatePickerIOS
+                date={new Date(filters.afterDate)}
+                mode="date"
+                maximumDate={new Date()}
+                onDateChange={afterDate => this.updateFilters({ afterDate })}
+              />
+
               <View style={styles.footerButtonContainer}>
                 <Button
                   uppercase={false}
@@ -160,7 +178,7 @@ export class DownloadInvestigationsComponent extends Component<{}> {
             uppercase={false}
             onPressIn={() => this.openModal()}
             style={styles.footerButton}
-            iconName={isBusy ? 'ios-checkmark-circle' : ''}
+            iconName={filtersSelected ? 'ios-checkmark-circle' : ''}
           >
             Filters
           </Button>
@@ -170,6 +188,19 @@ export class DownloadInvestigationsComponent extends Component<{}> {
   }
 }
 
+// <Picker
+// selectedValue={filters.sort}
+// onValueChange={sort => this.updateFilters({ sort })}
+// >
+// <Picker.Item label="Created(Asc)" value="createdat" />
+// <Picker.Item label="Created(Desc)" value="-createdat" />
+// <Picker.Item label="Last Updated(Asc)" value="lastupdated" />
+// <Picker.Item label="Last Updated(Desc)" value="-lastupdated" />
+// <Picker.Item label="Author(Asc)" value="author" />
+// <Picker.Item label="Author(Desc)" value="-author" />
+
+// </Picker>
+
 const styles = {
   container: {
     flexDirection: 'column',
@@ -177,6 +208,10 @@ const styles = {
   },
   inputText: {
     fontSize: 18
+  },
+  text: {
+    fontSize: 18,
+    color: Colors.dark
   },
   modalContainer: {
     flex: 1,
