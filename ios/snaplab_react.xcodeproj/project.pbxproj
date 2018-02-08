@@ -5,7 +5,6 @@
 	};
 	objectVersion = 46;
 	objects = {
-
 /* Begin PBXBuildFile section */
 		00C302E51ABCBA2D00DB3ED1 /* libRCTActionSheet.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 00C302AC1ABCB8CE00DB3ED1 /* libRCTActionSheet.a */; };
 		00C302E71ABCBA2D00DB3ED1 /* libRCTGeolocation.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 00C302BA1ABCB90400DB3ED1 /* libRCTGeolocation.a */; };
@@ -54,6 +53,7 @@
 		E3469A23181D466D867ECC7D /* libRNSVG.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 677656BD114A464EB8D73122 /* libRNSVG.a */; };
 		EA211615E3B14CA9BACA198E /* Ionicons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 145BFF226DB24518AB599299 /* Ionicons.ttf */; };
 		F994A6F5582D4EDFB498B83E /* MaterialCommunityIcons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 16EB4DA68D334AE093792E4B /* MaterialCommunityIcons.ttf */; };
+		665ADEEC7E4A4B09B059EE5E /* libBleClient.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 8E299EFCED9C4EB2BA91AEE1 /* libBleClient.a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -445,6 +445,8 @@
 		E6D0EFA8AD5447A4A6BF2BDE /* libRNSpinkit.a */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = archive.ar; path = libRNSpinkit.a; sourceTree = "<group>"; };
 		F8418B3396EA4E5F9F07226C /* Octicons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Octicons.ttf; path = "../node_modules/react-native-vector-icons/Fonts/Octicons.ttf"; sourceTree = "<group>"; };
 		FBF86E7409F044E9BCE37448 /* libRNVectorIcons.a */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = archive.ar; path = libRNVectorIcons.a; sourceTree = "<group>"; };
+		65A7E19FDCAF4309B4D86C8E /* BleClient.xcodeproj */ = {isa = PBXFileReference; name = "BleClient.xcodeproj"; path = "../node_modules/react-native-ble-plx/ios/BleClient.xcodeproj"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = wrapper.pb-project; explicitFileType = undefined; includeInIndex = 0; };
+		8E299EFCED9C4EB2BA91AEE1 /* libBleClient.a */ = {isa = PBXFileReference; name = "libBleClient.a"; path = "libBleClient.a"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = archive.ar; explicitFileType = undefined; includeInIndex = 0; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -480,6 +482,7 @@
 				6532E704ED54464798D821A6 /* libRNFS.a in Frameworks */,
 				3BF64FFC739746439BBDF3BD /* libBleManager.a in Frameworks */,
 				E3469A23181D466D867ECC7D /* libRNSVG.a in Frameworks */,
+				665ADEEC7E4A4B09B059EE5E /* libBleClient.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -679,6 +682,7 @@
 				8B3E9E9157B1491A8C10B12A /* RNFS.xcodeproj */,
 				816BABD8B6B344A3A8988F37 /* BleManager.xcodeproj */,
 				A3C713956EA74269A40CDA44 /* RNSVG.xcodeproj */,
+				65A7E19FDCAF4309B4D86C8E /* BleClient.xcodeproj */,
 			);
 			name = Libraries;
 			sourceTree = "<group>";
@@ -1483,12 +1487,14 @@
 					"$(SRCROOT)/../node_modules/react-native-fs/**",
 					"$(SRCROOT)/../node_modules/react-native-ble-manager/ios",
 					"$(SRCROOT)/../node_modules/react-native-svg/ios/**",
+					"$(SRCROOT)/../node_modules/react-native-ble-plx/ios/**",
 				);
 				INFOPLIST_FILE = snaplab_reactTests/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 				);
@@ -1516,12 +1522,14 @@
 					"$(SRCROOT)/../node_modules/react-native-fs/**",
 					"$(SRCROOT)/../node_modules/react-native-ble-manager/ios",
 					"$(SRCROOT)/../node_modules/react-native-svg/ios/**",
+					"$(SRCROOT)/../node_modules/react-native-ble-plx/ios/**",
 				);
 				INFOPLIST_FILE = snaplab_reactTests/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 				);
@@ -1551,6 +1559,7 @@
 					"$(SRCROOT)/../node_modules/react-native-fs/**",
 					"$(SRCROOT)/../node_modules/react-native-ble-manager/ios",
 					"$(SRCROOT)/../node_modules/react-native-svg/ios/**",
+					"$(SRCROOT)/../node_modules/react-native-ble-plx/ios/**",
 				);
 				INFOPLIST_FILE = snaplab_react/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
@@ -1580,6 +1589,7 @@
 					"$(SRCROOT)/../node_modules/react-native-fs/**",
 					"$(SRCROOT)/../node_modules/react-native-ble-manager/ios",
 					"$(SRCROOT)/../node_modules/react-native-svg/ios/**",
+					"$(SRCROOT)/../node_modules/react-native-ble-plx/ios/**",
 				);
 				INFOPLIST_FILE = snaplab_react/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
@@ -1615,11 +1625,13 @@
 					"$(SRCROOT)/../node_modules/react-native-fs/**",
 					"$(SRCROOT)/../node_modules/react-native-ble-manager/ios",
 					"$(SRCROOT)/../node_modules/react-native-svg/ios/**",
+					"$(SRCROOT)/../node_modules/react-native-ble-plx/ios/**",
 				);
 				INFOPLIST_FILE = "snaplab_react-tvOS/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 				);
@@ -1657,11 +1669,13 @@
 					"$(SRCROOT)/../node_modules/react-native-fs/**",
 					"$(SRCROOT)/../node_modules/react-native-ble-manager/ios",
 					"$(SRCROOT)/../node_modules/react-native-svg/ios/**",
+					"$(SRCROOT)/../node_modules/react-native-ble-plx/ios/**",
 				);
 				INFOPLIST_FILE = "snaplab_react-tvOS/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 				);
@@ -1694,6 +1708,7 @@
 					"$(inherited)",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = "com.facebook.REACT.snaplab_react-tvOSTests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -1718,6 +1733,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 				);

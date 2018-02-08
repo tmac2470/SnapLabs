@@ -3,6 +3,7 @@ package com.snaplab_react;
 import android.app.Application;
 
 import com.facebook.react.ReactApplication;
+import com.polidea.reactnativeble.BlePackage;
 import com.horcrux.svg.SvgPackage;
 import it.innove.BleManagerPackage;
 import com.rnfs.RNFSPackage;
@@ -30,6 +31,7 @@ public class MainApplication extends Application implements ReactApplication {
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
           new MainReactPackage(),
+            new BlePackage(),
             new SvgPackage(),
             new BleManagerPackage(),
             new RNFSPackage(),

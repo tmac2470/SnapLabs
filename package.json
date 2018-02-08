@@ -20,6 +20,7 @@
     "react": "16.0.0",
     "react-native": "0.51.0",
     "react-native-ble-manager": "^6.2.6",
+    "react-native-ble-plx": "^0.8.0",
     "react-native-fs": "^2.9.7",
     "react-native-photo-view": "^1.5.2",
     "react-native-spinkit": "^1.1.1",

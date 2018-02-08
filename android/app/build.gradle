@@ -137,6 +137,7 @@ android {
 }
 
 dependencies {
+    compile project(':react-native-ble-plx')
     compile project(':react-native-svg')
     compile project(':react-native-ble-manager')
     compile project(':react-native-fs')
