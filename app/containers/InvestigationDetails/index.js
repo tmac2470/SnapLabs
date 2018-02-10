@@ -438,7 +438,7 @@ export class InvestigationDetailsComponent extends Component<{}> {
       temp: roomTemp
     };
 
-    const displayVal = `${values.rh}% RH at ${values.temp.toFixed(3)} °C`;
+    const displayVal = `${values.rh.toFixed(3)}% RH at ${values.temp.toFixed(3)} °C`;
 
     const dataValueMap = {
       '°C': values.temp,
@@ -499,7 +499,7 @@ export class InvestigationDetailsComponent extends Component<{}> {
 
     const dataValueMap = {
       'Ambient Temperature (°C)': values.amb,
-      'Target (IR) Temperature (°C)': values.ir / 10
+      'Target (IR) Temperature (°C)': values.ir
     };
     this._updateSensorValue(sensorName, deviceId, displayVal, dataValueMap);
   }
