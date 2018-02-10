@@ -49,7 +49,7 @@ export class BluetoothConnectComponent extends Component<{}> {
   // Check if bluetooth is on.
   // Scan for devices
   // On device connect get all services
-  componentWillMount() {
+  componentDidMount() {
     if (Platform.OS === 'ios') {
       this.manager.onStateChange(state => {
         if (state === 'PoweredOn') {
@@ -87,7 +87,7 @@ export class BluetoothConnectComponent extends Component<{}> {
   }
 
   startScan() {
-    const { onAppError } = this.props;
+    const { onAppError, connectedDevices } = this.props;
     this.setState({ isBusy: true });
 
     this.manager.startDeviceScan(null, null, (error, device) => {
@@ -132,6 +132,7 @@ export class BluetoothConnectComponent extends Component<{}> {
     onDeviceConnect(device);
 
     this._getDeviceBatteryLevel(device);
+    this._getKeyPressed(device);
   }
 
   _getDeviceBatteryLevel(device) {
@@ -141,13 +142,36 @@ export class BluetoothConnectComponent extends Component<{}> {
     this.manager
       .readCharacteristicForDevice(device.id, UUID, DATA)
       .then(data => {
-        const { value } = data;
-        const array = base64.toByteArray(value).buffer;
-        const batteryLevel = new DataView(array).getInt8(0, true);
-        device.batteryLevel = batteryLevel;
+        device.batteryLevel = this._getInt8Value(data.value);
         onUpdateConnectedDevice(device);
       })
       .catch(e => onAppError(e.message));
+  }
+
+  _getInt8Value(value) {
+    const array = base64.toByteArray(value).buffer;
+    return new DataView(array).getInt8(0, true);
+  }
+
+  _getKeyPressed(device) {
+    const { onAppError } = this.props;
+    const { UUID, DATA } = SERVICES.IOBUTTON;
+
+    this.manager.monitorCharacteristicForDevice(
+      device.id,
+      UUID,
+      DATA,
+      (error, data) => {
+        if (error) {
+          onAppError(error.message);
+          return;
+        }
+        this._highlightConnectedDevice(
+          device.id,
+          this._getInt8Value(data.value)
+        );
+      }
+    );
   }
 
   disConnectDevice(device) {
@@ -166,21 +190,17 @@ export class BluetoothConnectComponent extends Component<{}> {
       });
   }
 
-  // _highlightConnectedDevice(deviceId, value) {
-  //   const { connectedDeviceKeyPressed } = this.state;
-  //   if (value.length > 0 && !!value[0]) {
-  //     if (value[0] > 0) {
-  //       connectedDeviceKeyPressed[deviceId] = true;
-  //     } else {
-  //       connectedDeviceKeyPressed[deviceId] = false;
-  //     }
-  //   } else {
-  //     connectedDeviceKeyPressed[deviceId] = false;
-  //   }
-  //   this.setState({
-  //     ...connectedDeviceKeyPressed
-  //   });
-  // }
+  _highlightConnectedDevice(deviceId, value) {
+    const { connectedDeviceKeyPressed } = this.state;
+    if (!!value) {
+      connectedDeviceKeyPressed[deviceId] = true;
+    } else {
+      connectedDeviceKeyPressed[deviceId] = false;
+    }
+    this.setState({
+      ...connectedDeviceKeyPressed
+    });
+  }
 
   _keyExtractor = (item, index) => item.id;
 
@@ -255,6 +275,12 @@ export class BluetoothConnectComponent extends Component<{}> {
     const numOfConnectedDevices = Object.keys(connectedDevices).length;
 
     const peripherals = peripheralMap.toArray();
+    // Object.keys(connectedDevices).map(key => {
+    //   const device = connectedDevices[key];
+    //   if (!peripheralMap.get(key)) {
+    //     peripherals.push(device);
+    //   }
+    // });
 
     return (
       <View style={styles.container}>
@@ -270,7 +296,6 @@ export class BluetoothConnectComponent extends Component<{}> {
         ) : null}
         <FlatList
           style={styles.list}
-          onRefresh={() => this.startScan}
           data={peripherals}
           refreshing={false}
           extraData={this.state}
