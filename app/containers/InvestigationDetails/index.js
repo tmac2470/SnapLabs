@@ -165,10 +165,16 @@ export class InvestigationDetailsComponent extends Component<{}> {
         );
         break;
       case SERVICES.Barometer.UUID.toLowerCase():
-        this._readBarometerNotifications(peripheral, value);
+        this._readBarometerNotifications(
+          peripheral,
+          base64.toByteArray(value).buffer
+        );
         break;
       case SERVICES.Humidity.UUID.toLowerCase():
-        this._readHumidityNotifications(peripheral, value);
+        this._readHumidityNotifications(
+          peripheral,
+          base64.toByteArray(value).buffer
+        );
         break;
       case SERVICES.Accelerometer.UUID.toLowerCase():
         this._readMovementNotifications(peripheral, value);
@@ -300,20 +306,20 @@ export class InvestigationDetailsComponent extends Component<{}> {
           !!config.grid.griddisplay
         ) {
           switch (sensorTag.name.toLowerCase()) {
-            // case 'temperature':
-            //   await this._startTemperatureNotifications(device);
-            //   break;
-            // case 'barometer':
-            //   await this._startBarometerNotifications(device);
-            //   break;
+            case 'temperature':
+              await this._startTemperatureNotifications(device);
+              break;
+            case 'barometer':
+              await this._startBarometerNotifications(device);
+              break;
             // case 'accelerometer':
             // case 'gyroscope':
             // case 'magnetometer':
             //   this._startMovementNotifications(device);
             //   break;
-            // case 'humidity':
-            //   await this._startHumidityNotifications(device);
-            //   break;
+            case 'humidity':
+              await this._startHumidityNotifications(device);
+              break;
             case 'luxometer':
               await this._startLuxometerNotifications(device);
               break;
@@ -418,10 +424,18 @@ export class InvestigationDetailsComponent extends Component<{}> {
   _readHumidityNotifications(deviceId, data) {
     const sensorName = 'Humidity';
     // Humidity DATA
-    // TempLSB:TempMSB:HumidityLSB:HumidityMSB
+
+    const state = new DataView(data).getUint16(0, true);
+    const roomTemp = -46.85 + 175.72 / 65536.0 * state;
+
+    // Calculate the relative humidity.
+    const temp = new DataView(data).getUint16(0, true);
+    const hData = temp & ~0x03;
+    const RHValue = -6.0 + 125.0 / 65536.0 * hData;
+
     const values = {
-      rh: data[3],
-      temp: data[1]
+      rh: RHValue,
+      temp: roomTemp
     };
 
     const displayVal = `${values.rh}% RH at ${values.temp.toFixed(3)} °C`;
@@ -435,17 +449,22 @@ export class InvestigationDetailsComponent extends Component<{}> {
 
   _startHumidityNotifications(device) {
     const service = SERVICES.Humidity;
-    this._asyncStartNotificationsForService(service, device, [1]);
+    this._asyncStartNotificationsForService(service, device, '0x01');
   }
 
   _readBarometerNotifications(deviceId, data) {
     const sensorName = 'Barometer';
     // Barometer DATA
-    // TempLSB:TempMSB(:TempEXt):PressureLSB:PressureMSB(:PressureExt)
+
+    const flTempData = new DataView(data).getUint32(0, true);
+    const flPressureData = new DataView(data).getUint32(2, true);
+
+    const tempValue = (flTempData & 0x00ffffff) / 100.0;
+    const pressureValue = ((flPressureData >> 8) & 0x00ffffff) / 100.0;
 
     const values = {
-      hPa: data[3],
-      c: data[0]
+      hPa: pressureValue,
+      c: tempValue
     };
 
     const displayVal = `${values.hPa} hPa at ${values.c} °C`;
@@ -459,7 +478,7 @@ export class InvestigationDetailsComponent extends Component<{}> {
 
   _startBarometerNotifications(device) {
     const service = SERVICES.Barometer;
-    this._asyncStartNotificationsForService(service, device, [1]);
+    this._asyncStartNotificationsForService(service, device, '0x01');
   }
 
   _readTemperatureNotifications(deviceId, data) {
