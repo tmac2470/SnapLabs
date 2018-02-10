@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { connect, connectAdvanced } from 'react-redux';
-import BleManager from 'react-native-ble-manager';
+import { BleManager } from 'react-native-ble-plx';
 import * as _ from 'lodash';
 import * as SERVICES from '../Bluetooth/services';
 import moment from 'moment';
@@ -25,18 +25,22 @@ import {
   VictoryZoomContainer
 } from 'victory-native';
 import FullScreenLoader from '../../components/FullScreenLoading';
+import base64 from 'base64-js';
+import buffer from 'buffer';
 
 import Colors from '../../Theme/colors';
 import * as utils from './utils';
 import { appError, appBusy } from '../../Metastores/actions';
 
-const BleManagerModule = NativeModules.BleManager;
-const bleManagerEmitter = new NativeEventEmitter(BleManagerModule);
-
 export class InvestigationDetailsComponent extends Component<{}> {
   static navigationOptions = {
     title: 'Investigation Details'
   };
+
+  constructor() {
+    super();
+    this.manager = new BleManager();
+  }
 
   state = {
     connectedDevices: {},
@@ -52,7 +56,8 @@ export class InvestigationDetailsComponent extends Component<{}> {
       grid: false,
       maxGridWidth: 100
     },
-    datasetsAvailable: []
+    datasetsAvailable: [],
+    isBusy: false
   };
 
   componentWillMount() {
@@ -75,65 +80,152 @@ export class InvestigationDetailsComponent extends Component<{}> {
   }
 
   componentDidMount() {
-    BleManager.checkState();
-    this._bleEmitterEvent = bleManagerEmitter.addListener(
-      'BleManagerDidUpdateValueForCharacteristic',
-      this._subscribeToBleData.bind(this)
-    );
+    if (Platform.OS === 'ios') {
+      this.manager.onStateChange(state => {
+        if (state === 'PoweredOn') {
+          this.startScan();
+        }
+      });
+    } else {
+      this.startScan();
+    }
+  }
+
+  componentWillUnmount() {
+    this.manager.destroy();
+    delete this.manager;
+  }
+
+  startScan() {
+    const { onAppError, connectedDevices } = this.props;
+    this.setState({ isBusy: true });
+
+    this.manager.startDeviceScan(null, null, (error, device) => {
+      if (error) {
+        this.setState({ isBusy: false });
+        onAppError(error.message);
+        return;
+      }
+      if (device && device.name) {
+        this._autoConnectIfPreviouslyConnected(device);
+      }
+    });
+
+    setTimeout(() => {
+      this.setState({ isBusy: false });
+      this.manager.stopDeviceScan();
+    }, 1500);
+  }
+
+  _autoConnectIfPreviouslyConnected(device) {
+    const { connectedDevices } = this.props;
+    if (!connectedDevices) {
+      return;
+    }
+    const wasConnectedPreviously = connectedDevices[device.id];
+    if (!!wasConnectedPreviously) {
+      this.connectToDevice(device);
+    }
+  }
+
+  connectToDevice(device) {
+    const { onAppError } = this.props;
+    this.setState({ isBusy: true });
+
+    this.manager
+      .connectToDevice(device.id)
+      .then(device => {
+        return device.discoverAllServicesAndCharacteristics();
+      })
+      .then(device => {
+        this.setState({ isBusy: false });
+        // Start notifications once connected
+        this.startNotifications(device);
+      })
+      .catch(error => {
+        this.setState({ isBusy: false });
+        onAppError(error.message);
+      });
   }
 
   _subscribeToBleData(data) {
-    const { peripheral, characteristic, value } = data;
+    const { peripheral, UUID, value } = data;
 
-    switch (characteristic.toLowerCase()) {
-      case SERVICES.Luxometer.DATA.toLowerCase():
-        this._readLuxometerNotifications(peripheral, value);
+    switch (UUID.toLowerCase()) {
+      case SERVICES.Luxometer.UUID.toLowerCase():
+        this._readLuxometerNotifications(
+          peripheral,
+          base64.toByteArray(value).buffer
+        );
         break;
-      case SERVICES.Temperature.DATA.toLowerCase():
-        this._readTemperatureNotifications(peripheral, value);
+      case SERVICES.Temperature.UUID.toLowerCase():
+        this._readTemperatureNotifications(
+          peripheral,
+          base64.toByteArray(value).buffer
+        );
         break;
-      case SERVICES.Barometer.DATA.toLowerCase():
+      case SERVICES.Barometer.UUID.toLowerCase():
         this._readBarometerNotifications(peripheral, value);
         break;
-      case SERVICES.Humidity.DATA.toLowerCase():
+      case SERVICES.Humidity.UUID.toLowerCase():
         this._readHumidityNotifications(peripheral, value);
         break;
-      case SERVICES.Accelerometer.DATA.toLowerCase():
+      case SERVICES.Accelerometer.UUID.toLowerCase():
         this._readMovementNotifications(peripheral, value);
         break;
-      case SERVICES.IOBUTTON.DATA.toLowerCase():
-        this._readSensorBtnNotifications(peripheral, value);
+      case SERVICES.IOBUTTON.UUID.toLowerCase():
+        this._readSensorBtnNotifications(peripheral, this._getInt8Value(value));
         break;
       default:
         break;
     }
   }
 
-  componentWillUnmount() {
-    this._unpingAllConnectedDevices();
-    this._bleEmitterEvent.remove();
-  }
-
-  _unpingAllConnectedDevices() {
-    const { connectedDevices } = this.props;
-
-    Object.keys(connectedDevices).map(key => {
-      const device = connectedDevices[key];
-      this._stopNotifications(device);
-    });
+  _getInt8Value(value) {
+    const array = base64.toByteArray(value).buffer;
+    return new DataView(array).getInt8(0, true);
   }
 
   _startNotificationForService(device, service) {
-    return BleManager.startNotification(device.id, service.UUID, service.DATA);
+    const { onAppError } = this.props;
+
+    return this.manager.monitorCharacteristicForDevice(
+      device.id,
+      service.UUID,
+      service.DATA,
+      (error, data) => {
+        if (error) {
+          onAppError(error.message);
+          return;
+        }
+        const payload = {
+          UUID: service.UUID,
+          peripheral: device.id,
+          value: data.value
+        };
+
+        this._subscribeToBleData(payload);
+      }
+    );
   }
 
   _writePeriodToDevice(device, service, sampleIntervalTime) {
     const period = [sampleIntervalTime * 10];
-    return BleManager.write(device.id, service.UUID, service.PERIOD, period);
+    return this.manager.writeCharacteristicWithResponseForDevice(
+      device.id,
+      service.UUID,
+      service.PERIOD,
+      period
+    );
   }
 
   _writeToDevice(device, service, data) {
-    return BleManager.write(device.id, service.UUID, service.CONFIG, data);
+    return this.manager.writeCharacteristicWithResponseForDevice(
+      device.id,
+      service.UUID,
+      service.CONFIG,
+      data
+    );
   }
 
   _stopNotifications(device) {
@@ -208,20 +300,20 @@ export class InvestigationDetailsComponent extends Component<{}> {
           !!config.grid.griddisplay
         ) {
           switch (sensorTag.name.toLowerCase()) {
-            case 'temperature':
-              await this._startTemperatureNotifications(device);
-              break;
-            case 'barometer':
-              await this._startBarometerNotifications(device);
-              break;
-            case 'accelerometer':
-            case 'gyroscope':
-            case 'magnetometer':
-              this._startMovementNotifications(device);
-              break;
-            case 'humidity':
-              await this._startHumidityNotifications(device);
-              break;
+            // case 'temperature':
+            //   await this._startTemperatureNotifications(device);
+            //   break;
+            // case 'barometer':
+            //   await this._startBarometerNotifications(device);
+            //   break;
+            // case 'accelerometer':
+            // case 'gyroscope':
+            // case 'magnetometer':
+            //   this._startMovementNotifications(device);
+            //   break;
+            // case 'humidity':
+            //   await this._startHumidityNotifications(device);
+            //   break;
             case 'luxometer':
               await this._startLuxometerNotifications(device);
               break;
@@ -372,11 +464,16 @@ export class InvestigationDetailsComponent extends Component<{}> {
 
   _readTemperatureNotifications(deviceId, data) {
     const sensorName = 'Temperature';
+
+    const temp = new DataView(data).getUint16(0, true);
+    const targetTemp = (temp >> 2) * 0.03125;
+    // Calculate ambient temp
+    const ambientTemp = new DataView(data).getUint16(2, true) / 128.0;
+
     // Temperature DATA
-    // ObjectLSB:ObjectMSB:AmbientLSB:AmbientMSB
     const values = {
-      amb: data[1],
-      ir: data[2]
+      amb: ambientTemp,
+      ir: targetTemp
     };
 
     const displayVal = `${values.amb}°C [Amb], ${values.ir}°C [IR]`;
@@ -390,14 +487,28 @@ export class InvestigationDetailsComponent extends Component<{}> {
 
   _startTemperatureNotifications(device) {
     const service = SERVICES.Temperature;
-    this._asyncStartNotificationsForService(service, device, [1]);
+    this._asyncStartNotificationsForService(service, device, '0x01');
   }
 
   _readLuxometerNotifications(deviceId, data) {
     const sensorName = 'Luxometer';
+
+    // Get 16 bit value from data buffer in little endian format.
+    const value = new DataView(data).getUint16(0, true);
+
+    // Extraction of luxometer value, based on sfloatExp2ToDouble
+    // from BLEUtility.m in Texas Instruments TI BLE SensorTag
+    // iOS app source code.
+    const mantissa = value & 0x0fff;
+    const exponent = value >> 12;
+    const magnitude = Math.pow(2, exponent);
+    const output = mantissa * magnitude;
+
+    const luxValue = output / 100.0;
+
     // Luxometer DATA
     const values = {
-      lux: data[0]
+      lux: luxValue
     };
     const displayVal = `${values.lux} lux`;
     const dataValueMap = {
@@ -408,7 +519,7 @@ export class InvestigationDetailsComponent extends Component<{}> {
 
   _startLuxometerNotifications(device) {
     const service = SERVICES.Luxometer;
-    this._asyncStartNotificationsForService(service, device, [1]);
+    this._asyncStartNotificationsForService(service, device, '0x01');
   }
 
   _asyncStartNotificationsForService = async (
@@ -421,21 +532,23 @@ export class InvestigationDetailsComponent extends Component<{}> {
     const { onAppError } = this.props;
 
     try {
-      await this._startNotificationForService(device, service);
       // Write the delay time
-      await this._writePeriodToDevice(device, service, sampleIntervalTime);
+      // await this._writePeriodToDevice(device, service, sampleIntervalTime);
+      // Start notification
+      await this._startNotificationForService(device, service);
+
       if (activationBits) {
         // Switch on the sensor
-        await this._writeToDevice(device, service, activationBits);
+        /* AQ=== 0x01 in hex */
+        await this._writeToDevice(device, service, 'AQ==');
       }
     } catch (e) {
       onAppError('Unable to write to device! Please reconnect device', e);
     }
   };
 
-  _readSensorBtnNotifications(deviceId, data) {
-    const state = new Uint8Array(data);
-    if (state.length > 0 && !!state[0]) {
+  _readSensorBtnNotifications(deviceId, pressed) {
+    if (pressed) {
       this.captureDeviceDataForGrid();
     }
   }
@@ -544,24 +657,6 @@ export class InvestigationDetailsComponent extends Component<{}> {
 
   initialiseSensorTags(sensors) {
     const { connectedDevices, onAppError } = this.props;
-    const connectedDeviceIds = Object.keys(connectedDevices);
-
-    // Need recursive pings coz running a loop doesnt work
-    const _pingRecursive = deviceIds => {
-      const Id = deviceIds.pop();
-      if (!Id) {
-        return;
-      }
-      BleManager.retrieveServices(Id)
-        .then(_ => {
-          this.startNotifications(connectedDevices[Id]);
-          _pingRecursive(deviceIds);
-        })
-        .catch(error => {
-          onAppError(error);
-        });
-    };
-    _pingRecursive(connectedDeviceIds);
 
     sensors.map(sensorTag => {
       sensorTag = this.initialiseChart(sensorTag, connectedDevices);
@@ -881,7 +976,8 @@ export class InvestigationDetailsComponent extends Component<{}> {
       graphs,
       investigation,
       sampleIntervalTime,
-      sensors
+      sensors,
+      isBusy
     } = this.state;
     const isConnectedToDevices = Object.keys(connectedDevices);
     const connectedText =
@@ -891,7 +987,7 @@ export class InvestigationDetailsComponent extends Component<{}> {
 
     return (
       <View style={styles.container}>
-        <FullScreenLoader visible={!!busy} />
+        <FullScreenLoader visible={!!busy || !!isBusy} />
 
         <ScrollView style={styles.scrollContainer}>
           <H2 style={[styles.header, styles.text, styles.textBold]}>
