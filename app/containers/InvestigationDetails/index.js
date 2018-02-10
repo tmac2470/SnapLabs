@@ -40,6 +40,7 @@ export class InvestigationDetailsComponent extends Component<{}> {
   constructor() {
     super();
     this.manager = new BleManager();
+    this.deviceMonitors = [];
   }
 
   state = {
@@ -92,6 +93,10 @@ export class InvestigationDetailsComponent extends Component<{}> {
   }
 
   componentWillUnmount() {
+    this.deviceMonitors.map(monitor => {
+      monitor.remove();
+    });
+
     this.manager.destroy();
     delete this.manager;
   }
@@ -176,8 +181,11 @@ export class InvestigationDetailsComponent extends Component<{}> {
           base64.toByteArray(value).buffer
         );
         break;
-      case SERVICES.Accelerometer.UUID.toLowerCase():
-        this._readMovementNotifications(peripheral, value);
+      case SERVICES.Movement.UUID.toLowerCase():
+        this._readMovementNotifications(
+          peripheral,
+          base64.toByteArray(value).buffer
+        );
         break;
       case SERVICES.IOBUTTON.UUID.toLowerCase():
         this._readSensorBtnNotifications(peripheral, this._getInt8Value(value));
@@ -195,7 +203,7 @@ export class InvestigationDetailsComponent extends Component<{}> {
   _startNotificationForService(device, service) {
     const { onAppError } = this.props;
 
-    return this.manager.monitorCharacteristicForDevice(
+    const monitor = this.manager.monitorCharacteristicForDevice(
       device.id,
       service.UUID,
       service.DATA,
@@ -213,6 +221,9 @@ export class InvestigationDetailsComponent extends Component<{}> {
         this._subscribeToBleData(payload);
       }
     );
+
+    this.deviceMonitors.push(monitor);
+    return monitor;
   }
 
   _writePeriodToDevice(device, service, sampleIntervalTime) {
@@ -312,11 +323,11 @@ export class InvestigationDetailsComponent extends Component<{}> {
             case 'barometer':
               await this._startBarometerNotifications(device);
               break;
-            // case 'accelerometer':
-            // case 'gyroscope':
-            // case 'magnetometer':
-            //   this._startMovementNotifications(device);
-            //   break;
+            case 'accelerometer':
+            case 'gyroscope':
+            case 'magnetometer':
+              this._startMovementNotifications(device);
+              break;
             case 'humidity':
               await this._startHumidityNotifications(device);
               break;
@@ -336,32 +347,42 @@ export class InvestigationDetailsComponent extends Component<{}> {
 
   _readMovementNotifications(deviceId, data) {
     // Movement DATA
-    // GXLSB:GXMSB:GYLSB:GYMSB:GZLSB:GZMSB,
-    // AXLSB:AXMSB:AYLSB:AYMSB:AZLSB:AZMSB
-    const accX = data[6];
-    // ax_temp / accDivisors.x;
-    const accY = data[7];
-    // ay_temp / accDivisors.y;
-    const accZ = data[8];
-    // az_temp / accDivisors.z;
+    //0 gyro x
+    //1 gyro y
+    //2 gyro z
+    //3 accel x
+    //4 accel y
+    //5 accel z
+    //6 mag x
+    //7 mag y
+    //8 mag z
+
+    // val depends on range: 2G = (32768/2), 4G = (32768/4), 8G = (32768/8) = 4096, 16G (32768/16)
+    // To correspond with bit set in snaplabs.devices.enableMovementSensor
+    // NOTE - MUST BE SIGNED INT (Not getUint16)
+    const accVal = 32768 / 2;
+    const accDivisors = { x: -1 * accVal, y: accVal, z: -1 * accVal };
+    const ax_temp = new DataView(data).getInt16(6, true);
+    const ay_temp = new DataView(data).getInt16(8, true);
+    const az_temp = new DataView(data).getInt16(10, true);
+
+    // Calculate accelerometer values.
+    // Leave as 6,8,10  http://processors.wiki.ti.com/index.php/CC2650_SensorTag_User's_Guide#Movement_Sensor
+    const accX = ax_temp / accDivisors.x;
+    const accY = ay_temp / accDivisors.y;
+    const accZ = az_temp / accDivisors.z;
     const accScalar = Math.sqrt(accX * accX + accY * accY + accZ * accZ);
 
     // Gyrometer calculations
     var gyroVal = 500 / 65536.0;
-    var gyroX = data[0];
-    // new DataView(data).getInt16(0, true) * gyroVal;
-    var gyroY = data[1];
-    // new DataView(data).getInt16(2, true) * gyroVal;
-    var gyroZ = data[2];
-    // new DataView(data).getInt16(4, true) * gyroVal;
+    var gyroX = new DataView(data).getInt16(0, true) * gyroVal;
+    var gyroY = new DataView(data).getInt16(2, true) * gyroVal;
+    var gyroZ = new DataView(data).getInt16(4, true) * gyroVal;
 
     // Magnetometer calculations
-    var magX = data[0];
-    // new DataView(data).getInt16(12, true);
-    var magY = data[0];
-    // new DataView(data).getInt16(14, true);
-    var magZ = data[0];
-    // new DataView(data).getInt16(16, true);
+    var magX = new DataView(data).getInt16(12, true);
+    var magY = new DataView(data).getInt16(14, true);
+    var magZ = new DataView(data).getInt16(16, true);
     var magScalar = Math.sqrt(magX * magX + magY * magY + magZ * magZ);
 
     const gyroscopeValues = {
@@ -383,6 +404,10 @@ export class InvestigationDetailsComponent extends Component<{}> {
       Z: magZ,
       'Scalar Value': magScalar
     };
+
+    // console.log(gyroscopeValues);
+    // console.log(accelerometerValues);
+    // console.log(magnetometerValues);
 
     const displayValGyro = `X ${gyroscopeValues.X}, Y ${gyroscopeValues.Y}, Z ${
       gyroscopeValues.Z
@@ -418,7 +443,7 @@ export class InvestigationDetailsComponent extends Component<{}> {
   // file:///Users/shailendrapal/Downloads/attr_cc2650%20sensortag.html
   _startMovementNotifications(device) {
     const service = SERVICES.Accelerometer;
-    this._asyncStartNotificationsForService(service, device, [1, 0]);
+    this._asyncStartNotificationsForService(service, device, 'AH8=');
   }
 
   _readHumidityNotifications(deviceId, data) {
@@ -438,7 +463,9 @@ export class InvestigationDetailsComponent extends Component<{}> {
       temp: roomTemp
     };
 
-    const displayVal = `${values.rh.toFixed(3)}% RH at ${values.temp.toFixed(3)} °C`;
+    const displayVal = `${values.rh.toFixed(3)}% RH at ${values.temp.toFixed(
+      3
+    )} °C`;
 
     const dataValueMap = {
       '°C': values.temp,
@@ -449,7 +476,7 @@ export class InvestigationDetailsComponent extends Component<{}> {
 
   _startHumidityNotifications(device) {
     const service = SERVICES.Humidity;
-    this._asyncStartNotificationsForService(service, device, '0x01');
+    this._asyncStartNotificationsForService(service, device, 'AQ==');
   }
 
   _readBarometerNotifications(deviceId, data) {
@@ -478,7 +505,7 @@ export class InvestigationDetailsComponent extends Component<{}> {
 
   _startBarometerNotifications(device) {
     const service = SERVICES.Barometer;
-    this._asyncStartNotificationsForService(service, device, '0x01');
+    this._asyncStartNotificationsForService(service, device, 'AQ==');
   }
 
   _readTemperatureNotifications(deviceId, data) {
@@ -506,7 +533,7 @@ export class InvestigationDetailsComponent extends Component<{}> {
 
   _startTemperatureNotifications(device) {
     const service = SERVICES.Temperature;
-    this._asyncStartNotificationsForService(service, device, '0x01');
+    this._asyncStartNotificationsForService(service, device, 'AQ==');
   }
 
   _readLuxometerNotifications(deviceId, data) {
@@ -538,7 +565,7 @@ export class InvestigationDetailsComponent extends Component<{}> {
 
   _startLuxometerNotifications(device) {
     const service = SERVICES.Luxometer;
-    this._asyncStartNotificationsForService(service, device, '0x01');
+    this._asyncStartNotificationsForService(service, device, 'AQ==');
   }
 
   _asyncStartNotificationsForService = async (
@@ -559,7 +586,7 @@ export class InvestigationDetailsComponent extends Component<{}> {
       if (activationBits) {
         // Switch on the sensor
         /* AQ=== 0x01 in hex */
-        await this._writeToDevice(device, service, 'AQ==');
+        await this._writeToDevice(device, service, activationBits);
       }
     } catch (e) {
       onAppError('Unable to write to device! Please reconnect device', e);
