@@ -7,6 +7,7 @@ const initialDownloadInvestigationsState = {
   list: {},
   filters: {
     afterDate: '2016-12-01',
+    beforeDate: new Date(),
     fields: 'all',
     query: '',
     sort: '-lastupdated'

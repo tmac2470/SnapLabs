@@ -1,15 +1,9 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import {
-  View,
-  Modal,
-  Text,
-  DatePickerIOS,
-  Picker,
-  TouchableOpacity
-} from 'react-native';
+import { View, Modal, Text, Picker, TouchableOpacity } from 'react-native';
 import InvestigationList from '../../../components/InvestigationList';
 import FullScreenLoader from '../../../components/FullScreenLoading';
+import DatePicker from 'react-native-datepicker';
 
 import Colors from '../../../Theme/colors';
 import { fetchInvestigations } from './actions';
@@ -140,6 +134,7 @@ export class DownloadInvestigationsComponent extends Component<{}> {
 
             <View style={styles.modalContent}>
               <View style={styles.filterList}>
+                <H5 style={styles.text}>Keywords</H5>
                 <Input
                   inputStyle={styles.inputText}
                   placeholder="Query"
@@ -148,15 +143,38 @@ export class DownloadInvestigationsComponent extends Component<{}> {
                   onChangeText={query => this.updateFilters({ query })}
                   value={filters.query}
                 />
-              </View>
 
-              <H5 style={styles.text}>After Date</H5>
-              <DatePickerIOS
-                date={new Date(filters.afterDate)}
-                mode="date"
-                maximumDate={new Date()}
-                onDateChange={afterDate => this.updateFilters({ afterDate })}
-              />
+                <H5 style={styles.text}>Filter from</H5>
+
+                <DatePicker
+                  date={filters.afterDate}
+                  mode="date"
+                  style={styles.datepicker}
+                  placeholder="From date"
+                  maxDate={filters.beforeDate || new Date()}
+                  confirmBtnText="Confirm"
+                  cancelBtnText="Cancel"
+                  showIcon={false}
+                  onDateChange={afterDate => this.updateFilters({ afterDate })}
+                />
+
+                <H5 style={styles.text}>To</H5>
+
+                <DatePicker
+                  date={filters.beforeDate}
+                  mode="date"
+                  style={styles.datepicker}
+                  placeholder="To date"
+                  maxDate={new Date()}
+                  minDate={filters.afterDate}
+                  confirmBtnText="Confirm"
+                  cancelBtnText="Cancel"
+                  showIcon={false}
+                  onDateChange={beforeDate =>
+                    this.updateFilters({ beforeDate })
+                  }
+                />
+              </View>
 
               <View style={styles.footerButtonContainer}>
                 <Button
@@ -178,7 +196,7 @@ export class DownloadInvestigationsComponent extends Component<{}> {
             uppercase={false}
             onPressIn={() => this.openModal()}
             style={styles.footerButton}
-            iconName={filtersSelected ? 'ios-checkmark-circle' : ''}
+            iconName={filtersSelected ? 'ios-alert-outline' : ''}
           >
             Filters
           </Button>
@@ -222,6 +240,10 @@ const styles = {
     flex: 1,
     padding: 15,
     flexDirection: 'column'
+  },
+  datepicker: {
+    width: '100%',
+    maxWidth: 500
   },
   list: {
     flex: 4
