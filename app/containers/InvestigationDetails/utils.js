@@ -17,7 +17,7 @@ const _getLegend = (label, color) => {
 const _getDataset = (label, color) => {
   return {
     label: label,
-    data: [],
+    data: [0, 0],
     style: {
       data: {
         stroke: color,
