@@ -49,7 +49,7 @@ export class BluetoothConnectComponent extends Component<{}> {
   // Check if bluetooth is on.
   // Scan for devices
   // On device connect get all services
-  componentDidMount() {
+  componentWillMount() {
     if (Platform.OS === 'ios') {
       this.manager.onStateChange(state => {
         if (state === 'PoweredOn') {

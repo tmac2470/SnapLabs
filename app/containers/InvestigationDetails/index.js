@@ -80,18 +80,7 @@ export class InvestigationDetailsComponent extends Component<{}> {
       this.initialiseSensorTags(sensors);
     };
     _assignState(investigation.sensorTags);
-  }
-
-  componentDidMount() {
-    if (Platform.OS === 'ios') {
-      this.manager.onStateChange(state => {
-        if (state === 'PoweredOn') {
-          this.startScan();
-        }
-      });
-    } else {
-      this.startScan();
-    }
+    this.initialiseBluetooth();
   }
 
   componentWillUnmount() {
@@ -101,6 +90,18 @@ export class InvestigationDetailsComponent extends Component<{}> {
 
     this.manager.destroy();
     delete this.manager;
+  }
+
+  initialiseBluetooth() {
+    if (Platform.OS === 'ios') {
+      this.manager.onStateChange(state => {
+        if (state === 'PoweredOn') {
+          this.startScan();
+        }
+      });
+    } else {
+      this.startScan();
+    }
   }
 
   startScan() {
@@ -730,6 +731,8 @@ export class InvestigationDetailsComponent extends Component<{}> {
   }
 
   startGraphs() {
+    this.initialiseBluetooth();
+
     const { graphs } = this.state;
     graphs.started = true;
     graphs.startedAtLeastOnce = true;
