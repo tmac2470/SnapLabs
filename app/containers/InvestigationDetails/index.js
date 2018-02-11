@@ -59,7 +59,8 @@ export class InvestigationDetailsComponent extends Component<{}> {
       maxGridWidth: 100
     },
     datasetsAvailable: [],
-    isBusy: false
+    isBusy: false,
+    reconnected: false
   };
 
   componentWillMount() {
@@ -144,7 +145,7 @@ export class InvestigationDetailsComponent extends Component<{}> {
         return device.discoverAllServicesAndCharacteristics();
       })
       .then(device => {
-        this.setState({ isBusy: false });
+        this.setState({ isBusy: false, reconnected: true });
         // Start notifications once connected
         this.startNotifications(device);
       })
@@ -1024,12 +1025,13 @@ export class InvestigationDetailsComponent extends Component<{}> {
       investigation,
       sampleIntervalTime,
       sensors,
-      isBusy
+      isBusy,
+      reconnected
     } = this.state;
     const isConnectedToDevices = Object.keys(connectedDevices);
     const connectedText =
       Object.keys(connectedDevices).length > 0
-        ? 'Connected!'
+        ? reconnected ? 'Connected!' : 'Connecting...'
         : 'Not connected!';
 
     return (
@@ -1338,7 +1340,7 @@ const mapStateToProps = state => {
     connectedDevices: state.bluetooth.connectedDevices,
     user: state.currentUser,
     busy: state.meta.busy
- };
+  };
 };
 
 const mapDispatchToProps = dispatch => {
