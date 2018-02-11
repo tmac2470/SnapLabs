@@ -5,6 +5,7 @@
 	};
 	objectVersion = 46;
 	objects = {
+
 /* Begin PBXBuildFile section */
 		00C302E51ABCBA2D00DB3ED1 /* libRCTActionSheet.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 00C302AC1ABCB8CE00DB3ED1 /* libRCTActionSheet.a */; };
 		00C302E71ABCBA2D00DB3ED1 /* libRCTGeolocation.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 00C302BA1ABCB90400DB3ED1 /* libRCTGeolocation.a */; };
@@ -36,7 +37,6 @@
 		2DCD954D1E0B4F2C00145EB5 /* snaplab_reactTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 00E356F21AD99517003FC87E /* snaplab_reactTests.m */; };
 		39F60027D9D24E99B89F9461 /* FontAwesome.ttf in Resources */ = {isa = PBXBuildFile; fileRef = CD905C3B3B234A6C8DB6B345 /* FontAwesome.ttf */; };
 		496B846FFF4347D7B9C4DD0B /* EvilIcons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 3405401AF1C9486D81ECA179 /* EvilIcons.ttf */; };
-		5BD6F4B2C564413F80A31191 /* libBVLinearGradient.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 819FE4ED048E41989B41A6DE /* libBVLinearGradient.a */; };
 		5E9157361DD0AC6A00FF2AA8 /* libRCTAnimation.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 5E9157331DD0AC6500FF2AA8 /* libRCTAnimation.a */; };
 		5F0964F0495F4EC4ABF5467E /* Octicons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = F8418B3396EA4E5F9F07226C /* Octicons.ttf */; };
 		6532E704ED54464798D821A6 /* libRNFS.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 217E70F036AA4C9AA6F7B912 /* libRNFS.a */; };
@@ -473,7 +473,6 @@
 				00C302EA1ABCBA2D00DB3ED1 /* libRCTVibration.a in Frameworks */,
 				139FDEF61B0652A700C62182 /* libRCTWebSocket.a in Frameworks */,
 				CF1E275399D94020AA3A3A0D /* libRNVectorIcons.a in Frameworks */,
-				5BD6F4B2C564413F80A31191 /* libBVLinearGradient.a in Frameworks */,
 				DA31ED81D63C4928BBBC5BC0 /* libRNPhotoView.a in Frameworks */,
 				A2A448615A65492B8E8EE514 /* libRNSpinkit.a in Frameworks */,
 				6532E704ED54464798D821A6 /* libRNFS.a in Frameworks */,
@@ -742,7 +741,6 @@
 				1CADF211D407422ABF385325 /* libRNPhotoView.a */,
 				E6D0EFA8AD5447A4A6BF2BDE /* libRNSpinkit.a */,
 				217E70F036AA4C9AA6F7B912 /* libRNFS.a */,
-				570F6103535941AEA09E80CE /* libBleManager.a */,
 				677656BD114A464EB8D73122 /* libRNSVG.a */,
 				8E299EFCED9C4EB2BA91AEE1 /* libBleClient.a */,
 			);
@@ -1509,9 +1507,7 @@
 				INFOPLIST_FILE = snaplab_reactTests/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-				);
+				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				OTHER_LDFLAGS = (
 					"-ObjC",
 					"-lc++",
@@ -1540,9 +1536,7 @@
 				INFOPLIST_FILE = snaplab_reactTests/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-				);
+				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				OTHER_LDFLAGS = (
 					"-ObjC",
 					"-lc++",
@@ -1579,6 +1573,7 @@
 					"-ObjC",
 					"-lc++",
 				);
+				PRODUCT_BUNDLE_IDENTIFIER = org.snaplabs.ti.app;
 				PRODUCT_NAME = snaplab_react;
 				VERSIONING_SYSTEM = "apple-generic";
 			};
@@ -1610,6 +1605,7 @@
 					"-ObjC",
 					"-lc++",
 				);
+				PRODUCT_BUNDLE_IDENTIFIER = org.snaplabs.ti.app;
 				PRODUCT_NAME = snaplab_react;
 				VERSIONING_SYSTEM = "apple-generic";
 			};
@@ -1640,9 +1636,7 @@
 				);
 				INFOPLIST_FILE = "snaplab_react-tvOS/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-				);
+				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				OTHER_LDFLAGS = (
 					"-ObjC",
 					"-lc++",
@@ -1680,9 +1674,7 @@
 				);
 				INFOPLIST_FILE = "snaplab_react-tvOS/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-				);
+				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				OTHER_LDFLAGS = (
 					"-ObjC",
 					"-lc++",
@@ -1708,9 +1700,7 @@
 				GCC_NO_COMMON_BLOCKS = YES;
 				INFOPLIST_FILE = "snaplab_react-tvOSTests/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-				);
+				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.facebook.REACT.snaplab_react-tvOSTests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = appletvos;
@@ -1732,9 +1722,7 @@
 				GCC_NO_COMMON_BLOCKS = YES;
 				INFOPLIST_FILE = "snaplab_react-tvOSTests/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-				);
+				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.facebook.REACT.snaplab_react-tvOSTests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = appletvos;
