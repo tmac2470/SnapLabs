@@ -19,7 +19,7 @@ export class GlobalErrorAlert extends Component<{}> {
         return false;
 
       default:
-        break;
+        return true;
     }
   }
 
@@ -30,7 +30,7 @@ export class GlobalErrorAlert extends Component<{}> {
 
     return (
       <View>
-        {visible
+        {showMessage
           ? Alert.alert(
               'Error',
               error,
