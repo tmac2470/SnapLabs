@@ -5,7 +5,6 @@
 	};
 	objectVersion = 46;
 	objects = {
-
 /* Begin PBXBuildFile section */
 		00C302E51ABCBA2D00DB3ED1 /* libRCTActionSheet.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 00C302AC1ABCB8CE00DB3ED1 /* libRCTActionSheet.a */; };
 		00C302E71ABCBA2D00DB3ED1 /* libRCTGeolocation.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 00C302BA1ABCB90400DB3ED1 /* libRCTGeolocation.a */; };
@@ -36,7 +35,6 @@
 		2D02E4C91E0B4AEC006451C7 /* libReact.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3DAD3EA31DF850E9000B6D8A /* libReact.a */; };
 		2DCD954D1E0B4F2C00145EB5 /* snaplab_reactTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 00E356F21AD99517003FC87E /* snaplab_reactTests.m */; };
 		39F60027D9D24E99B89F9461 /* FontAwesome.ttf in Resources */ = {isa = PBXBuildFile; fileRef = CD905C3B3B234A6C8DB6B345 /* FontAwesome.ttf */; };
-		3BF64FFC739746439BBDF3BD /* libBleManager.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 570F6103535941AEA09E80CE /* libBleManager.a */; };
 		496B846FFF4347D7B9C4DD0B /* EvilIcons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 3405401AF1C9486D81ECA179 /* EvilIcons.ttf */; };
 		5BD6F4B2C564413F80A31191 /* libBVLinearGradient.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 819FE4ED048E41989B41A6DE /* libBVLinearGradient.a */; };
 		5E9157361DD0AC6A00FF2AA8 /* libRCTAnimation.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 5E9157331DD0AC6500FF2AA8 /* libRCTAnimation.a */; };
@@ -254,13 +252,6 @@
 			remoteGlobalIDString = D73F06E81D48E17B00AD5963;
 			remoteInfo = BleClient;
 		};
-		883DCF892021D7D30000F4CD /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 816BABD8B6B344A3A8988F37 /* BleManager.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 134814201AA4EA6300B7C361;
-			remoteInfo = BleManager;
-		};
 		88972B7120140F3C00041FC3 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 8B3E9E9157B1491A8C10B12A /* RNFS.xcodeproj */;
@@ -432,14 +423,12 @@
 		2D02E4901E0B4A5D006451C7 /* snaplab_react-tvOSTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "snaplab_react-tvOSTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		3405401AF1C9486D81ECA179 /* EvilIcons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = EvilIcons.ttf; path = "../node_modules/react-native-vector-icons/Fonts/EvilIcons.ttf"; sourceTree = "<group>"; };
 		454EF6D1FE6E4483BB61E132 /* MaterialIcons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = MaterialIcons.ttf; path = "../node_modules/react-native-vector-icons/Fonts/MaterialIcons.ttf"; sourceTree = "<group>"; };
-		570F6103535941AEA09E80CE /* libBleManager.a */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = archive.ar; path = libBleManager.a; sourceTree = "<group>"; };
 		5E91572D1DD0AC6500FF2AA8 /* RCTAnimation.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTAnimation.xcodeproj; path = "../node_modules/react-native/Libraries/NativeAnimation/RCTAnimation.xcodeproj"; sourceTree = "<group>"; };
 		65A7E19FDCAF4309B4D86C8E /* BleClient.xcodeproj */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "wrapper.pb-project"; name = BleClient.xcodeproj; path = "../node_modules/react-native-ble-plx/ios/BleClient.xcodeproj"; sourceTree = "<group>"; };
 		677656BD114A464EB8D73122 /* libRNSVG.a */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = archive.ar; path = libRNSVG.a; sourceTree = "<group>"; };
 		6AB3B1BFBAF140EC9BC1FBA1 /* Foundation.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Foundation.ttf; path = "../node_modules/react-native-vector-icons/Fonts/Foundation.ttf"; sourceTree = "<group>"; };
 		78C398B01ACF4ADC00677621 /* RCTLinking.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTLinking.xcodeproj; path = "../node_modules/react-native/Libraries/LinkingIOS/RCTLinking.xcodeproj"; sourceTree = "<group>"; };
 		7CE75297DDBB428083115216 /* RNVectorIcons.xcodeproj */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "wrapper.pb-project"; name = RNVectorIcons.xcodeproj; path = "../node_modules/react-native-vector-icons/RNVectorIcons.xcodeproj"; sourceTree = "<group>"; };
-		816BABD8B6B344A3A8988F37 /* BleManager.xcodeproj */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "wrapper.pb-project"; name = BleManager.xcodeproj; path = "../node_modules/react-native-ble-manager/ios/BleManager.xcodeproj"; sourceTree = "<group>"; };
 		819FE4ED048E41989B41A6DE /* libBVLinearGradient.a */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = archive.ar; path = libBVLinearGradient.a; sourceTree = "<group>"; };
 		832341B01AAA6A8300B99B32 /* RCTText.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTText.xcodeproj; path = "../node_modules/react-native/Libraries/Text/RCTText.xcodeproj"; sourceTree = "<group>"; };
 		8B3E9E9157B1491A8C10B12A /* RNFS.xcodeproj */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "wrapper.pb-project"; name = RNFS.xcodeproj; path = "../node_modules/react-native-fs/RNFS.xcodeproj"; sourceTree = "<group>"; };
@@ -488,7 +477,6 @@
 				DA31ED81D63C4928BBBC5BC0 /* libRNPhotoView.a in Frameworks */,
 				A2A448615A65492B8E8EE514 /* libRNSpinkit.a in Frameworks */,
 				6532E704ED54464798D821A6 /* libRNFS.a in Frameworks */,
-				3BF64FFC739746439BBDF3BD /* libBleManager.a in Frameworks */,
 				E3469A23181D466D867ECC7D /* libRNSVG.a in Frameworks */,
 				665ADEEC7E4A4B09B059EE5E /* libBleClient.a in Frameworks */,
 			);
@@ -688,7 +676,6 @@
 				B088B90720454B16A25888C9 /* RNSpinkit.xcodeproj */,
 				1D641425BFCF475DBD7106DE /* RNPhotoView.xcodeproj */,
 				8B3E9E9157B1491A8C10B12A /* RNFS.xcodeproj */,
-				816BABD8B6B344A3A8988F37 /* BleManager.xcodeproj */,
 				A3C713956EA74269A40CDA44 /* RNSVG.xcodeproj */,
 				65A7E19FDCAF4309B4D86C8E /* BleClient.xcodeproj */,
 			);
@@ -734,14 +721,6 @@
 			isa = PBXGroup;
 			children = (
 				881E6104202C633800193DA5 /* libBleClient.a */,
-			);
-			name = Products;
-			sourceTree = "<group>";
-		};
-		883DCF862021D7D30000F4CD /* Products */ = {
-			isa = PBXGroup;
-			children = (
-				883DCF8A2021D7D30000F4CD /* libBleManager.a */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -945,10 +924,6 @@
 				{
 					ProductGroup = 881E6100202C633800193DA5 /* Products */;
 					ProjectRef = 65A7E19FDCAF4309B4D86C8E /* BleClient.xcodeproj */;
-				},
-				{
-					ProductGroup = 883DCF862021D7D30000F4CD /* Products */;
-					ProjectRef = 816BABD8B6B344A3A8988F37 /* BleManager.xcodeproj */;
 				},
 				{
 					ProductGroup = 88C2B81B2000B09C00DD9F53 /* Products */;
@@ -1214,13 +1189,6 @@
 			fileType = archive.ar;
 			path = libBleClient.a;
 			remoteRef = 881E6103202C633800193DA5 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		883DCF8A2021D7D30000F4CD /* libBleManager.a */ = {
-			isa = PBXReferenceProxy;
-			fileType = archive.ar;
-			path = libBleManager.a;
-			remoteRef = 883DCF892021D7D30000F4CD /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 		88972B7220140F3C00041FC3 /* libRNFS.a */ = {
@@ -1535,7 +1503,6 @@
 					"$(SRCROOT)/../node_modules/react-native-spinkit/ios/**",
 					"$(SRCROOT)/../node_modules/react-native-photo-view/ios/**",
 					"$(SRCROOT)/../node_modules/react-native-fs/**",
-					"$(SRCROOT)/../node_modules/react-native-ble-manager/ios",
 					"$(SRCROOT)/../node_modules/react-native-svg/ios/**",
 					"$(SRCROOT)/../node_modules/react-native-ble-plx/ios/**",
 				);
@@ -1544,9 +1511,6 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
-					"\"$(SRCROOT)/$(TARGET_NAME)\"",
-					"\"$(SRCROOT)/$(TARGET_NAME)\"",
-					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 				);
 				OTHER_LDFLAGS = (
 					"-ObjC",
@@ -1570,7 +1534,6 @@
 					"$(SRCROOT)/../node_modules/react-native-spinkit/ios/**",
 					"$(SRCROOT)/../node_modules/react-native-photo-view/ios/**",
 					"$(SRCROOT)/../node_modules/react-native-fs/**",
-					"$(SRCROOT)/../node_modules/react-native-ble-manager/ios",
 					"$(SRCROOT)/../node_modules/react-native-svg/ios/**",
 					"$(SRCROOT)/../node_modules/react-native-ble-plx/ios/**",
 				);
@@ -1579,9 +1542,6 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
-					"\"$(SRCROOT)/$(TARGET_NAME)\"",
-					"\"$(SRCROOT)/$(TARGET_NAME)\"",
-					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 				);
 				OTHER_LDFLAGS = (
 					"-ObjC",
@@ -1609,7 +1569,6 @@
 					"$(SRCROOT)/../node_modules/react-native-spinkit/ios/**",
 					"$(SRCROOT)/../node_modules/react-native-photo-view/ios/**",
 					"$(SRCROOT)/../node_modules/react-native-fs/**",
-					"$(SRCROOT)/../node_modules/react-native-ble-manager/ios",
 					"$(SRCROOT)/../node_modules/react-native-svg/ios/**",
 					"$(SRCROOT)/../node_modules/react-native-ble-plx/ios/**",
 				);
@@ -1641,7 +1600,6 @@
 					"$(SRCROOT)/../node_modules/react-native-spinkit/ios/**",
 					"$(SRCROOT)/../node_modules/react-native-photo-view/ios/**",
 					"$(SRCROOT)/../node_modules/react-native-fs/**",
-					"$(SRCROOT)/../node_modules/react-native-ble-manager/ios",
 					"$(SRCROOT)/../node_modules/react-native-svg/ios/**",
 					"$(SRCROOT)/../node_modules/react-native-ble-plx/ios/**",
 				);
@@ -1677,7 +1635,6 @@
 					"$(SRCROOT)/../node_modules/react-native-spinkit/ios/**",
 					"$(SRCROOT)/../node_modules/react-native-photo-view/ios/**",
 					"$(SRCROOT)/../node_modules/react-native-fs/**",
-					"$(SRCROOT)/../node_modules/react-native-ble-manager/ios",
 					"$(SRCROOT)/../node_modules/react-native-svg/ios/**",
 					"$(SRCROOT)/../node_modules/react-native-ble-plx/ios/**",
 				);
@@ -1685,9 +1642,6 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
-					"\"$(SRCROOT)/$(TARGET_NAME)\"",
-					"\"$(SRCROOT)/$(TARGET_NAME)\"",
-					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 				);
 				OTHER_LDFLAGS = (
 					"-ObjC",
@@ -1721,7 +1675,6 @@
 					"$(SRCROOT)/../node_modules/react-native-spinkit/ios/**",
 					"$(SRCROOT)/../node_modules/react-native-photo-view/ios/**",
 					"$(SRCROOT)/../node_modules/react-native-fs/**",
-					"$(SRCROOT)/../node_modules/react-native-ble-manager/ios",
 					"$(SRCROOT)/../node_modules/react-native-svg/ios/**",
 					"$(SRCROOT)/../node_modules/react-native-ble-plx/ios/**",
 				);
@@ -1729,9 +1682,6 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
-					"\"$(SRCROOT)/$(TARGET_NAME)\"",
-					"\"$(SRCROOT)/$(TARGET_NAME)\"",
-					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 				);
 				OTHER_LDFLAGS = (
 					"-ObjC",
@@ -1760,9 +1710,6 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
-					"\"$(SRCROOT)/$(TARGET_NAME)\"",
-					"\"$(SRCROOT)/$(TARGET_NAME)\"",
-					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = "com.facebook.REACT.snaplab_react-tvOSTests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -1787,9 +1734,6 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
-					"\"$(SRCROOT)/$(TARGET_NAME)\"",
-					"\"$(SRCROOT)/$(TARGET_NAME)\"",
-					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = "com.facebook.REACT.snaplab_react-tvOSTests";
 				PRODUCT_NAME = "$(TARGET_NAME)";

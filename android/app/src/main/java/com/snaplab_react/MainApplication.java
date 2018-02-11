@@ -5,7 +5,6 @@ import android.app.Application;
 import com.facebook.react.ReactApplication;
 import com.polidea.reactnativeble.BlePackage;
 import com.horcrux.svg.SvgPackage;
-import it.innove.BleManagerPackage;
 import com.rnfs.RNFSPackage;
 import com.react.rnspinkit.RNSpinkitPackage;
 import com.reactnative.photoview.PhotoViewPackage;
@@ -33,7 +32,6 @@ public class MainApplication extends Application implements ReactApplication {
           new MainReactPackage(),
             new BlePackage(),
             new SvgPackage(),
-            new BleManagerPackage(),
             new RNFSPackage(),
             new RNSpinkitPackage(),
             new PhotoViewPackage(),
