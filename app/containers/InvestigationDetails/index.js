@@ -25,6 +25,7 @@ import {
   VictoryZoomContainer
 } from 'victory-native';
 import FullScreenLoader from '../../components/FullScreenLoading';
+import GlobalErrorAlert from '../../components/GlobalErrorAlert';
 import base64 from 'base64-js';
 import buffer from 'buffer';
 
@@ -1033,6 +1034,7 @@ export class InvestigationDetailsComponent extends Component<{}> {
 
     return (
       <View style={styles.container}>
+        <GlobalErrorAlert />
         <FullScreenLoader visible={!!busy || !!isBusy} />
 
         <ScrollView style={styles.scrollContainer}>
@@ -1336,7 +1338,7 @@ const mapStateToProps = state => {
     connectedDevices: state.bluetooth.connectedDevices,
     user: state.currentUser,
     busy: state.meta.busy
-  };
+ };
 };
 
 const mapDispatchToProps = dispatch => {

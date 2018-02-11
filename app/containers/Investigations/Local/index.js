@@ -1,15 +1,16 @@
-import React, { Component } from "react";
-import { connect } from "react-redux";
-import { View } from "react-native";
-import { Button } from "nachos-ui";
-import InvestigationList from "../../../components/InvestigationList";
+import React, { Component } from 'react';
+import { connect } from 'react-redux';
+import { View } from 'react-native';
+import { Button } from 'nachos-ui';
+import InvestigationList from '../../../components/InvestigationList';
+import GlobalErrorAlert from '../../../components/GlobalErrorAlert';
 
-import Colors from "../../../Theme/colors";
-import { fetchInvestigationById, deleteInvestigation } from "../Local/actions";
+import Colors from '../../../Theme/colors';
+import { fetchInvestigationById, deleteInvestigation } from '../Local/actions';
 
 export class LocalInvestigationsComponent extends Component<{}> {
   static navigationOptions = {
-    title: "Local Investigations"
+    title: 'Local Investigations'
   };
 
   state = {
@@ -42,6 +43,7 @@ export class LocalInvestigationsComponent extends Component<{}> {
 
     return (
       <View style={styles.container}>
+        <GlobalErrorAlert />
         <InvestigationList
           investigations={localInvestigationsArray}
           localInvestigations={localInvestigations}
@@ -56,7 +58,7 @@ export class LocalInvestigationsComponent extends Component<{}> {
         <View style={styles.footerButtonContainer}>
           <Button
             uppercase={false}
-            onPressIn={() => navigation.navigate("BluetoothConnect")}
+            onPressIn={() => navigation.navigate('BluetoothConnect')}
             style={styles.footerButton}
           >
             Sensor Tags
@@ -69,7 +71,7 @@ export class LocalInvestigationsComponent extends Component<{}> {
 
 const styles = {
   container: {
-    flexDirection: "column",
+    flexDirection: 'column',
     flex: 1
   },
   footerButtonContainer: {
@@ -78,7 +80,7 @@ const styles = {
     padding: 10
   },
   footerButton: {
-    width: "100%",
+    width: '100%',
     borderRadius: 0
   }
 };

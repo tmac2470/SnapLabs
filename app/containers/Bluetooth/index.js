@@ -13,7 +13,7 @@ import {
 import { Button, H5, H4, H6, Badge } from 'nachos-ui';
 import FullScreenLoader from '../../components/FullScreenLoading';
 import { Map } from 'immutable';
-
+import GlobalErrorAlert from '../../components/GlobalErrorAlert';
 import { BleManager } from 'react-native-ble-plx';
 import base64 from 'base64-js';
 
@@ -275,16 +275,12 @@ export class BluetoothConnectComponent extends Component<{}> {
     const numOfConnectedDevices = Object.keys(connectedDevices).length;
 
     const peripherals = peripheralMap.toArray();
-    // Object.keys(connectedDevices).map(key => {
-    //   const device = connectedDevices[key];
-    //   if (!peripheralMap.get(key)) {
-    //     peripherals.push(device);
-    //   }
-    // });
 
     return (
       <View style={styles.container}>
+        <GlobalErrorAlert />
         <FullScreenLoader visible={!!busy || !!isBusy} />
+
         {showHighlightInfo &&
         numOfConnectedDevices > 0 &&
         peripherals.length > 0 ? (

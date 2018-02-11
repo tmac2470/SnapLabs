@@ -1,15 +1,16 @@
-import React, { Component } from "react";
-import { View, Alert } from "react-native";
-import { connect } from "react-redux";
-import { NavigationActions } from "react-navigation";
+import React, { Component } from 'react';
+import { View, Alert } from 'react-native';
+import { connect } from 'react-redux';
+import { NavigationActions } from 'react-navigation';
 
-import { Input, Button } from "nachos-ui";
-import Colors from "../../Theme/colors";
-import { setUser } from "./actions";
+import { Input, Button } from 'nachos-ui';
+import Colors from '../../Theme/colors';
+import { setUser } from './actions';
+import GlobalErrorAlert from '../../components/GlobalErrorAlert';
 
 export class JoinComponent extends Component<{}> {
   static navigationOptions = {
-    title: "Join",
+    title: 'Join',
     headerLeft: null
   };
 
@@ -31,7 +32,7 @@ export class JoinComponent extends Component<{}> {
   }
 
   showAlert() {
-    Alert.alert("Please provide a valid email");
+    Alert.alert('Please provide a valid email');
   }
 
   submit() {
@@ -42,7 +43,7 @@ export class JoinComponent extends Component<{}> {
       return;
     }
     onSaveUser(user);
-    this._navigateTo("Home");
+    this._navigateTo('Home');
   }
 
   _navigateTo(routeName) {
@@ -63,16 +64,17 @@ export class JoinComponent extends Component<{}> {
     const { username, email } = this.state.user;
     return (
       <View style={styles.container}>
+        <GlobalErrorAlert />
         <View style={styles.inputContainer}>
           <Input
             style={[styles.input, styles.marginTop]}
             inputStyle={styles.inputText}
             placeholder="Username"
-            status={username ? "valid" : "normal"}
+            status={username ? 'valid' : 'normal'}
             autoCorrect={false}
             autoFocus={true}
             onChangeText={username =>
-              this.onUpdateUserCredentials("username", username)
+              this.onUpdateUserCredentials('username', username)
             }
             value={username}
           />
@@ -83,13 +85,13 @@ export class JoinComponent extends Component<{}> {
             placeholder="Email"
             status={
               email && this.validateEmail(email)
-                ? "valid"
-                : !email ? "normal" : "warn"
+                ? 'valid'
+                : !email ? 'normal' : 'warn'
             }
             autoCapitalize="none"
             keyboardType="email-address"
             onChangeText={e =>
-              this.onUpdateUserCredentials("email", e.toLowerCase())
+              this.onUpdateUserCredentials('email', e.toLowerCase())
             }
             value={email}
           />
@@ -111,13 +113,13 @@ export class JoinComponent extends Component<{}> {
 const styles = {
   container: {
     flex: 1,
-    backgroundColor: "white",
+    backgroundColor: 'white',
     paddingLeft: 15,
     paddingRight: 15
   },
   inputContainer: {
     flex: 8,
-    justifyContent: "center"
+    justifyContent: 'center'
   },
   input: {
     // borderColor: Colors.primary
@@ -134,7 +136,7 @@ const styles = {
     padding: 10
   },
   footerButton: {
-    width: "100%",
+    width: '100%',
     borderRadius: 0
   }
 };
