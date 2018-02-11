@@ -96,7 +96,7 @@ export class BluetoothConnectComponent extends Component<{}> {
         onAppError(error.message);
         return;
       }
-      if (device && device.name) {
+      if (device && device.name && device.name.indexOf('Sensor') > -1) {
         this._addDeviceToList(device);
         this._autoConnectIfPreviouslyConnected(device);
       }
@@ -156,6 +156,10 @@ export class BluetoothConnectComponent extends Component<{}> {
   _getKeyPressed(device) {
     const { onAppError } = this.props;
     const { UUID, DATA } = SERVICES.IOBUTTON;
+
+    this.setState({
+      showHighlightInfo: true
+    });
 
     this.manager.monitorCharacteristicForDevice(
       device.id,
@@ -287,6 +291,10 @@ export class BluetoothConnectComponent extends Component<{}> {
           <View style={styles.connectedInfoContainer}>
             <H6 style={styles.text}>
               Press any button on the device to highlight the device name
+            </H6>
+            <H6 style={styles.text}>
+              If a device gets disconnected the app would try to re-connect on
+              investigation page.
             </H6>
           </View>
         ) : null}
