@@ -607,25 +607,6 @@ export class InvestigationDetailsComponent extends Component<{}> {
     const { onAppError } = this.props;
 
     try {
-      // try {
-      //   sampleIntervalTime = 280;
-      //   if (service.UUID.toLowerCase() === SERVICES.Temperature.UUID) {
-      //     if (sampleIntervalTime < 300) {
-      //       return new Error(
-      //         'IR Temperature sensor cannot have sample interval time lower than 300ms'
-      //       );
-      //     }
-      //   } else {
-      //     if (sampleIntervalTime < 100) {
-      //       return new Error(
-      //         'Sensors cannot have sample interval time lower than 100ms'
-      //       );
-      //     }
-      //   }
-      // } catch (e) {
-      //   return onAppError(e.message);
-      // }
-
       // Write the delay time
       await this._writePeriodToDevice(device, service, sampleIntervalTime);
 
@@ -638,12 +619,7 @@ export class InvestigationDetailsComponent extends Component<{}> {
         await this._writeToDevice(device, service, activationBits);
       }
     } catch (e) {
-      console.log(e);
-
-      return onAppError(
-        'Unable to write to device! Please reconnect device',
-        e
-      );
+      return onAppError('Unable to write to device! Please reconnect device');
     }
   };
 

@@ -23,6 +23,10 @@ export class GlobalErrorAlert extends Component<{}> {
     }
   }
 
+  shouldComponentUpdate(nextProps) {
+    return this.props.error !== nextProps.error;
+  }
+
   render() {
     const { visible, error } = this.props;
 

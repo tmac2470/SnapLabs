@@ -11,7 +11,7 @@ export function metaStoreReducer(initial = initialMetastoreState, action) {
 
   switch (action.type) {
     case APP_ERROR_SEEN:
-      return Object.assign({}, initial, { errorSeen });
+      return Object.assign({}, initial, { errorSeen, error: null });
     case APP_ERROR:
       return Object.assign({}, initial, { error, errorSeen: false });
     case APP_BUSY:
