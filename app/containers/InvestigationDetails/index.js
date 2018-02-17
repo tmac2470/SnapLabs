@@ -832,7 +832,7 @@ export class InvestigationDetailsComponent extends Component<{}> {
     Object.keys(connectedDevices).map(deviceId => {
       sensors.map(sensor => {
         Object.keys(sensor.graph[deviceId].type).map(graphKey => {
-          sensor.graph[deviceId].type[graphKey].data = [];
+          sensor.graph[deviceId].type[graphKey].data = [0, 0];
         });
       });
     });
@@ -1032,6 +1032,8 @@ export class InvestigationDetailsComponent extends Component<{}> {
           investigation,
           user
         );
+        await onAppBusy(false);
+        await this._successAlert('File saved!');
       } catch (error) {
         onAppBusy(false);
         onAppError(error);
@@ -1060,6 +1062,8 @@ export class InvestigationDetailsComponent extends Component<{}> {
           investigation,
           user
         );
+        await onAppBusy(false);
+        await this._successAlert('File saved!');
       } catch (error) {
         onAppBusy(false);
         onAppError(error);
@@ -1067,6 +1071,29 @@ export class InvestigationDetailsComponent extends Component<{}> {
       onAppBusy(false);
     };
     asyncSave();
+  }
+
+  _successAlert(message) {
+    setTimeout(() => {
+      Alert.alert(
+        'Success',
+        message,
+        [
+          {
+            text: 'Cancel',
+            onPress: () => {},
+            style: 'cancel'
+          },
+          {
+            text: 'OK',
+            onPress: () => {}
+          }
+        ],
+        {
+          cancelable: true
+        }
+      );
+    }, 500);
   }
 
   render() {
@@ -1269,7 +1296,7 @@ export class InvestigationDetailsComponent extends Component<{}> {
               )}
               {graphs.started ? (
                 <Button
-                  type="success"
+                  type="danger"
                   uppercase={false}
                   onPressIn={() => this.stopGraphs()}
                   style={styles.footerButton}
