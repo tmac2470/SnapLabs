@@ -27,7 +27,6 @@ import {
 import FullScreenLoader from '../../components/FullScreenLoading';
 import GlobalErrorAlert from '../../components/GlobalErrorAlert';
 import base64 from 'base64-js';
-import buffer from 'buffer';
 
 import Colors from '../../Theme/colors';
 import * as utils from './utils';
@@ -229,13 +228,40 @@ export class InvestigationDetailsComponent extends Component<{}> {
     return monitor;
   }
 
+  // Hex to Base64
+  _hexToBase64(str) {
+    return btoa(
+      String.fromCharCode.apply(
+        null,
+        str
+          .replace(/\r|\n/g, '')
+          .replace(/([\da-fA-F]{2}) ?/g, '0x$1 ')
+          .replace(/ +$/, '')
+          .split(' ')
+      )
+    );
+  }
+
+  _decToBase64(period) {
+    const periodToDec = period.toString(16);
+    return this._hexToBase64(periodToDec);
+  }
+
   _writePeriodToDevice(device, service, sampleIntervalTime) {
-    const period = [sampleIntervalTime * 10];
+    const period = sampleIntervalTime / 10;
+
+    // IR Temperature Range : 300 ms (0x1E) to 2.55 sec (0xFF).
+    // Movement Range       : Range 100 ms (0x0A) to 2.55 sec (0xFF)
+    // Humidity Range       : Range 100 ms (0x0A) to 2.55 sec (0xFF).
+    // Barometer Range      : Range 100 ms (0x0A) to 2.55 sec (0xFF)
+    // Luxometer Range      : Range 100 ms (0x0A) to 2.55 sec (0xFF)
+
+    const periodToBase64 = this._decToBase64(period);
     return this.manager.writeCharacteristicWithResponseForDevice(
       device.id,
       service.UUID,
       service.PERIOD,
-      period
+      periodToBase64
     );
   }
 
@@ -576,13 +602,33 @@ export class InvestigationDetailsComponent extends Component<{}> {
     device,
     activationBits
   ) => {
-    const { sampleIntervalTime } = this.state;
+    let { sampleIntervalTime } = this.state;
 
     const { onAppError } = this.props;
 
     try {
+      // try {
+      //   sampleIntervalTime = 280;
+      //   if (service.UUID.toLowerCase() === SERVICES.Temperature.UUID) {
+      //     if (sampleIntervalTime < 300) {
+      //       return new Error(
+      //         'IR Temperature sensor cannot have sample interval time lower than 300ms'
+      //       );
+      //     }
+      //   } else {
+      //     if (sampleIntervalTime < 100) {
+      //       return new Error(
+      //         'Sensors cannot have sample interval time lower than 100ms'
+      //       );
+      //     }
+      //   }
+      // } catch (e) {
+      //   return onAppError(e.message);
+      // }
+
       // Write the delay time
-      // await this._writePeriodToDevice(device, service, sampleIntervalTime);
+      await this._writePeriodToDevice(device, service, sampleIntervalTime);
+
       // Start notification
       await this._startNotificationForService(device, service);
 
@@ -592,7 +638,12 @@ export class InvestigationDetailsComponent extends Component<{}> {
         await this._writeToDevice(device, service, activationBits);
       }
     } catch (e) {
-      onAppError('Unable to write to device! Please reconnect device', e);
+      console.log(e);
+
+      return onAppError(
+        'Unable to write to device! Please reconnect device',
+        e
+      );
     }
   };
 
