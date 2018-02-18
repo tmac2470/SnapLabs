@@ -7,21 +7,16 @@
 
   <ion-toolbar>
     <ion-segment>
-      <ion-segment-button value="1" (click)="openSortOptions()">
-        Sort
+      <ion-segment-button value="1">
       </ion-segment-button>
-      <ion-segment-button value="2" (click)="openFilterOptions()">
-        Filter
+      <ion-segment-button value="2" (click)="openSortOptions()">
+        Sort
       </ion-segment-button>
     </ion-segment>
   </ion-toolbar>
 </ion-header>
 
 <ion-content>
-  <h5 padding *ngIf="investigations?.length>0">Select an investigation to download</h5>
-
-  <h5 padding *ngIf="investigations?.length==0" text-center>No results found!</h5>
-
   <ion-list *ngIf="investigations?.length>0">
     <ion-item *ngFor="let investigation of investigations" (click)="openDetailsPanel(investigation._id)" text-wrap>
       <h2 text-bold>{{ investigation.labTitle }}</h2>
@@ -42,3 +37,9 @@
     </ion-item>
   </ion-list>
 </ion-content>
+
+<ion-footer>
+  <button ion-button color="secondary" full no-margin (click)="openFilterOptions()">
+    Filter
+  </button>
+</ion-footer>

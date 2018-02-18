@@ -10,7 +10,8 @@ import {
 
 @Component({
   selector: "search-sort-page-component",
-  templateUrl: "search-sort.view.html"
+  templateUrl: "search-sort.view.html",
+  styles: ["./search-sort.styles.scss"]
 })
 export class SearchSortPageComponent {
   searchSortOptions = SearchSortOptions;
