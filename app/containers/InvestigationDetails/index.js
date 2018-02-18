@@ -1292,10 +1292,9 @@ export class InvestigationDetailsComponent extends Component<{}> {
               )}
               {graphs.startedAtLeastOnce ? (
                 <Button
-                  type="danger"
                   uppercase={false}
                   onPressIn={() => this.resetGraphs()}
-                  style={styles.footerButton}
+                  style={[styles.footerButton, styles.resetButton]}
                 >
                   Reset graphs
                 </Button>
@@ -1312,11 +1311,10 @@ export class InvestigationDetailsComponent extends Component<{}> {
                 Save grid data
               </Button>
               <Button
-                type="danger"
                 uppercase={false}
                 onPressIn={() => this.resetGrids()}
-                style={styles.footerButton}
-              >
+                style={[styles.footerButton, styles.resetButton]}
+                >
                 Reset grids
               </Button>
             </View>
@@ -1390,6 +1388,9 @@ const styles = {
   footerButton: {
     width: '100%',
     marginTop: 5
+  },
+  resetButton: {
+    backgroundColor: Colors.dark
   }
 };
 
