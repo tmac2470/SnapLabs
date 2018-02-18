@@ -1,21 +1,25 @@
 import RNFS from 'react-native-fs';
-import {FETCH_FILES_SUCCESS, SAVE_FILE_SUCCESS, DELETE_FILE_SUCCESS} from './constants';
-import {appBusy, appError} from "../../Metastores/actions";
-import {Platform} from 'react-native';
+import {
+  FETCH_FILES_SUCCESS,
+  SAVE_FILE_SUCCESS,
+  DELETE_FILE_SUCCESS
+} from './constants';
+import { appBusy, appError } from '../../Metastores/actions';
+import { Platform } from 'react-native';
 
 export function fetchFilesSuccess(files) {
-  return {type: FETCH_FILES_SUCCESS, files};
+  return { type: FETCH_FILES_SUCCESS, files };
 }
 
 export function saveFileSuccess(file) {
-  return {type: SAVE_FILE_SUCCESS, file};
+  return { type: SAVE_FILE_SUCCESS, file };
 }
 
 export function deleteFileSuccess(file) {
-  return {type: DELETE_FILE_SUCCESS, file};
+  return { type: DELETE_FILE_SUCCESS, file };
 }
 
-export const _getFolderPath = (user) => {
+export const _getFolderPath = user => {
   let folder = '';
   if (Platform.OS === 'ios') {
     folder = RNFS.LibraryDirectoryPath;
@@ -24,20 +28,26 @@ export const _getFolderPath = (user) => {
   }
 
   return `${folder}/${user.email}`;
-}
+};
 
-export const fetchFiles = (user) => {
+export const fetchFiles = user => {
+  const path = `${_getFolderPath(user)}`;
   return dispatch => {
-    return RNFS
-      .readDir(_getFolderPath(user))
-      .then(files => {
-        dispatch(fetchFilesSuccess(files));
+    return RNFS.mkdir(path)
+      .then(e => {
+        return RNFS.readDir(path)
+          .then(files => {
+            dispatch(fetchFilesSuccess(files));
+          })
+          .catch(error => {
+            dispatch(appError(error.message));
+          });
       })
       .catch(error => {
         dispatch(appError(error.message));
       });
-  }
-}
+  };
+};
 
 export const saveFile = (fileName, fileContent, user) => {
   const path = `${_getFolderPath(user)}`;
@@ -45,11 +55,9 @@ export const saveFile = (fileName, fileContent, user) => {
   return dispatch => {
     dispatch(appBusy(true));
 
-    return RNFS
-      .mkdir(path)
+    return RNFS.mkdir(path)
       .then(e => {
-        return RNFS
-          .writeFile(filePath, fileContent)
+        return RNFS.writeFile(filePath, fileContent)
           .then(_ => {
             console.log('saved file', fileName);
             // dispatch(saveFileSuccess(files));
@@ -63,9 +71,9 @@ export const saveFile = (fileName, fileContent, user) => {
       .catch(error => {
         dispatch(appError(error.message));
         dispatch(appBusy(false));
-      })
-  }
-}
+      });
+  };
+};
 
 export const deleteFile = (file, user) => {
   const fileName = file.name;
@@ -74,8 +82,7 @@ export const deleteFile = (file, user) => {
   return dispatch => {
     dispatch(appBusy(true));
 
-    return RNFS
-      .unlink(filePath)
+    return RNFS.unlink(filePath)
       .then(_ => {
         console.log('deleted', fileName);
         dispatch(deleteFileSuccess(file));
@@ -85,5 +92,5 @@ export const deleteFile = (file, user) => {
         dispatch(appError(error.message));
         dispatch(appBusy(false));
       });
-  }
-}
+  };
+};
