@@ -23,6 +23,7 @@
     "react-native-ble-plx": "^0.8.0",
     "react-native-datepicker": "^1.6.0",
     "react-native-fs": "^2.9.7",
+    "react-native-linear-gradient": "^2.4.0",
     "react-native-photo-view": "^1.5.2",
     "react-native-spinkit": "^1.1.1",
     "react-native-svg": "^6.0.1-rc.3",
