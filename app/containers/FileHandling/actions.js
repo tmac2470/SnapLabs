@@ -28,16 +28,13 @@ export const _getFolderPath = (user) => {
 
 export const fetchFiles = (user) => {
   return dispatch => {
-    dispatch(appBusy(true));
     return RNFS
       .readDir(_getFolderPath(user))
       .then(files => {
         dispatch(fetchFilesSuccess(files));
-        dispatch(appBusy(false));
       })
       .catch(error => {
         dispatch(appError(error.message));
-        dispatch(appBusy(false));
       });
   }
 }
