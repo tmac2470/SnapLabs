@@ -2,7 +2,7 @@
 <widget id="snaplab.ti.app.dev" version="2.0.1" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
     <name>SnapLabs App</name>
     <description>TI Sensor Tag Application</description>
-    <content original-src="index.html" src="http://10.0.0.82:8100" />
+    <content src="index.html" />
     <access origin="*" />
     <allow-navigation href="http://ionic.local/*" />
     <allow-navigation href="http://192.168.1.10:8100" />
@@ -76,6 +76,8 @@
         <splash height="1024" src="resources/ios/splash/Default-Portrait~ipad.png" width="768" />
         <splash height="960" src="resources/ios/splash/Default@2x~iphone.png" width="640" />
         <splash height="480" src="resources/ios/splash/Default~iphone.png" width="320" />
+        <icon height="1024" src="resources/ios/icon/icon-1024.png" width="1024" />
+        <splash height="2732" src="resources/ios/splash/Default@2x~universal~anyany.png" width="2732" />
     </platform>
     <allow-navigation href="http://192.168.1.8:8100" />
     <allow-navigation href="http://10.66.31.47:8100" />
@@ -84,7 +86,6 @@
     <allow-navigation href="http://10.0.0.81:8100" />
     <allow-navigation href="http://169.254.212.92:8100" />
     <allow-navigation href="http://169.254.214.48:8100" />
-    <engine name="android" spec="^6.2.3" />
     <engine name="ios" spec="^4.4.0" />
     <plugin name="cordova-plugin-ble-central" spec="^1.1.4" />
     <plugin name="cordova-plugin-console" spec="^1.1.0" />
@@ -96,4 +97,6 @@
     <plugin name="cordova-plugin-whitelist" spec="^1.3.1" />
     <plugin name="cordova-plugin-x-socialsharing" spec="^5.2.1" />
     <plugin name="ionic-plugin-keyboard" spec="^2.2.1" />
+    <engine name="android" spec="~6.4.0" />
+    <allow-navigation href="http://192.168.1.2:8100" />
 </widget>
