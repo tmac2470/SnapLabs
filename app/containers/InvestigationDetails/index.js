@@ -230,7 +230,7 @@ export class InvestigationDetailsComponent extends Component<{}> {
 
   // Hex to Base64
   _hexToBase64(str) {
-    return btoa(
+    return utils.Base64Btoa(
       String.fromCharCode.apply(
         null,
         str
@@ -257,6 +257,7 @@ export class InvestigationDetailsComponent extends Component<{}> {
     // Luxometer Range      : Range 100 ms (0x0A) to 2.55 sec (0xFF)
 
     const periodToBase64 = this._decToBase64(period);
+
     return this.manager.writeCharacteristicWithResponseForDevice(
       device.id,
       service.UUID,
@@ -619,7 +620,7 @@ export class InvestigationDetailsComponent extends Component<{}> {
         await this._writeToDevice(device, service, activationBits);
       }
     } catch (e) {
-      return onAppError('Unable to write to device! Please reconnect device');
+      return onAppError(e.message);
     }
   };
 
