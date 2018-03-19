@@ -79,6 +79,14 @@ export class HomeComponent extends Component<{}> {
           >
             File handling
           </Button>
+
+          <Button
+            uppercase={false}
+            onPressIn={() => navigation.navigate("BluetoothConnect")}
+            style={styles.button}
+          >
+            Sensor Tags
+          </Button>
         </View>
       </View>
     );
