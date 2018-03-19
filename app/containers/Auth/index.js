@@ -102,7 +102,7 @@ export class JoinComponent extends Component<{}> {
             onPressIn={this.submit.bind(this)}
             style={styles.footerButton}
           >
-            Save
+            Start!
           </Button>
         </View>
       </View>

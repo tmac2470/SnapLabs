@@ -1,9 +1,9 @@
-import React, { Component } from 'react';
-import { connect, connectAdvanced } from 'react-redux';
-import { BleManager } from 'react-native-ble-plx';
-import * as _ from 'lodash';
-import * as SERVICES from '../Bluetooth/services';
-import moment from 'moment';
+import React, { Component } from "react";
+import { connect, connectAdvanced } from "react-redux";
+import { BleManager } from "react-native-ble-plx";
+import * as _ from "lodash";
+import * as SERVICES from "../Bluetooth/services";
+import moment from "moment";
 import {
   Alert,
   Image,
@@ -13,8 +13,8 @@ import {
   ScrollView,
   TouchableOpacity,
   View
-} from 'react-native';
-import { Button, H2, H4, H5, H6 } from 'nachos-ui';
+} from "react-native";
+import { Button, H2, H4, H5, H6 } from "nachos-ui";
 import {
   VictoryLine,
   VictoryChart,
@@ -23,18 +23,18 @@ import {
   VictoryLabel,
   VictoryLegend,
   VictoryZoomContainer
-} from 'victory-native';
-import FullScreenLoader from '../../components/FullScreenLoading';
-import GlobalErrorAlert from '../../components/GlobalErrorAlert';
-import base64 from 'base64-js';
+} from "victory-native";
+import FullScreenLoader from "../../components/FullScreenLoading";
+import GlobalErrorAlert from "../../components/GlobalErrorAlert";
+import base64 from "base64-js";
 
-import Colors from '../../Theme/colors';
-import * as utils from './utils';
-import { appError, appBusy } from '../../Metastores/actions';
+import Colors from "../../Theme/colors";
+import * as utils from "./utils";
+import { appError, appBusy } from "../../Metastores/actions";
 
 export class InvestigationDetailsComponent extends Component<{}> {
   static navigationOptions = {
-    title: 'Investigation Details'
+    title: "Investigation Details"
   };
 
   constructor() {
@@ -92,9 +92,9 @@ export class InvestigationDetailsComponent extends Component<{}> {
   }
 
   initialiseBluetooth() {
-    if (Platform.OS === 'ios') {
+    if (Platform.OS === "ios") {
       this.manager.onStateChange(state => {
-        if (state === 'PoweredOn') {
+        if (state === "PoweredOn") {
           this.startScan();
         }
       });
@@ -234,10 +234,10 @@ export class InvestigationDetailsComponent extends Component<{}> {
       String.fromCharCode.apply(
         null,
         str
-          .replace(/\r|\n/g, '')
-          .replace(/([\da-fA-F]{2}) ?/g, '0x$1 ')
-          .replace(/ +$/, '')
-          .split(' ')
+          .replace(/\r|\n/g, "")
+          .replace(/([\da-fA-F]{2}) ?/g, "0x$1 ")
+          .replace(/ +$/, "")
+          .split(" ")
       )
     );
   }
@@ -291,21 +291,21 @@ export class InvestigationDetailsComponent extends Component<{}> {
         !!config.grid.griddisplay
       ) {
         switch (sensorTag.name.toLowerCase()) {
-          case 'temperature':
+          case "temperature":
             service = SERVICES.Temperature;
             break;
-          case 'barometer':
+          case "barometer":
             service = SERVICES.Barometer;
             break;
-          case 'accelerometer':
-          case 'gyroscope':
-          case 'magnetometer':
+          case "accelerometer":
+          case "gyroscope":
+          case "magnetometer":
             service = SERVICES.Accelerometer;
             break;
-          case 'humidity':
+          case "humidity":
             service = SERVICES.Humidity;
             break;
-          case 'luxometer':
+          case "luxometer":
             service = SERVICES.Luxometer;
             break;
 
@@ -347,21 +347,21 @@ export class InvestigationDetailsComponent extends Component<{}> {
           !!config.grid.griddisplay
         ) {
           switch (sensorTag.name.toLowerCase()) {
-            case 'temperature':
+            case "temperature":
               await this._startTemperatureNotifications(device);
               break;
-            case 'barometer':
+            case "barometer":
               await this._startBarometerNotifications(device);
               break;
-            case 'accelerometer':
-            case 'gyroscope':
-            case 'magnetometer':
+            case "accelerometer":
+            case "gyroscope":
+            case "magnetometer":
               this._startMovementNotifications(device);
               break;
-            case 'humidity':
+            case "humidity":
               await this._startHumidityNotifications(device);
               break;
-            case 'luxometer':
+            case "luxometer":
               await this._startLuxometerNotifications(device);
               break;
 
@@ -425,14 +425,14 @@ export class InvestigationDetailsComponent extends Component<{}> {
       X: accX,
       Y: accY,
       Z: accZ,
-      'Scalar Value': accScalar
+      "Scalar Value": accScalar
     };
 
     const magnetometerValues = {
       X: magX,
       Y: magY,
       Z: magZ,
-      'Scalar Value': magScalar
+      "Scalar Value": magScalar
     };
 
     // console.log(gyroscopeValues);
@@ -443,7 +443,7 @@ export class InvestigationDetailsComponent extends Component<{}> {
       gyroscopeValues.Z
     }`;
     this._updateSensorValue(
-      'Gyroscope',
+      "Gyroscope",
       deviceId,
       displayValGyro,
       gyroscopeValues
@@ -453,7 +453,7 @@ export class InvestigationDetailsComponent extends Component<{}> {
       accelerometerValues.Y
     }, Z ${accelerometerValues.Z}`;
     this._updateSensorValue(
-      'Accelerometer',
+      "Accelerometer",
       deviceId,
       displayValAcc,
       accelerometerValues
@@ -463,7 +463,7 @@ export class InvestigationDetailsComponent extends Component<{}> {
       magnetometerValues.Y
     }, Z ${magnetometerValues.Z}`;
     this._updateSensorValue(
-      'Magnetometer',
+      "Magnetometer",
       deviceId,
       displayValMag,
       magnetometerValues
@@ -473,11 +473,11 @@ export class InvestigationDetailsComponent extends Component<{}> {
   // file:///Users/shailendrapal/Downloads/attr_cc2650%20sensortag.html
   _startMovementNotifications(device) {
     const service = SERVICES.Accelerometer;
-    this._asyncStartNotificationsForService(service, device, 'AH8=');
+    this._asyncStartNotificationsForService(service, device, "AH8=");
   }
 
   _readHumidityNotifications(deviceId, data) {
-    const sensorName = 'Humidity';
+    const sensorName = "Humidity";
     // Humidity DATA
 
     const state = new DataView(data).getUint16(0, true);
@@ -498,19 +498,19 @@ export class InvestigationDetailsComponent extends Component<{}> {
     )} °C`;
 
     const dataValueMap = {
-      '°C': values.temp,
-      '% RH': values.rh
+      "°C": values.temp,
+      "% RH": values.rh
     };
     this._updateSensorValue(sensorName, deviceId, displayVal, dataValueMap);
   }
 
   _startHumidityNotifications(device) {
     const service = SERVICES.Humidity;
-    this._asyncStartNotificationsForService(service, device, 'AQ==');
+    this._asyncStartNotificationsForService(service, device, "AQ==");
   }
 
   _readBarometerNotifications(deviceId, data) {
-    const sensorName = 'Barometer';
+    const sensorName = "Barometer";
     // Barometer DATA
 
     const flTempData = new DataView(data).getUint32(0, true);
@@ -528,18 +528,18 @@ export class InvestigationDetailsComponent extends Component<{}> {
 
     const dataValueMap = {
       hPa: values.hPa,
-      '°C': values.c
+      "°C": values.c
     };
     this._updateSensorValue(sensorName, deviceId, displayVal, dataValueMap);
   }
 
   _startBarometerNotifications(device) {
     const service = SERVICES.Barometer;
-    this._asyncStartNotificationsForService(service, device, 'AQ==');
+    this._asyncStartNotificationsForService(service, device, "AQ==");
   }
 
   _readTemperatureNotifications(deviceId, data) {
-    const sensorName = 'Temperature';
+    const sensorName = "Temperature";
 
     const temp = new DataView(data).getUint16(0, true);
     const targetTemp = (temp >> 2) * 0.03125;
@@ -555,19 +555,19 @@ export class InvestigationDetailsComponent extends Component<{}> {
     const displayVal = `${values.amb}°C [Amb], ${values.ir}°C [IR]`;
 
     const dataValueMap = {
-      'Ambient Temperature (°C)': values.amb,
-      'Target (IR) Temperature (°C)': values.ir
+      "Ambient Temperature (°C)": values.amb,
+      "Target (IR) Temperature (°C)": values.ir
     };
     this._updateSensorValue(sensorName, deviceId, displayVal, dataValueMap);
   }
 
   _startTemperatureNotifications(device) {
     const service = SERVICES.Temperature;
-    this._asyncStartNotificationsForService(service, device, 'AQ==');
+    this._asyncStartNotificationsForService(service, device, "AQ==");
   }
 
   _readLuxometerNotifications(deviceId, data) {
-    const sensorName = 'Luxometer';
+    const sensorName = "Luxometer";
 
     // Get 16 bit value from data buffer in little endian format.
     const value = new DataView(data).getUint16(0, true);
@@ -595,7 +595,7 @@ export class InvestigationDetailsComponent extends Component<{}> {
 
   _startLuxometerNotifications(device) {
     const service = SERVICES.Luxometer;
-    this._asyncStartNotificationsForService(service, device, 'AQ==');
+    this._asyncStartNotificationsForService(service, device, "AQ==");
   }
 
   _asyncStartNotificationsForService = async (
@@ -781,18 +781,18 @@ export class InvestigationDetailsComponent extends Component<{}> {
     const { investigation } = this.state;
 
     Alert.alert(
-      'Confirm reset',
+      "Confirm reset",
       `This will reset all the graphs for the investigation "${
         investigation.labTitle
       }"`,
       [
         {
-          text: 'Cancel',
+          text: "Cancel",
           onPress: () => {},
-          style: 'cancel'
+          style: "cancel"
         },
         {
-          text: 'Continue',
+          text: "Continue",
           onPress: () => this._resetGraphs()
         }
       ],
@@ -824,65 +824,65 @@ export class InvestigationDetailsComponent extends Component<{}> {
     const mapDataSetConfig = this.mapDataSetConfig;
 
     switch (sensor.name.toLowerCase()) {
-      case 'temperature':
+      case "temperature":
         let tempDataSets = [];
 
         if (sensorParams.ambient) {
-          tempDataSets.push({ type: 'amb' });
+          tempDataSets.push({ type: "amb" });
         }
 
         if (sensorParams.IR) {
-          tempDataSets.push({ type: 'ir' });
+          tempDataSets.push({ type: "ir" });
         }
 
         return tempDataSets;
 
-      case 'barometer':
-        return [{ type: 'hPa' }];
+      case "barometer":
+        return [{ type: "hPa" }];
 
-      case 'luxometer':
-        return [{ type: 'lux' }];
+      case "luxometer":
+        return [{ type: "lux" }];
 
       // Accelerometer and magnetometer share similar data set config
-      case 'accelerometer':
+      case "accelerometer":
         let accXyzScalarDataSet = [];
 
         if (sensorParams.xyz) {
           accXyzScalarDataSet.push({
-            type: 'accxyz'
+            type: "accxyz"
           });
         }
 
         if (sensorParams.scalar) {
           accXyzScalarDataSet.push({
-            type: 'accscalar'
+            type: "accscalar"
           });
         }
 
         return accXyzScalarDataSet;
-      case 'magnetometer':
+      case "magnetometer":
         let mgXyzScalarDataSet = [];
 
         if (sensorParams.xyz) {
           mgXyzScalarDataSet.push({
-            type: 'mgxyz'
+            type: "mgxyz"
           });
         }
 
         if (sensorParams.scalar) {
           mgXyzScalarDataSet.push({
-            type: 'mgscalar'
+            type: "mgscalar"
           });
         }
 
         return mgXyzScalarDataSet;
 
       // Gyroscope shares the same xyzDataSet
-      case 'gyroscope':
-        return [{ type: 'gyroscope' }];
+      case "gyroscope":
+        return [{ type: "gyroscope" }];
 
-      case 'humidity':
-        return [{ type: 'humidity' }];
+      case "humidity":
+        return [{ type: "humidity" }];
     }
   }
 
@@ -904,7 +904,7 @@ export class InvestigationDetailsComponent extends Component<{}> {
   _getInnerGridStyle(grid) {
     const style = {};
     if (grid && grid.value && Object.keys(grid.value).length > 0) {
-      style['backgroundColor'] = Colors.danger;
+      style["backgroundColor"] = Colors.danger;
     }
     return style;
   }
@@ -922,9 +922,9 @@ export class InvestigationDetailsComponent extends Component<{}> {
 
   _addTimeStampValues(dataValueMap) {
     const timestamp = new Date();
-    dataValueMap['Unix Timestamp'] = moment(timestamp).valueOf();
-    dataValueMap['Timestamp'] = moment(timestamp).format(
-      'd/MM/YYYY, hh:mm:ss:SSS'
+    dataValueMap["Unix Timestamp"] = moment(timestamp).valueOf();
+    dataValueMap["Timestamp"] = moment(timestamp).format(
+      "d/MM/YYYY, hh:mm:ss:SSS"
     );
     return dataValueMap;
   }
@@ -1010,7 +1010,7 @@ export class InvestigationDetailsComponent extends Component<{}> {
           user
         );
         await onAppBusy(false);
-        await this._successAlert('File saved!');
+        await this._successAlert("File saved!");
       } catch (error) {
         onAppBusy(false);
         onAppError(error);
@@ -1040,7 +1040,7 @@ export class InvestigationDetailsComponent extends Component<{}> {
           user
         );
         await onAppBusy(false);
-        await this._successAlert('File saved!');
+        await this._successAlert("File saved!");
       } catch (error) {
         onAppBusy(false);
         onAppError(error);
@@ -1053,16 +1053,16 @@ export class InvestigationDetailsComponent extends Component<{}> {
   _successAlert(message) {
     setTimeout(() => {
       Alert.alert(
-        'Success',
+        "Success",
         message,
         [
           {
-            text: 'Cancel',
+            text: "Cancel",
             onPress: () => {},
-            style: 'cancel'
+            style: "cancel"
           },
           {
-            text: 'OK',
+            text: "OK",
             onPress: () => {}
           }
         ],
@@ -1089,8 +1089,8 @@ export class InvestigationDetailsComponent extends Component<{}> {
     const isConnectedToDevices = Object.keys(connectedDevices);
     const connectedText =
       Object.keys(connectedDevices).length > 0
-        ? reconnected ? 'Connected!' : 'Connecting...'
-        : 'Not connected!';
+        ? reconnected ? "Connected!" : "Connecting..."
+        : "Not connected!";
 
     return (
       <View style={styles.container}>
@@ -1147,7 +1147,7 @@ export class InvestigationDetailsComponent extends Component<{}> {
                                 {param.key}
                               </H5>
                               <H5 style={[styles.text, styles.textBold]}>
-                                {param.value ? 'ON' : 'OFF'}
+                                {param.value ? "ON" : "OFF"}
                               </H5>
                             </View>
                           );
@@ -1159,11 +1159,10 @@ export class InvestigationDetailsComponent extends Component<{}> {
                       : Object.keys(connectedDevices).map(deviceId => (
                           <View
                             key={`sensor-tag-value-${deviceId}`}
-                            style={styles.twoColBox}
                           >
                             <H6 style={styles.text}>Sensor {deviceId}</H6>
                             <H6 style={[styles.text, styles.textBold]}>
-                              {sensor.value[deviceId]}
+                              Value: {sensor.value[deviceId]}
                             </H6>
                           </View>
                         ))}
@@ -1243,8 +1242,7 @@ export class InvestigationDetailsComponent extends Component<{}> {
                                     ]}
                                   >
                                     <H6 style={styles.gridText}>
-                                      {' '}
-                                      {grid.number}{' '}
+                                      {grid.number}
                                     </H6>
                                   </View>
                                 </TouchableOpacity>
@@ -1314,7 +1312,7 @@ export class InvestigationDetailsComponent extends Component<{}> {
                 uppercase={false}
                 onPressIn={() => this.resetGrids()}
                 style={[styles.footerButton, styles.resetButton]}
-                >
+              >
                 Reset grids
               </Button>
             </View>
@@ -1343,12 +1341,13 @@ const styles = {
     paddingLeft: 5
   },
   twoColBox: {
-    display: 'flex',
-    flexDirection: 'row',
-    flexWrap: 'wrap',
+    display: "flex",
+    flexDirection: "row",
+    flexWrap: "wrap",
     // alignItems: 'stretch',
-    justifyContent: 'space-between',
-    width: '80%',
+    justifyContent: "space-between",
+    width: "80%",
+    overflow: "hidden",
     paddingLeft: 5,
     paddingRight: 5
   },
@@ -1356,20 +1355,20 @@ const styles = {
     color: Colors.secondary
   },
   textBold: {
-    fontWeight: '600'
+    fontWeight: "600"
   },
   gridContainer: {
-    flexWrap: 'wrap',
-    flexDirection: 'row',
-    justifyContent: 'center'
+    flexWrap: "wrap",
+    flexDirection: "row",
+    justifyContent: "center"
   },
   gridData: {
-    width: '95%',
+    width: "95%",
     minWidth: 55,
     minHeight: 80,
-    justifyContent: 'center',
-    alignItems: 'center',
-    flexDirection: 'column',
+    justifyContent: "center",
+    alignItems: "center",
+    flexDirection: "column",
     backgroundColor: Colors.valid,
 
     marginTop: 5,
@@ -1378,7 +1377,7 @@ const styles = {
   },
   gridText: {
     color: Colors.light,
-    fontWeight: '600'
+    fontWeight: "600"
   },
   scrollContainer: {},
   footerButtonContainer: {
@@ -1386,7 +1385,7 @@ const styles = {
     height: 205
   },
   footerButton: {
-    width: '100%',
+    width: "100%",
     marginTop: 5
   },
   resetButton: {
