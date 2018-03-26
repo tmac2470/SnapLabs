@@ -439,9 +439,9 @@ export class InvestigationDetailsComponent extends Component<{}> {
     // console.log(accelerometerValues);
     // console.log(magnetometerValues);
 
-    const displayValGyro = `X ${gyroscopeValues.X}, Y ${gyroscopeValues.Y}, Z ${
-      gyroscopeValues.Z
-    }`;
+    const displayValGyro = `X ${gyroscopeValues.X.toFixed(
+      3
+    )}, Y ${gyroscopeValues.Y.toFixed(3)}, Z ${gyroscopeValues.Z.toFixed(3)}`;
     this._updateSensorValue(
       "Gyroscope",
       deviceId,
@@ -524,7 +524,9 @@ export class InvestigationDetailsComponent extends Component<{}> {
       c: tempValue
     };
 
-    const displayVal = `${values.hPa} hPa at ${values.c} °C`;
+    const displayVal = `${values.hPa.toFixed(3)} hPa at ${values.c.toFixed(
+      3
+    )} °C`;
 
     const dataValueMap = {
       hPa: values.hPa,
@@ -552,7 +554,9 @@ export class InvestigationDetailsComponent extends Component<{}> {
       ir: targetTemp
     };
 
-    const displayVal = `${values.amb}°C [Amb], ${values.ir}°C [IR]`;
+    const displayVal = `${values.amb.toFixed(3)}°C [Amb], ${values.ir.toFixed(
+      3
+    )}°C [IR]`;
 
     const dataValueMap = {
       "Ambient Temperature (°C)": values.amb,
@@ -586,7 +590,7 @@ export class InvestigationDetailsComponent extends Component<{}> {
     const values = {
       lux: luxValue
     };
-    const displayVal = `${values.lux} lux`;
+    const displayVal = `${values.lux.toFixed(3)} lux`;
     const dataValueMap = {
       lux: values.lux
     };
@@ -914,7 +918,7 @@ export class InvestigationDetailsComponent extends Component<{}> {
 
     const style = {
       width: `${display.maxGridWidth}%`,
-      height: `${display.maxGridWidth}%`
+      maxHeight: 500
     };
 
     return style;
@@ -1157,9 +1161,7 @@ export class InvestigationDetailsComponent extends Component<{}> {
                     {!isConnectedToDevices
                       ? null
                       : Object.keys(connectedDevices).map(deviceId => (
-                          <View
-                            key={`sensor-tag-value-${deviceId}`}
-                          >
+                          <View key={`sensor-tag-value-${deviceId}`}>
                             <H6 style={styles.text}>Sensor {deviceId}</H6>
                             <H6 style={[styles.text, styles.textBold]}>
                               Value: {sensor.value[deviceId]}
@@ -1241,9 +1243,25 @@ export class InvestigationDetailsComponent extends Component<{}> {
                                       this._getInnerGridStyle(grid)
                                     ]}
                                   >
-                                    <H6 style={styles.gridText}>
-                                      {grid.number}
-                                    </H6>
+                                    {grid.value ? null : (
+                                      <H6 style={styles.gridText}>
+                                        {grid.number}
+                                      </H6>
+                                    )}
+                                    {Object.keys(connectedDevices).map(
+                                      deviceId => (
+                                        <H6
+                                          style={styles.gridText}
+                                          key={`gridbox-${deviceId}`}
+                                        >
+                                          {grid.value &&
+                                          grid.value[deviceId] &&
+                                          grid.value[deviceId].value
+                                            ? grid.value[deviceId].value
+                                            : null}
+                                        </H6>
+                                      )
+                                    )}
                                   </View>
                                 </TouchableOpacity>
                               ))
