@@ -21,8 +21,7 @@ import {
   VictoryAxis,
   VictoryTheme,
   VictoryLabel,
-  VictoryLegend,
-  VictoryZoomContainer
+  VictoryLegend
 } from "victory-native";
 import FullScreenLoader from "../../components/FullScreenLoading";
 import GlobalErrorAlert from "../../components/GlobalErrorAlert";
@@ -393,7 +392,7 @@ export class InvestigationDetailsComponent extends Component<{}> {
     const accVal = 32768 / 2;
     const accDivisors = { x: -1 * accVal, y: accVal, z: -1 * accVal };
     const ax_temp = new DataView(data).getInt16(6, true);
-    const ay_temp = new DataView(data).getInt16(8, true);
+    const ay_temp = new DataView(data).getInt16(4, true);
     const az_temp = new DataView(data).getInt16(10, true);
 
     // Calculate accelerometer values.
@@ -435,9 +434,9 @@ export class InvestigationDetailsComponent extends Component<{}> {
       "Scalar Value": magScalar
     };
 
-    // console.log(gyroscopeValues);
-    // console.log(accelerometerValues);
-    // console.log(magnetometerValues);
+    console.log(gyroscopeValues);
+    console.log(accelerometerValues);
+    console.log(magnetometerValues);
 
     const displayValGyro = `X ${gyroscopeValues.X.toFixed(
       3
@@ -449,9 +448,11 @@ export class InvestigationDetailsComponent extends Component<{}> {
       gyroscopeValues
     );
 
-    const displayValAcc = `X ${accelerometerValues.X}, Y ${
-      accelerometerValues.Y
-    }, Z ${accelerometerValues.Z}`;
+    const displayValAcc = `X ${accelerometerValues.X.toFixed(
+      3
+    )}, Y ${accelerometerValues.Y.toFixed(
+      3
+    )}, Z ${accelerometerValues.Z.toFixed(3)}`;
     this._updateSensorValue(
       "Accelerometer",
       deviceId,
@@ -459,9 +460,11 @@ export class InvestigationDetailsComponent extends Component<{}> {
       accelerometerValues
     );
 
-    const displayValMag = `X ${magnetometerValues.X}, Y ${
-      magnetometerValues.Y
-    }, Z ${magnetometerValues.Z}`;
+    const displayValMag = `X ${magnetometerValues.X.toFixed(
+      3
+    )}, Y ${magnetometerValues.Y.toFixed(3)}, Z ${magnetometerValues.Z.toFixed(
+      3
+    )}`;
     this._updateSensorValue(
       "Magnetometer",
       deviceId,
@@ -473,7 +476,7 @@ export class InvestigationDetailsComponent extends Component<{}> {
   // file:///Users/shailendrapal/Downloads/attr_cc2650%20sensortag.html
   _startMovementNotifications(device) {
     const service = SERVICES.Accelerometer;
-    this._asyncStartNotificationsForService(service, device, "AH8=");
+    this._asyncStartNotificationsForService(service, device, "KQI=");
   }
 
   _readHumidityNotifications(deviceId, data) {
@@ -612,8 +615,15 @@ export class InvestigationDetailsComponent extends Component<{}> {
     const { onAppError } = this.props;
 
     try {
-      // Write the delay time
-      await this._writePeriodToDevice(device, service, sampleIntervalTime);
+      if (
+        service.UUID === SERVICES.Accelerometer.UUID &&
+        sampleIntervalTime <= 100
+      ) {
+        // Dont write the delay
+      } else {
+        // Write the delay time
+        await this._writePeriodToDevice(device, service, sampleIntervalTime);
+      }
 
       // Start notification
       await this._startNotificationForService(device, service);
@@ -624,6 +634,8 @@ export class InvestigationDetailsComponent extends Component<{}> {
         await this._writeToDevice(device, service, activationBits);
       }
     } catch (e) {
+      console.log(e);
+
       return onAppError(e.message);
     }
   };
@@ -1169,14 +1181,7 @@ export class InvestigationDetailsComponent extends Component<{}> {
                           </View>
                         ))}
                     {display.graph && sensor.graph ? (
-                      <VictoryChart
-                        theme={VictoryTheme.material}
-                        containerComponent={
-                          <VictoryZoomContainer
-                            minimumZoom={{ x: 10, y: 10 }}
-                          />
-                        }
-                      >
+                      <VictoryChart theme={VictoryTheme.material}>
                         <VictoryLegend
                           x={125}
                           y={50}
