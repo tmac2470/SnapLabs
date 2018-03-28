@@ -1,3 +1,5 @@
+# Snap Lab Android App
+
 ## Prerequisites
 
 Install Ionic and cordova:
@@ -60,3 +62,6 @@ Misc:
 * Add a new splash.png and icon.png under `resources` folder before doing this step.
 
       npm run resources
+
+# Fix android ssl issue
+- http://ivancevich.me/articles/ignoring-invalid-ssl-certificates-on-cordova-android-ios/
