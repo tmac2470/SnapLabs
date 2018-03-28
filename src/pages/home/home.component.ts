@@ -1,23 +1,23 @@
 // Angular
-import { Component } from "@angular/core";
+import { Component } from '@angular/core';
 // Ionic
-import { NavController, LoadingController } from "ionic-angular";
+import { NavController, LoadingController } from 'ionic-angular';
 // SnapApp
-import { ConnectPageComponent } from "../connect";
+import { ConnectPageComponent } from '../connect';
 import {
   SigninPageComponent,
   SignupPageComponent,
   AccountService
-} from "../account";
-import { ToastService } from "../core/service";
-import { InvestigationsPageComponent } from "../investigations";
-import { DownloadInvestigationsPageComponent } from "../download-investigations";
+} from '../account';
+import { ToastService } from '../core/service';
+import { InvestigationsPageComponent } from '../investigations';
+import { DownloadInvestigationsPageComponent } from '../download-investigations';
 import { SavedFilesPageComponent } from '../saved-files';
 
 @Component({
-  selector: "home-page-component",
-  templateUrl: "home.view.html",
-  styles: ["./home.styles.scss"]
+  selector: 'home-page-component',
+  templateUrl: 'home.view.html',
+  styles: ['./home.styles.scss']
 })
 export class HomePageComponent {
   connectPageComponent = ConnectPageComponent;
@@ -43,12 +43,16 @@ export class HomePageComponent {
     this._accountService.getUser().subscribe(user => {
       loading.dismiss();
       this.isLoggedIn = !!user && !!user.email;
+
+      if (!this.isLoggedIn) {
+        this.openPage(this.signupPageComponent);
+      }
     });
   }
 
   loading() {
     let loader = this._loadingCtrl.create({
-      content: "Please wait...",
+      content: 'Please wait...',
       duration: 3000
     });
     loader.present();

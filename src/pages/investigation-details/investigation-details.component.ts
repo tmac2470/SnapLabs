@@ -312,7 +312,7 @@ export class InvestigationDetailsPageComponent {
 
             chart.update();
           },
-          this.sampleIntervalTime
+          100
         );
 
         this._debouncedUpdateSensorValue[device.id] = _.throttle(
@@ -331,7 +331,7 @@ export class InvestigationDetailsPageComponent {
               }
             });
           },
-          this.sampleIntervalTime
+          100
         );
       });
 
