@@ -71,12 +71,19 @@ Misc:
 ## Build the development versions of the app
 
     npm run build:android:dev
-    npm run build:ios:dev
+
 
 ## Build the production versions of the app
 
-    npm run build:android:prod
-    npm run build:ios:prod
+    - ionic cordova build android --prod --release
+    - Copy android-release-unsigned.apk to build tools (path below)
+
+    - Build a certificate if you don't have one : keytool -genkey -v -keystore snap-prod-key.jks -keyalg RSA -keysize 2048 -validity 10000 -alias snap-prod-key
+    - cd <PATH>Library/Android/sdk/build-tools/27.0.3
+    - jarsigner -verbose -sigalg SHA1withRSA -digestalg SHA1 -keystore snap-prod-key.jks android-release-unsigned.apk snap-prod-key
+    - ./zipalign -v 4 android-release-unsigned.apk Snaplabs.apk
+    - ./apksigner verify Snaplabs.apk
+
 
 ## Generate the app splashscreens and icon
 
